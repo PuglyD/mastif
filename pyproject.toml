@@ -21,6 +21,7 @@ dev = [
     "ruff>=0.8",
     "ty",
     "import-linter>=2.1",
+    "pyserial>=3.5",
 ]
 docs = [
     "mkdocs-material>=9.5",
@@ -33,7 +34,11 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "SIM", "B", "D"]
-ignore = ["D105", "D107"]
+ignore = [
+    "D105", "D107",
+    "D301",  # doctest examples need real escapes like "\n"; raw docstrings would change them
+    "N818",  # TransportTimeout and IdentityMismatch read better without an Error suffix
+]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["D104"]  # test packages need no __init__ docstring
@@ -45,6 +50,7 @@ convention = "google"
 
 [tool.pytest.ini_options]
 testpaths = ["packages"]
+filterwarnings = ["error"]
 addopts = ["--import-mode=importlib", "--doctest-modules"]
 doctest_optionflags = ["ELLIPSIS", "NORMALIZE_WHITESPACE"]
 

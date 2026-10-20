@@ -1,0 +1,71 @@
+[project]
+name = "mastif-workspace"
+version = "0.0.0"
+description = "Workspace root for mastif, a domain-neutral ATE framework."
+requires-python = ">=3.12"
+dependencies = ["mastif", "mastif-testing"]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+mastif = { workspace = true }
+mastif-testing = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+    "ty",
+    "import-linter>=2.1",
+]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "SIM", "B", "D"]
+ignore = ["D105", "D107"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["D"]
+"spikes/**" = ["D"]
+"**/kernel/units.py" = ["N816"]  # unit symbols are case-significant (mV vs MV)
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+testpaths = ["packages"]
+addopts = ["--import-mode=importlib", "--doctest-modules"]
+doctest_optionflags = ["ELLIPSIS", "NORMALIZE_WHITESPACE"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.importlinter]
+root_package = "mastif"
+
+[[tool.importlinter.contracts]]
+name = "Core layering"
+type = "layers"
+# Layers in parentheses are optional until the package exists.
+layers = [
+    "(mastif.cli)",
+    "(mastif.api)",
+    "(mastif.engine)",
+    "(mastif.station)",
+    "(mastif.resources)",
+    "mastif.kernel",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["mastif", "mastif_testing"]

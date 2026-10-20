@@ -170,5 +170,5 @@ Number ADRs sequentially. Never edit an accepted ADR's decision; supersede it wi
       context on where they fit (see `AGENTS.md`).
 - [ ] Tests use fakes, not mocks. Pure functions have direct unit tests.
 - [ ] There's an ADR if section 5 applies.
-- [ ] No employer or customer identifiers anywhere, and no copied code.
+- [ ] No employer or customer identifiers; reference projects used for inspiration only, nothing pasted.
 - [ ] Any new dependency has a permissive licence.

@@ -5,14 +5,22 @@ It provides a core (test execution engine, instrument/DUT primitives, results, e
 and a generic API. Organisations build their own SDK (contracts, drivers, DUT types,
 loop types) and UI on top of it.
 
-## Clean-room rules (non-negotiable)
+## Building from scratch (non-negotiable)
 
-- Write all code from first principles. **Never copy code, text, data or file layouts** from
-  other repositories on this machine (earlier attempts, legacy tools, driver
-  collections). Do not open them while
-  working here.
+- mastif is a **from-scratch implementation**. Other projects in the parent directory
+  (earlier mastif attempts, legacy test tools, driver collections, design session notes)
+  may be read freely as **inspiration and reference**:
+  - what problems a real station has
+  - which designs worked and which caused pain
+  - how an instrument protocol behaves
+- What comes back from them is **understanding, not material**. Write every line here
+  fresh, designed for a domain-neutral framework:
+  - don't paste code, docstrings, data files or test fixtures from those projects
+  - don't mechanically port a module
 - **No customer or employer identifiers** anywhere: company names, product names, part
-  numbers, protocol/ICD terms, site names, people. Examples use the fictional orgs `demo`
+  numbers, protocol/ICD terms, site names, people, internal IPs or paths. If a reference
+  project uses a product-specific concept, generalise it (e.g. a product's firmware
+  configuration becomes an org-defined loop type). Examples use the fictional orgs `demo`
   and `acme` and simulated devices.
 - Dependencies must use permissive licences (MIT, BSD, Apache-2.0, PSF). No GPL/AGPL/LGPL.
 
@@ -44,6 +52,9 @@ mastif.cli  →  mastif.api  →  mastif.engine  →  mastif.station  →  masti
 - pytest, Arrange / Act / Assert.
 - Use **fakes** (from `mastif-testing` or local), not mocks.
 - Every pure function gets direct unit tests; plan expansion and reports get golden tests.
+- Every test module and test function has a docstring. A test's docstring states the
+  behaviour it pins down and why that behaviour matters to users. Parametrised tests
+  document their parameters under `Args:`.
 - Docstring examples are written as doctests (`>>>`) and run by `uv run pytest`
   (`--doctest-modules`), so they can never go stale.
 

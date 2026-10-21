@@ -26,3 +26,4 @@ nav:
       - adr/0000-template.md
       - adr/0001-home-grown-units.md
       - adr/0002-result-model.md
+      - adr/0003-resource-model.md

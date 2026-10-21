@@ -528,6 +528,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "import-linter" },
+    { name = "pyserial" },
     { name = "pytest" },
     { name = "ruff" },
     { name = "ty" },
@@ -546,6 +547,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "import-linter", specifier = ">=2.1" },
+    { name = "pyserial", specifier = ">=3.5" },
     { name = "pytest", specifier = ">=8.3" },
     { name = "ruff", specifier = ">=0.8" },
     { name = "ty" },

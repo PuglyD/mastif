@@ -432,7 +432,9 @@ def dut(
     Args:
         driver_id: Unique id ``"<org>.<name>"``.
         provides: Contracts the DUT itself implements (often none).
-        state: Pydantic model for the DUT's live state (firmware loaded, mode...).
+        state: Pydantic model for the DUT's live state (firmware loaded, mode...). mastif
+            creates ``self.state`` from it. Also annotate ``state: MyState`` on the class,
+            so type checkers know the attribute exists.
 
     Returns:
         A class decorator.
@@ -445,6 +447,7 @@ def dut(
         >>> @dut("demo.board-x", state=BoardState)
         ... class BoardX:
         ...     console: Shell = channel()
+        ...     state: BoardState
         >>> spec_of(BoardX).kind, list(spec_of(BoardX).channels)
         ('dut', ['console'])
     """

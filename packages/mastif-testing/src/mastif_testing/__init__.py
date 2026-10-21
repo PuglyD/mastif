@@ -12,6 +12,14 @@ Example:
     'PSU-X'
 """
 
+from mastif_testing.conformance import LifecycleReport, assert_satisfies, check_lifecycle
 from mastif_testing.fakes import FakeDatagramPeer, FakeLineIO, FakeStream
 
-__all__ = ["FakeDatagramPeer", "FakeLineIO", "FakeStream"]
+__all__ = [
+    "FakeDatagramPeer",
+    "FakeLineIO",
+    "FakeStream",
+    "LifecycleReport",
+    "assert_satisfies",
+    "check_lifecycle",
+]

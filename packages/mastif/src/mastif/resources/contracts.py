@@ -269,8 +269,10 @@ def contract_problems(cls: type, proto: type) -> list[ContractProblem]:
         ...     def clear(self) -> None: ...
         >>> class HalfSwitch:
         ...     def route(self, a): ...
-        >>> [str(p) for p in contract_problems(HalfSwitch, Switch)]
-        ['route: incompatible parameters', 'clear: missing']
+        >>> for problem in contract_problems(HalfSwitch, Switch):
+        ...     print(problem)
+        route: incompatible parameters
+        clear: missing
     """
     problems: list[ContractProblem] = []
     for name, required in contract_members(proto).items():

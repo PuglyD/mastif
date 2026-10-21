@@ -26,3 +26,15 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
   - built-in `mastif.udp` and `mastif.line-shell` channel drivers
 - `mastif.station`: YAML `StationProfile` with sim overlay, `Station` as the composition root with role resolution and preflight checks, and `ResourceManager` covering ordered open, identity and health checks, rollback, safe state and close.
 - `mastif-testing`: `FakeLineIO`, `FakeStream`, `FakeDatagramPeer`, `assert_satisfies`, `check_lifecycle`.
+
+### Documentation
+
+- One comprehensive ADR per module (0003–0025), plus cross-cutting ADRs for layering (0001) and the error model (0002). These replace the earlier three summary ADRs.
+- A wiki for new engineers, covering:
+  - start here, architecture, and the life of a station
+  - a page per layer
+  - an error map and a glossary
+  - guides for writing drivers, DUT types and station profiles, and for testing drivers
+  - working on mastif, and the roadmap
+- API reference pages generated from docstrings.
+- `AGENTS.md` and `CONTRIBUTING.md` now require an ADR for every module and wiki updates in the same branch, and `mkdocs build --strict` is part of the checks.

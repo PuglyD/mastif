@@ -14,9 +14,10 @@ uv run pytest                             # unit tests + docstring examples (doc
 uv run ruff check . && uv run ruff format --check .
 uv run ty check                           # static types
 uv run lint-imports                       # layer boundaries
+uv run mkdocs build --strict              # wiki + ADRs build with no broken links
 ```
 
-All five commands must pass before a branch is merged.
+All six commands must pass before a branch is merged.
 
 ---
 
@@ -149,26 +150,38 @@ Rules:
 
 ---
 
-## 5. Changes that need an ADR
+## 5. ADRs and the wiki
 
-Write an Architecture Decision Record in `docs/adr/`, copied from `0000-template.md`, when a change:
+The full rules are in [`AGENTS.md`](AGENTS.md) under *Documentation*. In short:
 
-- adds or changes a public extension point (contracts, drivers, loops, events)
-- changes a stored or transmitted format (events, snapshots, station or plan YAML)
-- adds a runtime dependency
-- reverses or amends an existing ADR
+- **Every new module gets its own ADR**, written from `docs/adr/0000-template.md` with
+  every section filled in: the problem from first principles, where the module sits in
+  the system, the abstractions, data flow, errors, invariants, consequences,
+  alternatives, open questions and a code map.
+- **Cross-cutting decisions get an ADR too.** These are decisions such as layering,
+  error handling, stored formats and new runtime dependencies.
+- **A change to a module's behaviour updates its ADR** in the same branch, with a line
+  added to *History*. Reversing a decision needs a new ADR that supersedes the old one.
+- **The wiki (`docs/wiki/`) is updated in the same branch.** That covers:
+  - the layer page and the flow pages
+  - the glossary, for new terms
+  - the error map, for new exceptions
+  - a guide, for new extension points
 
-Number ADRs sequentially. Never edit an accepted ADR's decision; supersede it with a new one.
+  Write for an engineer who joined today.
+
+Number ADRs sequentially and add them to the `mkdocs.yml` nav.
 
 ---
 
 ## 6. Pull request / merge checklist
 
 - [ ] The branch name follows git flow, and the commits follow Conventional Commits.
-- [ ] `pytest`, `ruff`, `ty` and `lint-imports` all pass.
+- [ ] `pytest`, `ruff`, `ty`, `lint-imports` and `mkdocs build --strict` all pass.
 - [ ] New public functions have Google-style docstrings with a runnable `Example:` and
       context on where they fit (see `AGENTS.md`).
 - [ ] Tests use fakes, not mocks. Pure functions have direct unit tests.
-- [ ] There's an ADR if section 5 applies.
+- [ ] Every new module has its own complete ADR, and changed modules have their ADRs updated.
+- [ ] The wiki is updated: layer page, flows, glossary, error map and guides as relevant.
 - [ ] No employer or customer identifiers; reference projects used for inspiration only, nothing pasted.
 - [ ] Any new dependency has a permissive licence.

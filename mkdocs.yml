@@ -1,4 +1,5 @@
 site_name: mastif
+site_description: A domain-neutral framework for automated test equipment
 theme:
   name: material
   palette:
@@ -6,24 +7,85 @@ theme:
       toggle: {icon: material/brightness-7, name: Dark mode}
     - scheme: slate
       toggle: {icon: material/brightness-4, name: Light mode}
-  features: [navigation.tabs, content.code.copy]
+  features: [navigation.tabs, navigation.sections, navigation.top, content.code.copy, search.highlight]
 markdown_extensions:
   - admonition
+  - def_list
+  - tables
+  - toc: {permalink: true}
   - pymdownx.superfences:
       custom_fences:
-        - {name: mermaid, class: mermaid, format: !!python/name:pymdownx.superfences.fence_code_format}
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 plugins:
   - search
   - mkdocstrings:
       handlers:
         python:
-          paths: [packages/mastif/src]
-          options: {docstring_style: google}
+          paths: [packages/mastif/src, packages/mastif-testing/src]
+          options:
+            docstring_style: google
+            show_source: false
+            members_order: source
+            show_root_heading: true
 nav:
   - Home: index.md
-  - Plan: plan.md
+  - Wiki:
+      - Start here: wiki/start-here.md
+      - Architecture: wiki/architecture.md
+      - Life of a station: wiki/life-of-a-station.md
+      - Layers:
+          - Kernel: wiki/kernel.md
+          - Resources: wiki/resources.md
+          - Transports: wiki/transports.md
+          - Station: wiki/station.md
+          - Testing kit: wiki/testing-kit.md
+      - Guides:
+          - Write a driver: wiki/guides/write-a-driver.md
+          - Write a DUT type: wiki/guides/write-a-dut.md
+          - Write a station profile: wiki/guides/write-a-station-profile.md
+          - Test your driver: wiki/guides/test-your-driver.md
+      - Error map: wiki/errors.md
+      - Glossary: wiki/glossary.md
+      - Working on mastif: wiki/working-on-mastif.md
+      - Roadmap: wiki/roadmap.md
   - Decisions:
-      - adr/0000-template.md
-      - adr/0001-home-grown-units.md
-      - adr/0002-result-model.md
-      - adr/0003-resource-model.md
+      - Index: adr/index.md
+      - Template: adr/0000-template.md
+      - Cross-cutting:
+          - 0001 Layered architecture: adr/0001-layered-architecture.md
+          - 0002 Error model: adr/0002-error-model.md
+      - Kernel:
+          - 0003 Units: adr/0003-units.md
+          - 0004 Limits and evaluation: adr/0004-limits-and-evaluation.md
+          - 0005 Verdicts and aggregation: adr/0005-verdicts-and-aggregation.md
+          - 0006 Results: adr/0006-results.md
+          - 0007 Identifiers: adr/0007-identifiers.md
+      - Resources:
+          - 0008 Contracts: adr/0008-contracts.md
+          - 0009 Standard contracts: adr/0009-standard-contracts.md
+          - 0010 Identity and health: adr/0010-identity-and-health.md
+          - 0011 Drivers and DUTs: adr/0011-drivers-and-duts.md
+          - 0012 Driver registry: adr/0012-driver-registry.md
+          - 0013 Transport configuration: adr/0013-transport-configuration.md
+          - 0014 Byte streams: adr/0014-byte-streams.md
+          - 0015 Line I/O: adr/0015-line-io.md
+          - 0016 SCPI: adr/0016-scpi.md
+          - 0017 Datagram channel: adr/0017-datagram-channel.md
+          - 0018 I/O injection: adr/0018-io-injection.md
+          - 0019 Built-in UDP channel: adr/0019-builtin-udp-channel.md
+          - 0020 Built-in line shell: adr/0020-builtin-line-shell.md
+      - Station:
+          - 0021 Station profile: adr/0021-station-profile.md
+          - 0022 Resource manager: adr/0022-resource-manager.md
+          - 0023 Station composition root: adr/0023-station-composition-root.md
+      - Testing kit:
+          - 0024 Testing fakes: adr/0024-testing-fakes.md
+          - 0025 Conformance kit: adr/0025-conformance-kit.md
+  - API reference:
+      - Kernel: reference/kernel.md
+      - Resources: reference/resources.md
+      - Station: reference/station.md
+      - mastif-testing: reference/testing.md
+  - Plan: plan.md

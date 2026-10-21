@@ -71,9 +71,69 @@ uv run pytest
 uv run ruff check . && uv run ruff format --check .
 uv run ty check
 uv run lint-imports
+uv run mkdocs build --strict
 ```
+
+## Documentation (non-negotiable)
+
+Documentation is part of the change, not a follow-up. A branch that adds or changes code
+is not done until its ADRs and wiki pages are done too.
+
+**Audience.** Write every ADR and wiki page for a capable engineer who joined the project
+today and knows nothing about it. They should come away understanding *what* exists,
+*why* it exists, and *how it connects to the rest of the system*.
+
+**Style.**
+- **First principles.** Start from the real-world problem, e.g. "a cable falls out
+  mid-run", and derive the design from it. Never start from the code.
+- **Systems thinking.** Always place the thing in the wider system: what calls it, what
+  it calls, what flows through it, and what breaks if it's wrong.
+- Be precise and technical, but explain every term the first time it appears, and link
+  to the glossary.
+
+**An ADR for every module.** Every new module, meaning any new `.py` file with public
+API, gets its own ADR in `docs/adr/`, written from `docs/adr/0000-template.md` with all
+of its sections filled in:
+- the problem from first principles, and the forces and constraints in play
+- where the module sits in the system, with upstream and downstream relations and a
+  diagram
+- the decision
+- **every abstraction**: purpose, invariants and key behaviour of each public type and
+  function
+- the **data flow**, as a mermaid diagram plus a step-by-step walk-through
+- **every exception**: when it's raised, what it means, who should catch it and what
+  they should do
+- guarantees and invariants
+- consequences, including the negatives
+- alternatives considered and why they were rejected
+- open questions
+- a code map
+
+Cross-cutting decisions get their own ADRs too, e.g. layering or the error model.
+
+**Keep ADRs current.**
+- When a module's behaviour changes, update its ADR in the same branch and add a line
+  to its *History* section.
+- Reversing a decision requires a new ADR that supersedes the old one.
+
+**The wiki (`docs/wiki/`).** Keep the wiki in step with the code:
+- each layer's page
+- the end-to-end flow pages
+- the glossary
+- the error map
+- the guides
+
+New concepts get a glossary entry. New exceptions go into the error map. New extension
+points get a how-to guide.
+
+**Docstrings.** Every docstring has a runnable example and a sentence on where the code
+fits in the system (see Code style).
+
+**Check.** `uv run mkdocs build --strict` must pass, with no broken links or missing nav
+entries.
 
 ## Decisions
 
 Architecture decisions are recorded in `docs/adr/` (template: `docs/adr/0000-template.md`).
-Read the ADRs before changing anything they cover.
+Read the ADRs before changing anything they cover; start with ADR-0001 (layering) and
+ADR-0002 (error model).

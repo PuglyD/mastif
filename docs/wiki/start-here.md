@@ -43,11 +43,12 @@ flowchart TB
         engine["engine (planned): runs plans"]
         station["station: one bench from a YAML profile"]
         resources["resources: contracts, drivers, transports"]
+        infra["infra: settings, logging, versions"]
         kernel["kernel: units, limits, verdicts, results"]
     end
     ui --> engine
     tests --> engine
-    engine --> station --> resources --> kernel
+    engine --> station --> resources --> infra --> kernel
     sdk --> resources
 ```
 
@@ -90,6 +91,7 @@ mastif-oss/
 ├── packages/
 │   ├── mastif/src/mastif/
 │   │   ├── kernel/        units, limits, verdict, results, ids, errors
+│   │   ├── infra/         config (settings), logs, version, bootstrap, errors
 │   │   ├── resources/     contracts, std, identity, driver, registry, errors
 │   │   │   ├── transports/   config, stream, lineio, scpi, datagram, factory
 │   │   │   └── channels/     built-in mastif.udp and mastif.line-shell
@@ -109,7 +111,8 @@ mastif-oss/
 |---|---|---|
 | 1 | [Architecture](architecture.md) | The layers and the rules between them |
 | 2 | [Kernel](kernel.md) | The vocabulary everything else speaks |
-| 3 | [Resources](resources.md) and [Transports](transports.md) | How hardware is described and reached |
+| 3 | [Infra](infra.md) | Settings, logging and versions: how an application starts |
+| 3b | [Resources](resources.md) and [Transports](transports.md) | How hardware is described and reached |
 | 4 | [Station](station.md) | How a bench comes together and stays safe |
 | 5 | [Life of a station](life-of-a-station.md) | Everything above, as one flow |
 | 6 | [Write a driver](guides/write-a-driver.md) | Do it yourself |

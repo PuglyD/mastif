@@ -84,6 +84,7 @@ flowchart LR
      | a `DriverConfig` subclass | the validated config |
      | one of `IO_TYPES` (`StreamTransport`, `LineIO`, `Scpi`, `DatagramChannel`) | built I/O |
      | `logging.Logger` | a logger named after the resource |
+     | `Settings` (`mastif.infra.config`) | the application settings given to `Station.build(settings=...)` (ADR-0026) |
      | anything else | must have a default |
 
    - Asking for I/O requires a `transport` field on `Config`.
@@ -127,11 +128,11 @@ flowchart LR
 | `NoConfig` | Config of drivers without one | Accepts only `{}`. |
 | `channel(*, optional)` | Declare a DUT channel | Must be annotated with a contract. |
 | `ChannelSpec(name, contract, optional)` | Recorded channel declaration | Stored in `DriverSpec.channels`. |
-| `DriverSpec` | Everything learned at decoration | Fields: `id`, `cls`, `kind`, `provides`, `config_model`, `config_param`, `io_params`, `logger_param`, `channels`, `state_model`. Frozen. |
+| `DriverSpec` | Everything learned at decoration | Fields: `id`, `cls`, `kind`, `provides`, `config_model`, `config_param`, `io_params`, `logger_param`, `channels`, `state_model`, `settings_param`. Frozen. |
 | `DriverSpec.provides_contract(p)` | Can this driver serve role type `p`? | Declared, or structurally satisfied. |
 | `spec_of(cls)` / `is_driver(obj)` | Read or detect a spec | `spec_of` raises `DriverDefinitionError` on undecorated classes. |
 | `BuiltResource(name, spec, instance, config, io)` | A constructed driver plus its I/O | `io` lists injected objects in parameter order; the station opens them before the driver. |
-| `build_resource(...)` | Construct from a profile config | No I/O. Raises `ValidationError` or `DriverDefinitionError`. |
+| `build_resource(..., settings=None)` | Construct from a profile config | No I/O. Raises `ValidationError` or `DriverDefinitionError`, or `ResourceError` if the driver needs settings and none were given. |
 | `call_hook` / `has_hook` | Optional hook helpers | A missing hook gives `None` / `False`. |
 | `make_safe(built)` | Reach the safe state | Driver hook first, else contract actions. Returns bool. |
 | `LIFECYCLE_HOOKS` | The recognised hook names | `open, identify, health, safe_state, close` (plus `children`, used by the station). |
@@ -225,3 +226,6 @@ Hooks may raise anything. The station handles hook errors (ADR-0022).
 ## History
 
 - 2026-10-21: created. Replaces part of the old ADR-0003, "resource model".
+- 2026-10-25: drivers can receive the application settings by annotating an `__init__`
+  parameter with `Settings` (dependency injection; ADR-0026). The injection rules are
+  now an internal `_InitPlan`.

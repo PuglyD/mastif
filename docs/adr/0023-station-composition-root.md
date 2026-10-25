@@ -60,7 +60,7 @@ flowchart LR
 ## 4. Decision
 
 1. **`Station.build(profile, registry, *, sim=False, io_factory=build_io,
-   listener=None, logger=None)`**. For each entry in `profile.entries(sim)`:
+   listener=None, logger=None, settings=None)`**. For each entry in `profile.entries(sim)`:
    - look up the driver; `DriverNotFound` becomes `StationError("resource 'x': ...")`
    - call `build_resource`; config `ValidationError`s become `StationError` with
      `location: message` details, and `DriverDefinitionError` (e.g. an impossible I/O
@@ -99,7 +99,7 @@ flowchart LR
 | Name | Purpose | Invariants and behaviour |
 |---|---|---|
 | `Station` | Built station | Holds `profile`, `handles`, `sim`, `manager`. `name` is the profile's station name. |
-| `Station.build(...)` | Composition root | No I/O. Raises `StationError` on any wiring problem. |
+| `Station.build(..., settings=None)` | Composition root | No I/O. Raises `StationError` on any wiring problem, including a driver needing settings when none were given. Keeps the settings as `station.settings`. |
 | `resource(name)` | Handle by profile name | Raises `StationError` if unknown. |
 | `role(role)` | Object playing a role | Raises `RoleError`. |
 | `require(role, contract)` | Role, checked against a contract | Raises `RoleError`. |
@@ -181,3 +181,6 @@ sequenceDiagram
 ## History
 
 - 2026-10-21: created.
+- 2026-10-25: `Station.build(settings=...)` passes the application settings (ADR-0026) to
+  every driver and channel that asks for them. A driver needing settings on a station
+  built without them is a `StationError`.

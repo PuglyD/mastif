@@ -37,6 +37,7 @@ nav:
       - Life of a station: wiki/life-of-a-station.md
       - Layers:
           - Kernel: wiki/kernel.md
+          - Infra: wiki/infra.md
           - Resources: wiki/resources.md
           - Transports: wiki/transports.md
           - Station: wiki/station.md
@@ -46,6 +47,7 @@ nav:
           - Write a DUT type: wiki/guides/write-a-dut.md
           - Write a station profile: wiki/guides/write-a-station-profile.md
           - Test your driver: wiki/guides/test-your-driver.md
+          - Bootstrap an application: wiki/guides/bootstrap-an-application.md
       - Error map: wiki/errors.md
       - Glossary: wiki/glossary.md
       - Working on mastif: wiki/working-on-mastif.md
@@ -83,8 +85,14 @@ nav:
       - Testing kit:
           - 0024 Testing fakes: adr/0024-testing-fakes.md
           - 0025 Conformance kit: adr/0025-conformance-kit.md
+      - Infra:
+          - 0026 Settings: adr/0026-settings.md
+          - 0027 Logging: adr/0027-logging.md
+          - 0028 Version information: adr/0028-version-information.md
+          - 0029 Bootstrap: adr/0029-bootstrap.md
   - API reference:
       - Kernel: reference/kernel.md
+      - Infra: reference/infra.md
       - Resources: reference/resources.md
       - Station: reference/station.md
       - mastif-testing: reference/testing.md

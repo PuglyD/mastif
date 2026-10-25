@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | accepted |
 | **Date** | 2026-10-21 |
-| **Module(s)** | `mastif.kernel.errors`, `mastif.resources.errors`, `mastif.station.errors` |
+| **Module(s)** | `mastif.kernel.errors`, `mastif.infra.errors`, `mastif.resources.errors`, `mastif.station.errors` |
 | **Layer** | cross-cutting (each layer owns its errors) |
 | **Related** | ADR-0001 (layers); ADR-0005 (verdicts: how errors become ERROR); every module ADR's *Errors* section |
 
@@ -47,6 +47,9 @@ outcome in testing: shipping a bad unit with a PASS record.
 flowchart TB
     ME[MastifError] --> UE[UnitError]
     ME --> LE[LimitsError]
+    ME --> IE[InfraError]
+    IE --> CE[ConfigError]
+    IE --> VE[VersionError]
     ME --> RE[ResourceError]
     ME --> SE[StationError]
     RE --> DDE[DriverDefinitionError] --> CM[ContractMismatch]
@@ -91,6 +94,9 @@ flowchart TB
 | `MastifError` | kernel | Root: "mastif failed" | never raised directly |
 | `UnitError` | kernel | Incompatible units, or a meaningless dB operation | `Quantity`, `convert`, `evaluate` |
 | `LimitsError` | kernel | Malformed limits or table; no limits for an index | `Range`, `Limits`, `IndexedLimits`, `Table` |
+| `InfraError` | infra | Root of infrastructure errors | — |
+| `ConfigError` | infra | Settings can't be loaded; a section is missing or invalid; invalid logging config | `create_settings`, `section`, `configure_logging` |
+| `VersionError` | infra | A distribution isn't installed, or its version can't be parsed | `PackageVersion`, `VersionInfo.load` |
 | `ResourceError` | resources | Root of hardware-side errors | — |
 | `DriverDefinitionError` | resources | An org's driver class is wrong (bad id, `Config`, `__init__`) | `@driver`, `@dut`, `build_io` |
 | `ContractMismatch` | resources | A driver lacks or mis-declares contract methods | `check_provides` |
@@ -189,6 +195,7 @@ This ADR is the error catalogue. Who should catch what:
 | What | Where |
 |---|---|
 | Root and kernel errors | `packages/mastif/src/mastif/kernel/errors.py` |
+| Infra errors | `packages/mastif/src/mastif/infra/errors.py` |
 | Resource errors | `packages/mastif/src/mastif/resources/errors.py` |
 | Station errors | `packages/mastif/src/mastif/station/errors.py` |
 | Wiki error map | `docs/wiki/errors.md` |
@@ -197,3 +204,6 @@ This ADR is the error catalogue. Who should catch what:
 
 - 2026-10-21: created. Consolidates the error notes from the old result-model and
   resource-model ADRs.
+- 2026-10-25: added `InfraError`, `ConfigError` and `VersionError` for the new infra
+  layer. `ResourceError` is now also raised when a driver needs settings that weren't
+  provided.

@@ -6,6 +6,7 @@
 |---|---|---|
 | Repository | uv workspace, ruff, ty, pytest + doctests, import-linter, mkdocs, git flow | 0001 |
 | Kernel | units, limits, verdicts, results, ids, errors | 0002–0007 |
+| Infra | Dynaconf settings by dependency injection, logging (Rich console, rotating file, tables), version and build info, bootstrap | 0026–0029 |
 | Resources | contracts, std contracts, identity/health, `@driver`/`@dut`, registry, transports (TCP, serial, VISA, lines, SCPI, UDP), built-in channels | 0008–0020 |
 | Station | profile with roles and sim overlay; composition root; resource manager | 0021–0023 |
 | Testing kit | fakes; conformance helpers | 0024–0025 |

@@ -24,6 +24,14 @@ where it lives.
 : A named way into a DUT, declared on the DUT class as `console: Shell = channel()`.
   It is mapped in the profile to a channel driver. ADR-0011, ADR-0023.
 
+**Bootstrap**
+: The single start-up call (`mastif.infra.bootstrap`): load settings, configure logging,
+  record the version. Returns a `Runtime`. ADR-0029.
+
+**Build info**
+: Git information embedded into a wheel at build time (`_build_info.py`), so installed
+  software knows its commit. ADR-0028.
+
 **Children**
 : Sub-resources a composite driver reports once open, e.g. the axes of a positioner
   controller. They are reachable by role as `resource.child`.
@@ -43,6 +51,10 @@ where it lives.
 **DriverSpec**
 : The record `@driver`/`@dut` attaches to a class: id, provided contracts, config model,
   injected parameters, channels and state model. ADR-0011.
+
+**Dynaconf**
+: The configuration library behind mastif's `Settings`: multi-format files, merging,
+  environment-variable overrides. ADR-0026.
 
 **Driver**
 : A class marked `@driver("org.name", provides=[...])` holding the knowledge of one
@@ -75,6 +87,10 @@ where it lives.
 **FAIL (verdict)**
 : The unit did not meet a limit or check.
 
+**GitInfo / VersionInfo**
+: Which commit and package version produced a run; `source` says whether it was
+  embedded, captured live, or unavailable. ADR-0028.
+
 **Health**
 : Whether a resource is fit for use right now (`Health(ok, detail, readings)`). An
   unhealthy resource is refused when the station opens. ADR-0010.
@@ -86,6 +102,10 @@ where it lives.
 **Injection (of I/O)**
 : The station builds the I/O object a driver asks for in its `__init__` annotation, from
   the profile's `transport:` block. ADR-0018.
+
+**Infra**
+: The layer above the kernel for application plumbing: settings, logging, version
+  information. ADR-0001, ADR-0026–0029.
 
 **Kernel**
 : The bottom layer: units, limits, verdicts, results, ids and errors. It is pure, with
@@ -149,12 +169,21 @@ where it lives.
 : A special return value meaning "failed", such as `0.0`, `None` or `-1`. Forbidden in
   mastif. Errors are raised instead. ADR-0002.
 
+**Settings**
+: The one Dynaconf object holding an application's configuration, built once at
+  start-up and passed explicitly (dependency injection). `section()` gives typed views.
+  ADR-0026.
+
 **Sim / simulation mode**
 : Building a station with `sim=True`, which swaps in the profile's `sim:` entries.
 
 **Slot**
 : One DUT position on a multi-DUT fixture. It is carried in ids and profiles today, and
   will be used later. ADR-0007.
+
+**TRACE / SUCCESS**
+: Extra log levels: TRACE (5) for raw protocol traffic, SUCCESS (25) for positive
+  milestones. ADR-0027.
 
 **Transport**
 : How bytes or messages reach a device: TCP, serial, VISA or UDP. ADR-0013–0017.

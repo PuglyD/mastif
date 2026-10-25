@@ -17,11 +17,12 @@ mastif is split into layers, stacked so that each one may only use the layers be
 it. From the bottom up they are:
 
 1. `kernel` (pure vocabulary: units, limits, results)
-2. `resources` (how to describe and talk to hardware)
-3. `station` (one physical bench, built from a profile)
-4. `engine` (running tests; planned)
-5. `api` (stable public surface; planned)
-6. `cli` (command line; planned)
+2. `infra` (settings, logging, version information)
+3. `resources` (how to describe and talk to hardware)
+4. `station` (one physical bench, built from a profile)
+5. `engine` (running tests; planned)
+6. `api` (stable public surface; planned)
+7. `cli` (command line; planned)
 
 On top sit two things mastif never imports: **organisation SDKs** (an org's own
 contracts, drivers and DUT types) and **UIs**. The one idea to remember: *dependencies
@@ -68,6 +69,7 @@ flowchart TB
         engine["mastif.engine (planned)"]
         station["mastif.station"]
         resources["mastif.resources"]
+        infra["mastif.infra"]
         kernel["mastif.kernel"]
     end
     testing["mastif-testing (fakes, conformance)"]
@@ -75,7 +77,7 @@ flowchart TB
     tests --> api
     sdk --> resources
     sdk --> kernel
-    cli --> api --> engine --> station --> resources --> kernel
+    cli --> api --> engine --> station --> resources --> infra --> kernel
     testing --> resources
     engine -.discovers via entry points.-> sdk
     engine -.discovers via entry points.-> tests
@@ -86,9 +88,9 @@ points, without importing by name".
 
 ## 4. Decision
 
-1. **Six layers, in a strict order:** `cli → api → engine → station → resources →
-   kernel`. A module may import from its own layer and from layers to its right
-   (below it), never from layers to its left.
+1. **Seven layers, in a strict order:** `cli → api → engine → station → resources →
+   infra → kernel`. A module may import from its own layer and from layers to its
+   right (below it), never from layers to its left.
 2. **`kernel` is pure.** It does no I/O, uses no threads, and touches no hardware or
    clock other than for generating ids. It may use Pydantic.
 3. **The core never imports org code.** Org drivers, DUT types, loop types and test
@@ -115,6 +117,7 @@ points, without importing by name".
 | Layer | Responsibility | Typical contents | Status |
 |---|---|---|---|
 | `kernel` | The shared vocabulary every layer speaks | `Quantity`, `Limits`, `Verdict`, `Measurement`, `Position`, `MastifError` | built |
+| `infra` | Application plumbing: one settings object passed by dependency injection, logging set-up, version and build information | `create_settings`, `section`, `configure_logging`, `VersionInfo`, `bootstrap` | built |
 | `resources` | Describing hardware and talking to it | contracts, `@driver`/`@dut`, transports, `Registry` | built |
 | `station` | One physical bench: which resources exist, where, under which role names, and their lifecycle | `StationProfile`, `Station`, `ResourceManager` | built |
 | `engine` | Running test plans: tasks, loops, results, events, snapshots | `Task`, plan expansion, runner, run store | planned |
@@ -222,3 +225,7 @@ single root, `MastifError`. See ADR-0002.
 ## History
 
 - 2026-10-21: created. Replaces the informal layering notes in the step-1 plan.
+- 2026-10-25: added the `infra` layer between `kernel` and `resources` (ADR-0026 to
+  ADR-0029). It does I/O (files, environment, git), so it can't live in the pure
+  kernel, while drivers and the station must still be able to receive settings and
+  loggers.

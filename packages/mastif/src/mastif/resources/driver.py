@@ -47,6 +47,7 @@ from typing import Any, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 
+from mastif.infra.config import Settings
 from mastif.resources.contracts import check_provides, contract_info
 from mastif.resources.errors import DriverDefinitionError, ResourceError
 from mastif.resources.transports.config import TransportConfig
@@ -190,6 +191,8 @@ class DriverSpec:
         config_param: Name of the ``__init__`` parameter receiving the config, if any.
         io_params: ``__init__`` parameter name to the I/O type to inject.
         logger_param: Name of the ``__init__`` parameter receiving a logger, if any.
+        settings_param: Name of the ``__init__`` parameter receiving the application
+            settings (annotated `mastif.infra.config.Settings`), if any.
         channels: Declared channels, by name.
         state_model: Pydantic model for the resource's live state, if declared.
 
@@ -210,6 +213,7 @@ class DriverSpec:
     logger_param: str | None
     channels: dict[str, ChannelSpec] = field(default_factory=dict)
     state_model: type[BaseModel] | None = None
+    settings_param: str | None = None
 
     def provides_contract(self, proto: type) -> bool:
         """Tell whether resources of this driver can serve a role needing ``proto``.
@@ -255,55 +259,73 @@ def _hints(fn: Callable[..., Any], cls: type) -> dict[str, Any]:
         raise DriverDefinitionError(f"{cls.__name__}: cannot resolve annotations: {exc}") from exc
 
 
-def _inspect_init(
-    driver_id: str, cls: type, config_model: type[DriverConfig]
-) -> tuple[str | None, dict[str, type], str | None]:
-    """Work out which ``__init__`` parameters receive the config, I/O objects and a logger.
+@dataclass
+class _InitPlan:
+    """Which ``__init__`` parameters receive which injected values.
 
-    Rules: a parameter annotated with the driver's ``Config`` (or any `DriverConfig`)
-    gets the validated config. One annotated with an injectable I/O type gets that I/O.
-    One annotated ``logging.Logger`` gets a logger. Any other parameter must have a
-    default value.
+    Example:
+        ``def __init__(self, cfg: Config, io: Scpi)`` gives
+        ``_InitPlan(config_param="cfg", io_params={"io": Scpi})``.
+    """
+
+    config_param: str | None = None
+    io_params: dict[str, type] = field(default_factory=dict)
+    logger_param: str | None = None
+    settings_param: str | None = None
+
+
+def _inspect_init(driver_id: str, cls: type, config_model: type[DriverConfig]) -> _InitPlan:
+    """Work out which ``__init__`` parameters receive the config, I/O, logger and settings.
+
+    The rules, by annotation:
+
+    - the driver's ``Config`` (or any `DriverConfig`): the validated config
+    - an injectable I/O type: that I/O
+    - ``logging.Logger``: a logger named after the resource
+    - `mastif.infra.config.Settings`: the application settings given to the station
+
+    Any other parameter must have a default value.
 
     Returns:
-        ``(config_param, io_params, logger_param)``.
+        The injection plan.
 
     Raises:
         DriverDefinitionError: For parameters mastif can't supply, or I/O without a
             ``transport`` config field.
 
     Example:
-        ``def __init__(self, cfg: Config, io: Scpi)`` gives ``("cfg", {"io": Scpi}, None)``.
+        ``def __init__(self, cfg: Config, io: Scpi, settings: Settings)`` gives
+        ``config_param="cfg"``, ``io_params={"io": Scpi}``, ``settings_param="settings"``.
     """
+    plan = _InitPlan()
     init = cls.__init__
     if init is object.__init__:
-        return None, {}, None
+        return plan
     hints = _hints(init, cls)
-    config_param: str | None = None
-    logger_param: str | None = None
-    io_params: dict[str, type] = {}
     params = list(inspect.signature(init).parameters.values())[1:]
     for p in params:
         if p.kind in (p.VAR_POSITIONAL, p.VAR_KEYWORD):
             continue
         hint = hints.get(p.name)
         if isinstance(hint, type) and issubclass(hint, DriverConfig):
-            config_param = p.name
+            plan.config_param = p.name
         elif hint in IO_TYPES:
-            io_params[p.name] = hint
+            plan.io_params[p.name] = hint
         elif hint is logging.Logger:
-            logger_param = p.name
+            plan.logger_param = p.name
+        elif isinstance(hint, type) and issubclass(hint, Settings):
+            plan.settings_param = p.name
         elif p.default is p.empty:
             raise DriverDefinitionError(
                 f"{driver_id}: __init__ parameter {p.name!r} can't be supplied by mastif; "
-                "annotate it with the Config class, an I/O type, logging.Logger, "
+                "annotate it with the Config class, an I/O type, logging.Logger, Settings, "
                 "or give it a default"
             )
-    if io_params and "transport" not in config_model.model_fields:
+    if plan.io_params and "transport" not in config_model.model_fields:
         raise DriverDefinitionError(
             f"{driver_id}: asks for injected I/O but Config has no 'transport' field"
         )
-    return config_param, io_params, logger_param
+    return plan
 
 
 def _collect_channels(driver_id: str, cls: type) -> dict[str, ChannelSpec]:
@@ -361,16 +383,17 @@ def _decorate(
         if state is not None and not issubclass(state, BaseModel):
             raise DriverDefinitionError(f"{driver_id}: state must be a pydantic model")
         check_provides(driver_id, cls, provides)
-        config_param, io_params, logger_param = _inspect_init(driver_id, cls, config_model)
+        plan = _inspect_init(driver_id, cls, config_model)
         spec = DriverSpec(
             id=driver_id,
             cls=cls,
             kind=kind,
             provides=provides,
             config_model=config_model,
-            config_param=config_param,
-            io_params=io_params,
-            logger_param=logger_param,
+            config_param=plan.config_param,
+            io_params=plan.io_params,
+            logger_param=plan.logger_param,
+            settings_param=plan.settings_param,
             channels=_collect_channels(driver_id, cls),
             state_model=state,
         )
@@ -524,6 +547,7 @@ def build_resource(
     name: str,
     io_factory: IoFactory = build_io,
     logger: logging.Logger | None = None,
+    settings: Settings | None = None,
 ) -> BuiltResource:
     """Validate a profile's config and construct the driver, injecting what it asked for.
 
@@ -537,6 +561,8 @@ def build_resource(
         name: The resource name, used for the logger and messages.
         io_factory: Builds I/O objects; pass a function returning fakes in tests.
         logger: Parent logger; the driver gets a child named after the resource.
+        settings: The application settings, given to drivers that ask for them with a
+            parameter annotated `Settings`.
 
     Returns:
         The built resource.
@@ -544,6 +570,7 @@ def build_resource(
     Raises:
         pydantic.ValidationError: If the config is invalid.
         DriverDefinitionError: If the requested I/O can't be built from the transport.
+        ResourceError: If the driver asks for settings and none were given.
 
     Example:
         >>> from mastif_testing import FakeLineIO
@@ -571,6 +598,13 @@ def build_resource(
         io.append(obj)
     if spec.logger_param:
         kwargs[spec.logger_param] = log
+    if spec.settings_param:
+        if settings is None:
+            raise ResourceError(
+                f"{name}: driver {spec.id} needs application settings; "
+                "pass settings= when building the station"
+            )
+        kwargs[spec.settings_param] = settings
     instance = spec.cls(**kwargs)
     if spec.state_model is not None and "state" not in vars(instance):
         instance.state = spec.state_model()

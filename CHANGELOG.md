@@ -18,6 +18,12 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 
 
+- Telnet transport (`kind: telnet`, via `telnetlib` / `telnetlib-313-and-up`) and SSH
+  transports (`kind: ssh`, optional `mastif[ssh]` extra with paramiko): `SshSession` for
+  command execution with real exit codes and stderr, and an interactive-shell stream.
+  New built-in channel `mastif.ssh-shell`; `mastif.line-shell` accepts Telnet and SSH
+  and drains already-waiting prompts on open; `ShellResult.stderr`;
+  `mastif_testing.FakeSshSession` (ADR-0032 to ADR-0034).
 - Licensing: mastif and mastif-testing are licensed AGPL-3.0-or-later, with a
   commercial licence available from the author (`LICENSE`, `NOTICE`, PEP 639 metadata).
   The dependency rule changes from "permissive only" to "AGPL-compatible" (ADR-0031).

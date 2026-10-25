@@ -13,11 +13,12 @@ Example:
 """
 
 from mastif_testing.conformance import LifecycleReport, assert_satisfies, check_lifecycle
-from mastif_testing.fakes import FakeDatagramPeer, FakeLineIO, FakeStream
+from mastif_testing.fakes import FakeDatagramPeer, FakeLineIO, FakeSshSession, FakeStream
 
 __all__ = [
     "FakeDatagramPeer",
     "FakeLineIO",
+    "FakeSshSession",
     "FakeStream",
     "LifecycleReport",
     "assert_satisfies",

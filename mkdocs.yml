@@ -82,6 +82,9 @@ nav:
           - 0018 I/O injection: adr/0018-io-injection.md
           - 0019 Built-in UDP channel: adr/0019-builtin-udp-channel.md
           - 0020 Built-in line shell: adr/0020-builtin-line-shell.md
+          - 0032 Telnet transport: adr/0032-telnet-transport.md
+          - 0033 SSH transports: adr/0033-ssh-transports.md
+          - 0034 Built-in SSH shell: adr/0034-builtin-ssh-shell.md
       - Station:
           - 0021 Station profile: adr/0021-station-profile.md
           - 0022 Resource manager: adr/0022-resource-manager.md

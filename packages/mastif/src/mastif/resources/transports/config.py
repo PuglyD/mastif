@@ -18,11 +18,13 @@ Where it fits:
         transport: {kind: serial, port: COM3, baudrate: 115200}
         transport: {kind: udp, host: 192.168.1.50, port: 9000}
         transport: {kind: visa, resource: "USB0::0x1234::0x5678::A123::INSTR"}
+        transport: {kind: telnet, host: 10.0.0.9}
+        transport: {kind: ssh, host: 192.168.1.60, username: root, key_file: ~/.ssh/id_ed25519}
 """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
 
 
 class LineSettings(BaseModel):
@@ -164,7 +166,124 @@ class VisaConfig(LineSettings):
     backend: str = ""
 
 
+class TelnetConfig(LineSettings):
+    """A Telnet connection, e.g. a switch matrix or a digital I/O box with a Telnet console.
+
+    Telnet is TCP plus a little in-band negotiation, so this is a `TcpConfig` with a
+    different default port and line endings, and an optional login. Lines default to
+    ``"\\r\\n"``, the Telnet standard (RFC 854). Passwords are `SecretStr`, so they never
+    appear in logs or reprs.
+
+    Attributes:
+        kind: Always ``"telnet"``.
+        host: Hostname or IP address.
+        port: TCP port; 23 is the Telnet default.
+        connect_timeout: Seconds to wait for the connection, and for each prompt during
+            ``open`` (login, password, ready).
+        login_prompt: Text the server prints to ask for the user name, e.g. ``"login: "``.
+            ``None`` means the server doesn't ask for a login.
+        username: User name to send after ``login_prompt``.
+        password_prompt: Text the server prints to ask for the password.
+        password: Password to send after ``password_prompt``; ``None`` if none is asked.
+        ready_prompt: Text the server prints once it is ready for commands, e.g. the end
+            of a banner or a ``"> "`` prompt. ``open`` waits for it and discards
+            everything before it, so greetings never reach the driver as a reply.
+            ``None`` means nothing is waited for.
+
+    Example:
+        >>> cfg = TelnetConfig(host="10.0.0.9", login_prompt="login: ", username="admin")
+        >>> cfg.port, cfg.write_termination
+        (23, '\\r\\n')
+        >>> TelnetConfig(host="h", username="admin")
+        Traceback (most recent call last):
+        ...
+        pydantic_core._pydantic_core.ValidationError: 1 validation error for TelnetConfig
+        ...
+    """
+
+    kind: Literal["telnet"] = "telnet"
+    host: str
+    port: int = Field(default=23, ge=1, le=65535)
+    read_termination: str = "\r\n"
+    write_termination: str = "\r\n"
+    connect_timeout: float = Field(default=5.0, gt=0)
+    login_prompt: str | None = None
+    username: str | None = None
+    password_prompt: str = "Password: "
+    password: SecretStr | None = None
+    ready_prompt: str | None = None
+
+    @model_validator(mode="after")
+    def _login_is_complete(self) -> Self:
+        """Require ``login_prompt`` and ``username`` together, and a login before a password.
+
+        Returns:
+            The config unchanged.
+
+        Raises:
+            ValueError: If only one of ``login_prompt`` and ``username`` is set, or a
+                password is given without them (reported as a validation error).
+
+        Example:
+            >>> TelnetConfig(host="h", login_prompt="login: ", username="u").username
+            'u'
+        """
+        if (self.login_prompt is None) != (self.username is None):
+            raise ValueError("login_prompt and username must be given together")
+        if self.password is not None and self.username is None:
+            raise ValueError("a password needs login_prompt and username")
+        return self
+
+
+class SshConfig(LineSettings):
+    """An SSH connection, e.g. to a Linux DUT. Needs the ``ssh`` extra (``mastif[ssh]``).
+
+    The same config serves command execution (`SshSession`) and an interactive shell
+    stream (`SshStreamTransport`); the `LineSettings` fields apply to the stream.
+
+    Host keys are checked against ``known_hosts``. ``strict`` (the default) refuses
+    hosts whose key is not known yet, exactly like ``ssh -o StrictHostKeyChecking=yes``.
+    ``accept_new`` trusts a host the first time and remembers it, like OpenSSH's
+    ``accept-new``. A host whose key *changed* is always refused.
+
+    If neither ``password`` nor ``key_file`` is given, the SSH agent and the default
+    key files (``~/.ssh/id_*``) are tried.
+
+    Attributes:
+        kind: Always ``"ssh"``.
+        host: Hostname or IP address.
+        port: TCP port; 22 is the SSH default.
+        username: User to log in as.
+        password: Password, if password authentication is used.
+        key_file: Path to a private key file (``~`` is expanded).
+        key_passphrase: Passphrase of an encrypted ``key_file``.
+        known_hosts: ``"strict"`` or ``"accept_new"``.
+        known_hosts_file: A known-hosts file to use in addition to the user's own
+            (``~/.ssh/known_hosts``). With ``accept_new``, new keys are saved here.
+        connect_timeout: Seconds to wait for the connection and the SSH handshake.
+
+    Example:
+        >>> cfg = SshConfig(host="192.168.1.60", username="root")
+        >>> cfg.port, cfg.known_hosts
+        (22, 'strict')
+        >>> SshConfig(host="h", username="u", password="pw")
+        SshConfig(..., password=SecretStr('**********'), ...)
+    """
+
+    kind: Literal["ssh"] = "ssh"
+    host: str
+    port: int = Field(default=22, ge=1, le=65535)
+    username: str
+    password: SecretStr | None = None
+    key_file: str | None = None
+    key_passphrase: SecretStr | None = None
+    known_hosts: Literal["strict", "accept_new"] = "strict"
+    known_hosts_file: str | None = None
+    connect_timeout: float = Field(default=10.0, gt=0)
+
+
 type TransportConfig = Annotated[
-    TcpConfig | SerialConfig | UdpConfig | VisaConfig, Field(discriminator="kind")
+    TcpConfig | SerialConfig | UdpConfig | VisaConfig | TelnetConfig | SshConfig,
+    Field(discriminator="kind"),
 ]
 """Any built-in transport config, selected by its ``kind`` field."""

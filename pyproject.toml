@@ -22,6 +22,7 @@ dev = [
     "ty",
     "import-linter>=2.1",
     "pyserial>=3.5",
+    "paramiko>=3.4",  # runs the in-process SSH server tests (ADR-0033)
 ]
 docs = [
     "mkdocs>=1.6,<2",  # MkDocs 2.0 drops the plugin system that mkdocstrings needs

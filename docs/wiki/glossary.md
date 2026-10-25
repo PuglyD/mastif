@@ -95,6 +95,11 @@ where it lives.
 : The pure function that turns a value and limits into PASS, WARN or FAIL.
   `mastif.kernel.limits.evaluate`. ADR-0004.
 
+**Exec channel**
+: An SSH channel that runs one command and reports its output, error output and exit
+  status separately. `SshSession.run` and `mastif.ssh-shell` use one per command.
+  ADR-0033.
+
 **Expect**
 : Identity fields a profile requires a resource to report, e.g. `{serial: A123}`. They
   are checked before use. ADR-0010, ADR-0022.
@@ -113,6 +118,11 @@ where it lives.
 **Health**
 : Whether a resource is fit for use right now (`Health(ok, detail, readings)`). An
   unhealthy resource is refused when the station opens. ADR-0010.
+
+**Host key / known hosts**
+: An SSH server proves its identity with a host key, checked against a known-hosts file.
+  mastif refuses unknown hosts by default (`known_hosts: strict`) and always refuses a
+  changed key. ADR-0033.
 
 **Identity**
 : What a resource reports about itself: vendor, model, serial, revision, extra.
@@ -218,6 +228,11 @@ where it lives.
   start-up and passed explicitly (dependency injection). `section()` gives typed views.
   ADR-0026.
 
+**SSH**
+: Secure Shell: an encrypted, authenticated connection to a host, used for Linux DUTs.
+  `kind: ssh` transport, `SshSession`, `mastif.ssh-shell`; needs `mastif[ssh]`
+  (paramiko). ADR-0033, ADR-0034.
+
 **Sim / simulation mode**
 : Building a station with `sim=True`, which swaps in the profile's `sim:` entries.
 
@@ -233,6 +248,11 @@ where it lives.
 **Station runtime**
 : The planned long-lived process that owns a station and serves several clients (the
   test executor, a control GUI) through proxies. Built after the engine. ADR-0030.
+
+**Telnet**
+: A text protocol over TCP (port 23) with in-band option negotiation, common on lab
+  boxes such as switch matrices. `kind: telnet` transport; negotiation is stripped.
+  ADR-0032.
 
 **TRACE / SUCCESS**
 : Extra log levels: TRACE (5) for raw protocol traffic, SUCCESS (25) for positive

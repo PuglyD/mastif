@@ -10,7 +10,8 @@ Why this exists:
 
 Where it fits:
     - `FakeLineIO` replaces `LineIO`; wrap it in `Scpi` for SCPI drivers.
-    - `FakeStream` replaces `StreamTransport` for binary protocols.
+    - `FakeStream` replaces `StreamTransport` for binary protocols and consoles.
+    - `FakeSshSession` replaces `SshSession`, for DUT code that runs commands over SSH.
     - `FakeDatagramPeer` is a real UDP peer on localhost, for testing `DatagramChannel`
       and UDP-based DUT code end to end.
 """
@@ -23,6 +24,7 @@ from types import TracebackType
 from typing import Self
 
 from mastif.resources.errors import TransportError, TransportTimeout
+from mastif.resources.std import ShellResult
 from mastif.resources.transports.stream import BufferedStream
 
 type Reply = str | list[str]
@@ -203,6 +205,110 @@ class FakeStream(BufferedStream):
             Returns ``b"OK\\n"`` after ``feed(b"OK\\n")``.
         """
         return self._incoming.popleft() if self._incoming else b""
+
+
+class FakeSshSession:
+    """A scripted `SshSession`: each known command returns a canned result.
+
+    A script value may be:
+
+    - a ``str``: the command's output, with exit code 0
+    - a `ShellResult`: full control over output, exit code and stderr (its ``command``
+      is replaced by the command actually run)
+    - an exception instance: raised when the command runs, e.g. a `TransportTimeout`
+      to simulate a command that hangs
+
+    Unknown commands behave like a real shell: exit code 127 and "command not found" on
+    stderr. Running a command while closed raises `TransportError`, as the real session
+    does.
+
+    Attributes:
+        ran: Every command run, in order, for assertions.
+        opened: How many times `open` was called.
+        closed: How many times `close` was called.
+
+    Example:
+        >>> ssh = FakeSshSession({"uname -r": "6.1.0\\n",
+        ...                       "false": ShellResult(command="", output="", exit_code=1)})
+        >>> ssh.open()
+        >>> ssh.run("uname -r").output, ssh.run("false").exit_code, ssh.run("nope").exit_code
+        ('6.1.0\\n', 1, 127)
+        >>> ssh.ran
+        ['uname -r', 'false', 'nope']
+    """
+
+    def __init__(self, commands: Mapping[str, str | ShellResult | Exception] | None = None) -> None:
+        """Create the fake with a command script.
+
+        Args:
+            commands: Command line to its output, result or exception.
+
+        Example:
+            ``FakeSshSession({"cat /etc/hostname": "dut-07\\n"})``
+        """
+        self._script = dict(commands or {})
+        self.name = "fake-ssh"
+        self.ran: list[str] = []
+        self.opened = 0
+        self.closed = 0
+        self._open = False
+
+    @property
+    def is_open(self) -> bool:
+        """Whether `open` was called more recently than `close`.
+
+        Example:
+            >>> FakeSshSession().is_open
+            False
+        """
+        return self._open
+
+    def open(self) -> None:
+        """Mark the session open and count the call.
+
+        Example:
+            >>> s = FakeSshSession(); s.open(); s.is_open, s.opened
+            (True, 1)
+        """
+        self._open = True
+        self.opened += 1
+
+    def close(self) -> None:
+        """Mark the session closed and count the call.
+
+        Example:
+            >>> s = FakeSshSession(); s.open(); s.close(); s.is_open, s.closed
+            (False, 1)
+        """
+        self._open = False
+        self.closed += 1
+
+    def run(self, command: str, timeout: float | None = None) -> ShellResult:
+        """Record the command and return (or raise) its scripted result.
+
+        Raises:
+            TransportError: If the session is not open, or the script says so.
+
+        Example:
+            >>> FakeSshSession().run("ls")
+            Traceback (most recent call last):
+            ...
+            mastif.resources.errors.TransportError: fake-ssh: not open
+        """
+        if not self._open:
+            raise TransportError(f"{self.name}: not open")
+        self.ran.append(command)
+        reply = self._script.get(command)
+        if isinstance(reply, Exception):
+            raise reply
+        if isinstance(reply, ShellResult):
+            return reply.model_copy(update={"command": command})
+        if isinstance(reply, str):
+            return ShellResult(command=command, output=reply, exit_code=0)
+        name = command.split()[0] if command.split() else command
+        return ShellResult(
+            command=command, output="", exit_code=127, stderr=f"sh: {name}: command not found\n"
+        )
 
 
 class FakeDatagramPeer:

@@ -75,6 +75,20 @@ resources:
         config: {transport: {kind: udp, host: 192.168.1.50, port: 9000}}
 ```
 
+The same DUT on a bench where it is reached over SSH needs only a different profile
+entry. `mastif.ssh-shell` runs each command over SSH and reports real exit codes:
+
+```yaml
+      console:
+        driver: mastif.ssh-shell
+        config:
+          transport: {kind: ssh, host: 192.168.1.60, username: root,
+                      key_file: ~/.ssh/id_ed25519}
+```
+
+In unit tests, give the DUT a `FakeSshSession` (or a `FakeStream` for console shells)
+through the station's `io_factory`, or call the channel driver directly.
+
 **What the station checks at build time:**
 
 - Every required channel is mapped.

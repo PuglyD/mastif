@@ -16,10 +16,11 @@ What can be built from what:
     ===================  =====================================
     requested type       transport kinds
     ===================  =====================================
-    ``StreamTransport``  tcp, serial
-    ``LineIO``           tcp, serial, visa
-    ``Scpi``             tcp, serial, visa
+    ``StreamTransport``  tcp, serial, telnet, ssh (interactive shell)
+    ``LineIO``           tcp, serial, visa, telnet, ssh
+    ``Scpi``             tcp, serial, visa, telnet, ssh
     ``DatagramChannel``  udp
+    ``SshSession``       ssh (command execution)
     ===================  =====================================
 """
 
@@ -28,7 +29,9 @@ import logging
 from mastif.resources.errors import DriverDefinitionError
 from mastif.resources.transports.config import (
     SerialConfig,
+    SshConfig,
     TcpConfig,
+    TelnetConfig,
     TransportConfig,
     UdpConfig,
     VisaConfig,
@@ -36,9 +39,11 @@ from mastif.resources.transports.config import (
 from mastif.resources.transports.datagram import DatagramChannel
 from mastif.resources.transports.lineio import LineIO, StreamLineIO, VisaLineIO
 from mastif.resources.transports.scpi import Scpi
+from mastif.resources.transports.ssh import SshSession, SshStreamTransport
 from mastif.resources.transports.stream import SerialTransport, StreamTransport, TcpTransport
+from mastif.resources.transports.telnet import TelnetTransport
 
-IO_TYPES: tuple[type, ...] = (StreamTransport, LineIO, Scpi, DatagramChannel)
+IO_TYPES: tuple[type, ...] = (StreamTransport, LineIO, Scpi, DatagramChannel, SshSession)
 """Types a driver may request as ``__init__`` parameters, built from its transport config."""
 
 
@@ -52,6 +57,10 @@ def _stream(config: TransportConfig, logger: logging.Logger | None) -> StreamTra
         return TcpTransport(config, logger)
     if isinstance(config, SerialConfig):
         return SerialTransport(config, logger)
+    if isinstance(config, TelnetConfig):
+        return TelnetTransport(config, logger)
+    if isinstance(config, SshConfig):
+        return SshStreamTransport(config, logger)
     return None
 
 
@@ -64,7 +73,9 @@ def _line_io(config: TransportConfig, logger: logging.Logger | None) -> LineIO |
     if isinstance(config, VisaConfig):
         return VisaLineIO(config, logger)
     stream = _stream(config, logger)
-    if stream is not None and isinstance(config, TcpConfig | SerialConfig):
+    if stream is not None and isinstance(
+        config, TcpConfig | SerialConfig | TelnetConfig | SshConfig
+    ):
         return StreamLineIO(stream, config)
     return None
 
@@ -106,6 +117,8 @@ def build_io(want: type, config: TransportConfig, logger: logging.Logger | None 
         built = Scpi(line) if line is not None else None
     elif want is DatagramChannel and isinstance(config, UdpConfig):
         built = DatagramChannel(config, logger)
+    elif want is SshSession and isinstance(config, SshConfig):
+        built = SshSession(config, logger)
     if built is None:
         raise DriverDefinitionError(
             f"cannot provide {want.__name__} over a {config.kind!r} transport"

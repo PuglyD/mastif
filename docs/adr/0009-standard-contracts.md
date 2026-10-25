@@ -67,8 +67,10 @@ flowchart LR
      (fire-and-forget), `request(msg, match, timeout, retries)` (reply picked out by a
      matcher among other traffic), and `subscribe(handler)` (unsolicited messages). It
      returns an unsubscribe function.
-4. **`ShellResult(command, output, exit_code=None)`** is a model. Its `ok` property is
-   True unless the exit code is non-zero; "unknown" counts as ok.
+4. **`ShellResult(command, output, exit_code=None, stderr="")`** is a model. Its `ok`
+   property is True unless the exit code is non-zero; "unknown" counts as ok.
+   `stderr` holds error output when the shell keeps it separate (SSH exec channels
+   do, ADR-0033); consoles mix it into `output` and leave `stderr` empty.
 5. **Extend by inheritance, replace by definition:**
    `class ProtectedSupply(PowerSupply, Protocol)` adds members. An org can also simply
    define its own `PowerSupply`.
@@ -84,7 +86,7 @@ flowchart LR
 | `Relay` | `set(channel, closed)`, `is_closed(channel)`, `open_all()` | relay bank |
 | `DigitalIO` | `write(line, high)`, `read(line) -> bool` | DIO card, fixture sensors |
 | `Axis` | `move_to(Quantity)`, `position()`, `home()`, `stop()` | turntable, linear stage |
-| `Shell` | `execute(command, timeout=5.0) -> ShellResult` | `mastif.line-shell` |
+| `Shell` | `execute(command, timeout=5.0) -> ShellResult` | `mastif.line-shell`, `mastif.ssh-shell` |
 | `MessageChannel` | `send`, `request`, `subscribe` | `mastif.udp` |
 
 ## 6. Data flow
@@ -140,3 +142,4 @@ None are defined here. Implementations raise transport, protocol or fault errors
 ## History
 
 - 2026-10-21: created.
+- 2026-10-25: `ShellResult` gained `stderr` (default empty), for SSH command execution (ADR-0033, ADR-0034). Backwards compatible.

@@ -18,6 +18,7 @@ it in their own test environments.
 |---|---|---|
 | `FakeLineIO(replies)` | `LineIO` | Scripted reply per command (lists repeat their last entry). `written` records what was sent. Nothing queued raises `TransportTimeout`. `feed()` adds unsolicited lines. |
 | `FakeStream()` | `StreamTransport` | Uses the real framing code (`BufferedStream`). `feed(bytes)` makes data readable; `sent` holds what was written. |
+| `FakeSshSession(commands)` | `SshSession` | Scripted results per command: a `str` (output, exit 0), a `ShellResult`, or an exception to raise. Unknown commands exit 127. `ran` records commands. |
 | `FakeDatagramPeer(responder)` | a UDP device | A real localhost socket. `responder(msg) -> reply or None`. `push()` sends unsolicited messages. `received` records everything. |
 
 ```python

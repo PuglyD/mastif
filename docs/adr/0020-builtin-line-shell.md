@@ -11,7 +11,8 @@
 ## 1. Summary
 
 `LineShell` (driver id `mastif.line-shell`) turns a text console into the `Shell`
-contract. The console may be a serial port or TCP, e.g. through a terminal server.
+contract. The console may be a serial port, TCP (e.g. through a terminal server), Telnet, or an
+interactive SSH shell.
 `execute(cmd)` sends the command, reads until the prompt, removes the echoed command,
 and returns the output. If configured, it also runs an exit-code command (`echo $?`) and
 parses the result. The one idea to remember: *a DUT console becomes `execute(cmd) ->
@@ -50,15 +51,20 @@ flowchart LR
 
    | Field | Default | Meaning |
    |---|---|---|
-   | `transport` | (required) | serial or TCP |
+   | `transport` | (required) | serial, TCP, Telnet or SSH (interactive shell) |
    | `prompt` | `"$ "` | text marking "ready" |
    | `echo` | `true` | the console echoes commands |
    | `exit_code_command` | `null` | e.g. `"echo $?"` |
    | `sync_on_open` | `true` | send an empty line on open and wait for a prompt |
+   | `settle_time` | 0.2 s | after that prompt, discard further prompts until the console is quiet this long |
    | `timeout` | 5 s | default wait for the prompt |
 
 3. **`open()`** synchronises when `sync_on_open` is set. It sends the write terminator
-   and reads until the prompt, which discards boot noise.
+   and reads until the prompt, which discards boot noise. It then keeps reading
+   prompts until none arrives for `settle_time`. Without this, a prompt that was
+   already waiting (after a login banner, typical for Telnet and SSH) plus the one
+   answering the empty line would leave a stray prompt, and the first command would
+   return empty output.
 4. **`execute(command, timeout=None)`**:
    - Writes the command plus the write terminator, and reads until the prompt.
    - Normalises line endings.
@@ -113,7 +119,9 @@ sequenceDiagram
 - **Negative:**
   - A prompt string that also appears inside command output ends the read early. Choose
     distinctive prompts.
-  - There is no login handling yet.
+  - Login is handled by the transport (Telnet's `login_prompt`, SSH authentication),
+    not by this driver; serial consoles that ask for a login aren't handled yet.
+  - `settle_time` adds up to that long to every `open`.
   - ANSI colour codes are not stripped.
 
 ## 10. Alternatives considered
@@ -124,16 +132,18 @@ sequenceDiagram
 
 ## 11. Open questions and future work
 
-- Login sequences, regex prompts, ANSI stripping, and SSH/Telnet transports.
+- Serial login sequences, regex prompts and ANSI stripping. For plain command
+  execution over SSH, prefer `mastif.ssh-shell` (ADR-0034).
 
 ## 12. Code map
 
 | What | Where |
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/channels/shell.py` |
-| Tests | `packages/mastif/tests/resources/test_drivers.py`, plus doctests (using `FakeStream`) |
+| Tests | `packages/mastif/tests/resources/test_drivers.py`, `test_telnet.py`, `test_ssh.py` (real Telnet and SSH servers), plus doctests (using `FakeStream`) |
 | Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-dut.md` |
 
 ## History
 
 - 2026-10-21: created.
+- 2026-10-25: accepts Telnet and SSH transports (ADR-0032, ADR-0033); `open` now drains already-waiting prompts (`settle_time`), found while testing against a real SSH server.

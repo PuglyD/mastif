@@ -10,11 +10,15 @@ dependencies = [
     "pydantic>=2.9",
     "pyyaml>=6.0",
     "rich>=13",
+    # telnetlib left the stdlib in 3.13; this is the same module, repackaged (PSF licence).
+    # On 3.12 the stdlib copy is used (ADR-0032).
+    "telnetlib-313-and-up>=3.13.1; python_version >= '3.13'",
 ]
 
 [project.optional-dependencies]
 serial = ["pyserial>=3.5"]
 visa = ["pyvisa>=1.14"]
+ssh = ["paramiko>=3.4"]  # LGPL-2.1, AGPL-compatible (ADR-0031, ADR-0033)
 pandas = ["pandas>=2.0"]  # optional: log DataFrames as tables
 
 [build-system]

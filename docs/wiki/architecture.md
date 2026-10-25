@@ -105,6 +105,38 @@ flowchart TB
     U --> SC
 ```
 
+## Deployment modes: who owns the instruments?
+
+Instruments sit behind exclusive handles (a serial port, a USB session, a vendor DLL
+session), so exactly one process can own a station at a time. mastif supports two
+answers to "which one?", behind the same contracts
+([ADR-0030](../adr/0030-execution-topology.md)):
+
+| | Direct mode | Station runtime |
+|---|---|---|
+| Who owns the station | the test process | one long-lived runtime process |
+| Who can use it | that one process | several clients at once: the executor, a control GUI, dashboards |
+| What a task receives from `require` | the driver itself | a proxy implementing the same contract |
+| Background polling | none | only opt-in monitors declared in the profile |
+| Best for | simple benches, CI, laptops, debugging, minimal resource use | a GUI next to the executor, safety monitors, slow-to-open instruments |
+| Status | built first, default | designed; built after the engine |
+
+```mermaid
+flowchart LR
+    subgraph Direct
+        E1[engine] --> S1[Station] --> H1[(hardware)]
+    end
+    subgraph Runtime
+        E2[executor] --> RT[runtime]
+        G[GUI] --> RT
+        RT --> S2[Station] --> H2[(hardware)]
+    end
+```
+
+The rule that makes both possible: tasks reach hardware only through `require(role,
+Contract)`, and everything crossing that boundary is serialisable. The practical advice
+behind direct mode is in the [field notes](field-notes.md).
+
 ## Cross-cutting rules
 
 - **Errors** are typed, layered and never replaced by sentinel values (ADR-0002, and the

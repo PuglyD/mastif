@@ -61,7 +61,9 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 ### Documentation
 
-
+- ADR-0030 designs the execution topology: direct mode now (the test process owns the
+  station), a shared station runtime later behind the same contracts, with the
+  constraints the engine must respect. New wiki page: field notes.
 
 - One comprehensive ADR per module (0003–0025), plus cross-cutting ADRs for layering (0001) and the error model (0002). These replace the earlier three summary ADRs.
 

@@ -48,6 +48,7 @@ nav:
           - Write a station profile: wiki/guides/write-a-station-profile.md
           - Test your driver: wiki/guides/test-your-driver.md
           - Bootstrap an application: wiki/guides/bootstrap-an-application.md
+      - Field notes: wiki/field-notes.md
       - Error map: wiki/errors.md
       - Glossary: wiki/glossary.md
       - Licensing: wiki/licensing.md
@@ -59,6 +60,7 @@ nav:
       - Cross-cutting:
           - 0001 Layered architecture: adr/0001-layered-architecture.md
           - 0002 Error model: adr/0002-error-model.md
+          - 0030 Execution topology: adr/0030-execution-topology.md
           - 0031 Licensing and dependency policy: adr/0031-licensing-and-dependency-policy.md
       - Kernel:
           - 0003 Units: adr/0003-units.md

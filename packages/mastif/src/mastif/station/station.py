@@ -31,9 +31,10 @@ from typing import Any, Self
 
 from pydantic import ValidationError
 
+from mastif.infra.config import Settings
 from mastif.resources.contracts import contract_info
 from mastif.resources.driver import IoFactory, build_resource
-from mastif.resources.errors import DriverDefinitionError, DriverNotFound
+from mastif.resources.errors import DriverDefinitionError, DriverNotFound, ResourceError
 from mastif.resources.identity import Identity
 from mastif.resources.registry import Registry
 from mastif.resources.transports.factory import build_io
@@ -91,6 +92,7 @@ class Station:
         self.handles = handles
         self.sim = sim
         self.manager = ResourceManager(handles.values(), listener, logger)
+        self.settings: Settings | None = None
 
     @property
     def name(self) -> str:
@@ -111,6 +113,7 @@ class Station:
         io_factory: IoFactory = build_io,
         listener: Listener | None = None,
         logger: logging.Logger | None = None,
+        settings: Settings | None = None,
     ) -> "Station":
         """Build every resource in the profile, without opening anything.
 
@@ -121,6 +124,8 @@ class Station:
             io_factory: Builds injected I/O; pass a function returning fakes in tests.
             listener: Receives a `ResourceEvent` for every lifecycle step.
             logger: Parent logger for drivers and the manager.
+            settings: Application settings (see `mastif.infra.config`), injected into
+                every driver whose ``__init__`` asks for them.
 
         Returns:
             The station, closed.
@@ -138,10 +143,12 @@ class Station:
         """
         log = logger or logging.getLogger("mastif.station")
         handles = {
-            name: cls._build_handle(name, entry, registry, io_factory, log)
+            name: cls._build_handle(name, entry, registry, io_factory, log, settings)
             for name, entry in profile.entries(sim).items()
         }
-        return cls(profile, handles, sim=sim, listener=listener, logger=log)
+        station = cls(profile, handles, sim=sim, listener=listener, logger=log)
+        station.settings = settings
+        return station
 
     @staticmethod
     def _build_handle(
@@ -150,6 +157,7 @@ class Station:
         registry: Registry,
         io_factory: IoFactory,
         log: logging.Logger,
+        settings: Settings | None = None,
     ) -> ResourceHandle:
         """Build one resource and, for DUTs, its channels; translate errors to `StationError`.
 
@@ -159,12 +167,14 @@ class Station:
         where = f"resource {name!r}"
         try:
             spec = registry.get(entry.driver)
-            built = build_resource(spec, entry.config, name=name, io_factory=io_factory, logger=log)
+            built = build_resource(
+                spec, entry.config, name=name, io_factory=io_factory, logger=log, settings=settings
+            )
         except DriverNotFound as exc:
             raise StationError(f"{where}: {exc}") from exc
         except ValidationError as exc:
             raise _config_error(where, exc) from exc
-        except DriverDefinitionError as exc:
+        except (DriverDefinitionError, ResourceError) as exc:
             raise StationError(f"{where}: {exc}") from exc
         resource_entry = (
             entry if isinstance(entry, ResourceEntry) else ResourceEntry(driver=entry.driver)
@@ -180,7 +190,9 @@ class Station:
                 if ch_spec.optional:
                     continue
                 raise StationError(f"{where}: channel {ch_name!r} is not mapped in the profile")
-            child = Station._build_handle(f"{name}.{ch_name}", ch_entry, registry, io_factory, log)
+            child = Station._build_handle(
+                f"{name}.{ch_name}", ch_entry, registry, io_factory, log, settings
+            )
             if not child.spec.provides_contract(ch_spec.contract):
                 raise StationError(
                     f"{where}: channel {ch_name!r} needs "

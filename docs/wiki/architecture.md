@@ -40,6 +40,7 @@ settings, a board's boot sequence, one vendor's instrument commands.
 | Layer | Question it answers | Built? |
 |---|---|---|
 | `kernel` | What do values, limits, verdicts and results *mean*? | ✓ |
+| `infra` | How does an application load its settings, set up logging and know its version? | ✓ |
 | `resources` | How is a piece of hardware described, built and talked to? | ✓ |
 | `station` | Which hardware is on *this* bench, under which roles, and how is it brought up and made safe? | ✓ |
 | `engine` | How is a test plan run: tasks, loops, results, events, resume? | planned |

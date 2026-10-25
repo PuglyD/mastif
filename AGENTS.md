@@ -27,12 +27,15 @@ loop types) and UI on top of it.
 ## Layering
 
 ```
-mastif.cli  →  mastif.api  →  mastif.engine  →  mastif.station  →  mastif.resources  →  mastif.kernel
+mastif.cli → mastif.api → mastif.engine → mastif.station → mastif.resources → mastif.infra → mastif.kernel
 ```
 
 - A layer may import only layers to its right. Enforced by import-linter (`uv run lint-imports`).
 - The core never imports org code; org code is discovered through entry points.
 - `mastif.kernel` is pure: no I/O, no threads, no hardware.
+- Settings are never global: build one `Settings` object at the application's entry point and
+  pass it explicitly (constructor or function parameter). Logging is configured once, by an
+  explicit call, never at import time.
 - Nothing domain-specific in core. If a concept only makes sense for one kind of product,
   it belongs in an org SDK as an extension.
 

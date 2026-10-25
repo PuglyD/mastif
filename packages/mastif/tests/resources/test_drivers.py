@@ -353,3 +353,32 @@ def test_line_shell_times_out_without_prompt():
 
     with pytest.raises(TransportTimeout):
         sh.execute("sleep 100", timeout=0.05)
+
+
+def test_settings_are_injected_when_requested():
+    """A driver annotating a parameter with Settings receives the application settings."""
+    from mastif.infra.config import Settings, create_settings
+
+    @driver("acme.configured")
+    class Configured:
+        def __init__(self, settings: Settings) -> None:
+            self.retries = settings.station.retries
+
+    settings = create_settings(defaults={"station": {"retries": 4}})
+    built = build_resource(spec_of(Configured), {}, name="x", settings=settings)
+
+    assert spec_of(Configured).settings_param == "settings"
+    assert built.instance.retries == 4
+
+
+def test_missing_settings_for_driver_that_needs_them_is_an_error():
+    """Building a settings-hungry driver without settings fails with guidance."""
+    from mastif.infra.config import Settings
+
+    @driver("acme.configured2")
+    class Configured:
+        def __init__(self, settings: Settings) -> None:
+            self.settings = settings
+
+    with pytest.raises(ResourceError, match="needs application settings"):
+        build_resource(spec_of(Configured), {}, name="x")

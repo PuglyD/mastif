@@ -13,7 +13,7 @@ working in, bottom-up.
 
 | ADR | Decision | One-line summary |
 |---|---|---|
-| [0001](0001-layered-architecture.md) | Layered architecture | Six layers, dependencies point down only, org code is plugged in via entry points. |
+| [0001](0001-layered-architecture.md) | Layered architecture | Seven layers, dependencies point down only, org code is plugged in via entry points. |
 | [0002](0002-error-model.md) | Error model | One typed hierarchy under `MastifError`; the type says what happened, the message says where; no sentinels. |
 
 ## Kernel: the shared vocabulary
@@ -25,6 +25,15 @@ working in, bottom-up.
 | [0005](0005-verdicts-and-aggregation.md) | `kernel.verdict` | Six verdicts; worst child wins; ERROR is not FAIL. |
 | [0006](0006-results.md) | `kernel.results` | Measurements, checks and tables that compute their own verdicts. |
 | [0007](0007-identifiers.md) | `kernel.ids` | Run ids, slot ids and plan positions for full provenance. |
+
+## Infra: settings, logging and versions
+
+| ADR | Module | One-line summary |
+|---|---|---|
+| [0026](0026-settings.md) | `infra.config` | One Dynaconf settings object, built once and passed explicitly; typed sections. |
+| [0027](0027-logging.md) | `infra.logs` | Operator console, complete rotating file, tables as tables, TRACE/SUCCESS levels. |
+| [0028](0028-version-information.md) | `infra.version` | Package version plus git state, embedded in wheels or captured live. |
+| [0029](0029-bootstrap.md) | `infra.bootstrap` | The one start-up call: settings, then logging, then version. |
 
 ## Resources: describing and talking to hardware
 

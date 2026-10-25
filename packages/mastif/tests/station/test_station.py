@@ -373,3 +373,36 @@ def test_listener_receives_lifecycle_events():
 
     assert events[:2] == [("psu", "opening"), ("psu", "opened")]
     assert events[-1] == ("psu", "closed")
+
+
+def test_station_passes_settings_to_drivers():
+    """Settings given to Station.build reach every driver that asks for them."""
+    from mastif.infra.config import Settings, create_settings
+
+    @driver("test.configured")
+    class Configured:
+        def __init__(self, settings: Settings) -> None:
+            self.name = settings.station.name
+
+    registry = Registry([Configured])
+    profile = StationProfile.from_yaml("station: s\nresources: {c: {driver: test.configured}}")
+    settings = create_settings(defaults={"station": {"name": "bench-01"}})
+
+    station = Station.build(profile, registry, settings=settings)
+
+    assert station.role("c").name == "bench-01" and station.settings is settings
+
+
+def test_station_without_needed_settings_is_station_error():
+    """A driver needing settings on a station built without them fails at build time."""
+    from mastif.infra.config import Settings
+
+    @driver("test.configured2")
+    class Configured:
+        def __init__(self, settings: Settings) -> None:
+            self.settings = settings
+
+    profile = StationProfile.from_yaml("station: s\nresources: {c: {driver: test.configured2}}")
+
+    with pytest.raises(StationError, match="needs application settings"):
+        Station.build(profile, Registry([Configured]))

@@ -57,6 +57,7 @@ working in, bottom-up.
 | [0032](0032-telnet-transport.md) | `transports.telnet` | Telnet as a stream: negotiation stripped, optional login, via `telnetlib`. |
 | [0033](0033-ssh-transports.md) | `transports.ssh` | SSH command sessions with real exit codes, and interactive shells; strict host keys. |
 | [0034](0034-builtin-ssh-shell.md) | `channels.ssh` | `mastif.ssh-shell`: SSH command execution as a `Shell`. |
+| [0035](0035-native-vendor-libraries.md) | `transports.native` | Vendor DLLs: declared prototypes, one thread per library, status checks, load hints. |
 
 ## Station: one physical bench
 

@@ -18,6 +18,9 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 
 
+- Native vendor libraries (`kind: native`): `NativeLibrary` with required prototypes,
+  thread-confined calls, `StatusCheck` and load-error hints; `FakeNativeLibrary` and
+  `set_out` in mastif-testing; guide "Wrap a vendor DLL" (ADR-0035).
 - Telnet transport (`kind: telnet`, via `telnetlib` / `telnetlib-313-and-up`) and SSH
   transports (`kind: ssh`, optional `mastif[ssh]` extra with paramiko): `SshSession` for
   command execution with real exit codes and stderr, and an interactive-shell stream.

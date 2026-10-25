@@ -29,6 +29,8 @@ Generated from docstrings. For the concepts, see [Resources](../wiki/resources.m
 
 ::: mastif.resources.transports.ssh
 
+::: mastif.resources.transports.native
+
 ::: mastif.resources.transports.factory
 
 ::: mastif.resources.channels.udp

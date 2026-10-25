@@ -9,3 +9,8 @@ build/
 .mypy_cache/
 site/
 runs/
+# Vendor libraries are proprietary and installed per station; never commit them (ADR-0035).
+*.dll
+*.so
+*.so.*
+*.dylib

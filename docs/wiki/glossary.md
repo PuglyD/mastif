@@ -25,6 +25,11 @@ where it lives.
 : One physical test setup: instruments, fixture and DUT. It is described by a
   **station profile**. The words are used interchangeably.
 
+**Calling convention**
+: How a C function receives its arguments: `cdecl` (the default) or `stdcall` (the
+  `WINAPI` convention of many Windows vendor DLLs). Set per library in `NativeConfig`.
+  ADR-0035.
+
 **Channel**
 : A named way into a DUT, declared on the DUT class as `console: Shell = channel()`.
   It is mapped in the profile to a channel driver. ADR-0011, ADR-0023.
@@ -165,12 +170,21 @@ where it lives.
   by a `monitor:` block in the station profile. Runtime mode only; pauses while a test
   holds the resource by default. ADR-0030 (planned).
 
+**Native library**
+: A vendor's compiled library (Windows DLL, Linux shared object) driving an instrument.
+  Reached through `NativeLibrary` (`kind: native`), never committed to a repository.
+  ADR-0035.
+
 **Measurement / Check / Table**
 : The three result kinds. Each computes its own verdict. ADR-0006.
 
 **Position**
 : The current value of every loop in a plan, outermost first. Used for provenance,
   transitions and resume. ADR-0007.
+
+**Prototype (of a C function)**
+: Its return type and argument types, declared with `NativeLibrary.function` before the
+  function can be called. Prevents ctypes from truncating 64-bit pointers. ADR-0035.
 
 **Profile (station profile)**
 : The YAML facts of one bench: resources, roles and sim overrides. ADR-0021.
@@ -253,6 +267,11 @@ where it lives.
 : A text protocol over TCP (port 23) with in-band option negotiation, common on lab
   boxes such as switch matrices. `kind: telnet` transport; negotiation is stripped.
   ADR-0032.
+
+**Thread confinement**
+: Running every call to a resource on one dedicated thread, because many vendor libraries
+  aren't thread-safe. The default for `NativeLibrary`; also how the planned station
+  runtime serialises calls per resource. ADR-0030, ADR-0035.
 
 **TRACE / SUCCESS**
 : Extra log levels: TRACE (5) for raw protocol traffic, SUCCESS (25) for positive

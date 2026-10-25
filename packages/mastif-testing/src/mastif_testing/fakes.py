@@ -12,6 +12,8 @@ Where it fits:
     - `FakeLineIO` replaces `LineIO`; wrap it in `Scpi` for SCPI drivers.
     - `FakeStream` replaces `StreamTransport` for binary protocols and consoles.
     - `FakeSshSession` replaces `SshSession`, for DUT code that runs commands over SSH.
+    - `FakeNativeLibrary` replaces `NativeLibrary`, with Python functions in place of a
+      vendor DLL's; `set_out` fills output parameters the way a C function would.
     - `FakeDatagramPeer` is a real UDP peer on localhost, for testing `DatagramChannel`
       and UDP-based DUT code end to end.
 """
@@ -19,15 +21,17 @@ Where it fits:
 import socket
 import threading
 from collections import deque
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from types import TracebackType
-from typing import Self
+from typing import Any, Self
 
-from mastif.resources.errors import TransportError, TransportTimeout
+from mastif.resources.errors import DriverDefinitionError, TransportError, TransportTimeout
 from mastif.resources.std import ShellResult
+from mastif.resources.transports.native import NativeFunction, StatusCheck
 from mastif.resources.transports.stream import BufferedStream
 
 type Reply = str | list[str]
+type NativeBehaviour = Callable[..., Any] | int | list[int]
 
 
 class FakeLineIO:
@@ -309,6 +313,176 @@ class FakeSshSession:
         return ShellResult(
             command=command, output="", exit_code=127, stderr=f"sh: {name}: command not found\n"
         )
+
+
+def set_out(ref: Any, value: Any) -> None:
+    """Write through a ``byref()`` or ``pointer()`` argument, as a C function would.
+
+    Vendor functions return results through output parameters (``int *count``). A fake
+    function receives the same ctypes argument the driver passed and uses this to fill
+    it in.
+
+    Args:
+        ref: The argument: ``ctypes.byref(x)`` or ``ctypes.pointer(x)``.
+        value: The value to store in ``x``.
+
+    Example:
+        >>> import ctypes
+        >>> count = ctypes.c_int()
+        >>> set_out(ctypes.byref(count), 7)
+        >>> count.value
+        7
+    """
+    target = getattr(ref, "_obj", None)  # what ctypes.byref() wraps
+    if target is None:
+        target = ref.contents  # a ctypes.pointer()
+    target.value = value
+
+
+class FakeNativeLibrary:
+    """A scripted `NativeLibrary`: each vendor function is a Python stand-in.
+
+    A behaviour may be:
+
+    - a callable: called with the driver's arguments; its return value is returned
+    - an ``int``: returned on every call (typically a status code)
+    - a list of ints: returned in order, the last one repeating (e.g. ``[-3, 0]`` for
+      "busy, then fine")
+
+    The rules match the real library: functions must be declared with
+    `function` before being called, declaring a name the "library" doesn't have raises
+    `TransportError`, calling while closed raises `TransportError`, and a declaration's
+    `StatusCheck` is applied to every result.
+
+    Attributes:
+        calls: Every call as ``(name, args)``, in order.
+        opened: How many times `open` was called.
+        closed: How many times `close` was called.
+
+    Example:
+        >>> import ctypes
+        >>> lib = FakeNativeLibrary({"ACME_Count": 4, "ACME_Reset": [-3, 0]})
+        >>> lib.open()
+        >>> lib.function("ACME_Count", ctypes.c_int, [])
+        NativeFunction(name='ACME_Count', ...)
+        >>> lib.function("ACME_Reset", ctypes.c_int, [], check=StatusCheck())
+        NativeFunction(name='ACME_Reset', ...)
+        >>> lib.call("ACME_Count")
+        4
+        >>> lib.call("ACME_Reset")
+        Traceback (most recent call last):
+        ...
+        mastif.resources.errors.ProtocolError: fake-native: ACME_Reset returned status -3
+        >>> lib.call("ACME_Reset"), lib.calls[-1]
+        (0, ('ACME_Reset', ()))
+    """
+
+    def __init__(self, functions: Mapping[str, NativeBehaviour] | None = None) -> None:
+        """Create the fake with the functions the "library" exports.
+
+        Args:
+            functions: Symbol name to behaviour.
+
+        Example:
+            ``FakeNativeLibrary({"ACME_Open": open_fn, "ACME_Close": 0})``
+        """
+        self._behaviour: dict[str, Any] = {
+            k: deque(v) if isinstance(v, list) else v for k, v in (functions or {}).items()
+        }
+        self.name = "fake-native"
+        self.calls: list[tuple[str, tuple[Any, ...]]] = []
+        self.declared: dict[str, NativeFunction] = {}
+        self.opened = 0
+        self.closed = 0
+        self._open = False
+
+    @property
+    def is_open(self) -> bool:
+        """Whether `open` was called more recently than `close`.
+
+        Example:
+            >>> FakeNativeLibrary().is_open
+            False
+        """
+        return self._open
+
+    def open(self) -> None:
+        """Mark the library loaded and count the call.
+
+        Example:
+            >>> lib = FakeNativeLibrary(); lib.open(); lib.opened
+            1
+        """
+        self._open = True
+        self.opened += 1
+
+    def close(self) -> None:
+        """Mark the library unloaded and count the call.
+
+        Example:
+            >>> lib = FakeNativeLibrary(); lib.open(); lib.close(); lib.is_open
+            False
+        """
+        self._open = False
+        self.closed += 1
+
+    def function(
+        self,
+        name: str,
+        restype: Any,
+        argtypes: Sequence[Any],
+        check: StatusCheck | None = None,
+    ) -> NativeFunction:
+        """Declare a function, validating it exactly as `NativeLibrary.function` does.
+
+        Raises:
+            DriverDefinitionError: If ``argtypes`` is missing or not a list.
+            TransportError: If the fake has no behaviour for ``name``.
+
+        Example:
+            >>> FakeNativeLibrary().function("ACME_Missing", None, [])
+            Traceback (most recent call last):
+            ...
+            mastif.resources.errors.TransportError: fake-native: the library has no function ...
+        """
+        fn = NativeFunction.declare(name, restype, argtypes, check)
+        if name not in self._behaviour:
+            raise TransportError(f"{self.name}: the library has no function {name!r}")
+        self.declared[name] = fn
+        return fn
+
+    def call(self, fn: NativeFunction | str, *args: Any) -> Any:
+        """Record the call, run the behaviour, and apply the declaration's check.
+
+        Raises:
+            TransportError: If the library is not open.
+            DriverDefinitionError: If the function wasn't declared.
+            ProtocolError: If the declaration's status check fails.
+
+        Example:
+            >>> lib = FakeNativeLibrary({"ACME_Count": 1}); lib.open()
+            >>> lib.call("ACME_Count")
+            Traceback (most recent call last):
+            ...
+            mastif.resources.errors.DriverDefinitionError: fake-native: 'ACME_Count' was called ...
+        """
+        name = fn if isinstance(fn, str) else fn.name
+        if not self._open:
+            raise TransportError(f"{self.name}: not open")
+        declared = self.declared.get(name)
+        if declared is None:
+            raise DriverDefinitionError(f"{self.name}: {name!r} was called before being declared")
+        self.calls.append((name, args))
+        behaviour = self._behaviour[name]
+        if isinstance(behaviour, deque):
+            result = behaviour.popleft() if len(behaviour) > 1 else behaviour[0]
+        elif callable(behaviour):
+            result = behaviour(*args)
+        else:
+            result = behaviour
+        if declared.check is not None:
+            declared.check(result, f"{self.name}: {name}")
+        return result
 
 
 class FakeDatagramPeer:

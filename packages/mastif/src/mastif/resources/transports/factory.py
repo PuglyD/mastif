@@ -21,6 +21,7 @@ What can be built from what:
     ``Scpi``             tcp, serial, visa, telnet, ssh
     ``DatagramChannel``  udp
     ``SshSession``       ssh (command execution)
+    ``NativeLibrary``    native (vendor DLL / shared object)
     ===================  =====================================
 """
 
@@ -28,6 +29,7 @@ import logging
 
 from mastif.resources.errors import DriverDefinitionError
 from mastif.resources.transports.config import (
+    NativeConfig,
     SerialConfig,
     SshConfig,
     TcpConfig,
@@ -38,12 +40,20 @@ from mastif.resources.transports.config import (
 )
 from mastif.resources.transports.datagram import DatagramChannel
 from mastif.resources.transports.lineio import LineIO, StreamLineIO, VisaLineIO
+from mastif.resources.transports.native import NativeLibrary
 from mastif.resources.transports.scpi import Scpi
 from mastif.resources.transports.ssh import SshSession, SshStreamTransport
 from mastif.resources.transports.stream import SerialTransport, StreamTransport, TcpTransport
 from mastif.resources.transports.telnet import TelnetTransport
 
-IO_TYPES: tuple[type, ...] = (StreamTransport, LineIO, Scpi, DatagramChannel, SshSession)
+IO_TYPES: tuple[type, ...] = (
+    StreamTransport,
+    LineIO,
+    Scpi,
+    DatagramChannel,
+    SshSession,
+    NativeLibrary,
+)
 """Types a driver may request as ``__init__`` parameters, built from its transport config."""
 
 
@@ -119,6 +129,8 @@ def build_io(want: type, config: TransportConfig, logger: logging.Logger | None 
         built = DatagramChannel(config, logger)
     elif want is SshSession and isinstance(config, SshConfig):
         built = SshSession(config, logger)
+    elif want is NativeLibrary and isinstance(config, NativeConfig):
+        built = NativeLibrary(config, logger)
     if built is None:
         raise DriverDefinitionError(
             f"cannot provide {want.__name__} over a {config.kind!r} transport"

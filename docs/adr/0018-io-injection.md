@@ -45,7 +45,8 @@ flowchart LR
 ## 4. Decision
 
 1. **The injectable types are**
-   `IO_TYPES = (StreamTransport, LineIO, Scpi, DatagramChannel, SshSession)`.
+   `IO_TYPES = (StreamTransport, LineIO, Scpi, DatagramChannel, SshSession,
+   NativeLibrary)`.
 2. **The combination table:**
 
    | Requested | tcp | serial | visa | udp | telnet | ssh |
@@ -55,6 +56,9 @@ flowchart LR
    | `Scpi` | `Scpi(StreamLineIO(Tcp…))` | `Scpi(StreamLineIO(Serial…))` | `Scpi(VisaLineIO)` | ✗ | `Scpi(StreamLineIO(Telnet…))` | `Scpi(StreamLineIO(SshStream…))` |
    | `DatagramChannel` | ✗ | ✗ | ✗ | `DatagramChannel` | ✗ | ✗ |
    | `SshSession` | ✗ | ✗ | ✗ | ✗ | ✗ | `SshSession` |
+
+   `NativeLibrary` is built only from `kind: native` (ADR-0035), and `native` provides
+   nothing else.
 
    A ✗ raises `DriverDefinitionError("cannot provide <Type> over a '<kind>' transport")`.
 3. **Every returned object has `open()`/`close()`.** Wrappers pass them through. The
@@ -125,3 +129,4 @@ sequenceDiagram
 
 - 2026-10-21: created.
 - 2026-10-25: added the `telnet` and `ssh` columns and `SshSession` as an injectable type (ADR-0032, ADR-0033).
+- 2026-10-25: added `NativeLibrary` from `kind: native` (ADR-0035).

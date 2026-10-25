@@ -46,6 +46,7 @@ nav:
           - Write a driver: wiki/guides/write-a-driver.md
           - Write a DUT type: wiki/guides/write-a-dut.md
           - Write a station profile: wiki/guides/write-a-station-profile.md
+          - Wrap a vendor DLL: wiki/guides/wrap-a-vendor-dll.md
           - Test your driver: wiki/guides/test-your-driver.md
           - Bootstrap an application: wiki/guides/bootstrap-an-application.md
       - Field notes: wiki/field-notes.md
@@ -85,6 +86,7 @@ nav:
           - 0032 Telnet transport: adr/0032-telnet-transport.md
           - 0033 SSH transports: adr/0033-ssh-transports.md
           - 0034 Built-in SSH shell: adr/0034-builtin-ssh-shell.md
+          - 0035 Native vendor libraries: adr/0035-native-vendor-libraries.md
       - Station:
           - 0021 Station profile: adr/0021-station-profile.md
           - 0022 Resource manager: adr/0022-resource-manager.md

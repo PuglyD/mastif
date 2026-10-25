@@ -132,5 +132,8 @@ def test_psu_x_conforms():
 - Ask for `io: StreamTransport` for binary frames, and use `read_exactly` /
   `read_until`.
 - Ask for `io: DatagramChannel` for UDP.
+- Ask for `session: SshSession` to run commands on a host over SSH.
+- Ask for `lib: NativeLibrary` when the instrument comes with a vendor DLL; see
+  [Wrap a vendor DLL](wrap-a-vendor-dll.md).
 
 The station builds whichever you ask for from the profile's `transport:` block.

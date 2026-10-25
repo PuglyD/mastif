@@ -20,6 +20,7 @@ Where it fits:
         transport: {kind: visa, resource: "USB0::0x1234::0x5678::A123::INSTR"}
         transport: {kind: telnet, host: 10.0.0.9}
         transport: {kind: ssh, host: 192.168.1.60, username: root, key_file: ~/.ssh/id_ed25519}
+        transport: {kind: native, library: acmedio, search_paths: ["C:/Program Files/Acme"]}
 """
 
 from typing import Annotated, Literal, Self
@@ -282,8 +283,46 @@ class SshConfig(LineSettings):
     connect_timeout: float = Field(default=10.0, gt=0)
 
 
+class NativeConfig(BaseModel):
+    """A vendor's native library (a Windows DLL or a shared object), called through ctypes.
+
+    Some instruments are only reachable through the vendor's library: the library talks
+    to the hardware, and the driver calls its functions. The library is a fact of the
+    station (where it is installed, which version), so its location lives in the
+    profile, never in driver code. Vendor libraries are never committed to a
+    repository; each station installs its own.
+
+    Attributes:
+        kind: Always ``"native"``.
+        library: The library's path, or its name (``"acmedio"`` finds ``acmedio.dll``,
+            ``libacmedio.so`` or ``libacmedio.dylib`` in ``search_paths``, then on the
+            system search path). ``~`` is expanded.
+        search_paths: Folders searched for ``library``. On Windows they are also added
+            to the DLL search path while the library loads, so the vendor's *dependent*
+            DLLs in those folders are found.
+        calling_convention: ``"cdecl"`` (the default, and the only one outside Windows)
+            or ``"stdcall"`` (the ``WINAPI`` convention of many Windows vendor DLLs).
+        thread_confined: Run every call on one dedicated thread. Many vendor libraries
+            are not thread-safe or keep per-thread state; leave this on unless the
+            vendor documents otherwise.
+
+    Example:
+        >>> cfg = NativeConfig(library="acmedio", search_paths=["C:/Program Files/Acme/bin"])
+        >>> cfg.calling_convention, cfg.thread_confined
+        ('cdecl', True)
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: Literal["native"] = "native"
+    library: str = Field(min_length=1)
+    search_paths: tuple[str, ...] = ()
+    calling_convention: Literal["cdecl", "stdcall"] = "cdecl"
+    thread_confined: bool = True
+
+
 type TransportConfig = Annotated[
-    TcpConfig | SerialConfig | UdpConfig | VisaConfig | TelnetConfig | SshConfig,
+    TcpConfig | SerialConfig | UdpConfig | VisaConfig | TelnetConfig | SshConfig | NativeConfig,
     Field(discriminator="kind"),
 ]
 """Any built-in transport config, selected by its ``kind`` field."""

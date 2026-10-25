@@ -11,7 +11,7 @@
 ## 1. Summary
 
 These Pydantic models describe how to reach a device: `TcpConfig`, `SerialConfig`,
-`UdpConfig`, `VisaConfig`, `TelnetConfig` and `SshConfig`. They are joined in the `TransportConfig` union,
+`UdpConfig`, `VisaConfig`, `TelnetConfig`, `SshConfig` and `NativeConfig`. They are joined in the `TransportConfig` union,
 discriminated by a `kind` field. Line framing (terminators, encoding, timeout) is shared
 through `LineSettings`. They appear in station profiles under `transport:`, and are
 validated before anything is opened. The one idea to remember: *addresses are facts of
@@ -49,12 +49,13 @@ flowchart LR
    | `UdpConfig` | `udp` | `host`, `port`, `local_host`, `local_port` | `0.0.0.0`, port `0` (OS-chosen) |
    | `VisaConfig` | `visa` | `resource`, `backend` | system backend |
    | `TelnetConfig` | `telnet` | `host`, `port`, optional login (`login_prompt`, `username`, `password_prompt`, `password`), `ready_prompt` | port 23, CRLF lines (ADR-0032) |
+   | `NativeConfig` | `native` | `library` (path or name), `search_paths`, `calling_convention` (`cdecl`/`stdcall`), `thread_confined` | cdecl, confined (ADR-0035) |
    | `SshConfig` | `ssh` | `host`, `port`, `username`, `password` or `key_file` (+ `key_passphrase`), `known_hosts` (`strict`/`accept_new`), `known_hosts_file` | port 22, strict host keys (ADR-0033) |
 
 2. **`LineSettings`** (`read_termination`, `write_termination`, `encoding`, `timeout > 0`)
-   is the base of the TCP, serial, VISA, Telnet and SSH configs. UDP has no lines, so it doesn't
-   inherit it.
-3. **`TransportConfig`** is the union of all six, discriminated by `kind`. A driver
+   is the base of the TCP, serial, VISA, Telnet and SSH configs. UDP and native libraries
+   have no lines, so they don't inherit it.
+3. **`TransportConfig`** is the union of all seven, discriminated by `kind`. A driver
    chooses how strict to be: `transport: TcpConfig` (one kind), `SerialConfig |
    TcpConfig` (several), or `TransportConfig` (any).
 4. **Stop bits** are validated with a validator, not a `Literal`, because `1.5` is a
@@ -121,3 +122,4 @@ YAML → StationProfile (raw dict) → DriverConfig.model_validate → Transport
 
 - 2026-10-21: created.
 - 2026-10-25: added `TelnetConfig` (ADR-0032) and `SshConfig` (ADR-0033) to the union; secrets as `SecretStr`.
+- 2026-10-25: added `NativeConfig` (ADR-0035).

@@ -15,6 +15,7 @@
 - `FakeLineIO`: scripted replies to text commands
 - `FakeStream`: fed bytes, with the real framing code
 - `FakeSshSession`: scripted command results, for DUT code using SSH
+- `FakeNativeLibrary` and `set_out`: Python stand-ins for a vendor DLL's functions
 - `FakeDatagramPeer`: a real UDP peer on localhost
 
 Drivers and DUT code can then be tested in CI without hardware, through the same
@@ -75,6 +76,15 @@ flowchart LR
    - Unknown commands return exit code 127 and "command not found" on stderr, as a
      real shell would.
    - `ran` records commands; running while closed raises `TransportError`.
+5. **`FakeNativeLibrary(functions)`** stands in for `NativeLibrary` (ADR-0035):
+   - each function is a callable, a fixed return code, or a list of codes served in
+     order (the last repeats)
+   - it enforces the real rules: declare before calling, unknown names raise
+     `TransportError`, calls while closed raise `TransportError`, and a declaration's
+     `StatusCheck` is applied
+   - `calls` records `(name, args)`
+   - `set_out(ref, value)` writes through a `byref()`/`pointer()` argument, as the C
+     function would fill an output parameter.
 
 ## 5. Abstractions
 
@@ -84,6 +94,8 @@ flowchart LR
 | `FakeStream` | `StreamTransport` (via `BufferedStream`) | Real framing; fed chunks; records sends. |
 | `FakeDatagramPeer` | a UDP peer | Real sockets; responder function; `push` for broadcasts. |
 | `FakeSshSession` | `SshSession` (by shape) | Scripted results; exit 127 for unknown commands; records commands. |
+| `FakeNativeLibrary` | `NativeLibrary` (by shape) | Python functions for vendor functions; same declaration rules; records calls. |
+| `set_out` | a C output parameter | Fills `byref(x)` / `pointer(x)`. |
 | `Reply` | type | `str \| list[str]`. |
 
 ## 6. Data flow
@@ -147,3 +159,4 @@ sequenceDiagram
 
 - 2026-10-21: created.
 - 2026-10-25: added `FakeSshSession` (ADR-0033).
+- 2026-10-25: added `FakeNativeLibrary` and `set_out` (ADR-0035).

@@ -2,11 +2,12 @@
 
 **Package:** `mastif.resources.transports`. **ADRs:** 0013 (configs), 0014 (streams),
 0015 (line I/O), 0016 (SCPI), 0017 (datagrams), 0018 (injection), 0032 (Telnet),
-0033 (SSH).
+0033 (SSH), 0035 (native vendor libraries).
 
 ## Why it exists
 
-Drivers need to talk to devices over TCP, serial, VISA, UDP, Telnet or SSH. Each medium has its own
+Drivers need to talk to devices over TCP, serial, VISA, UDP, Telnet or SSH, or through
+a vendor's native library. Each medium has its own
 library, its own errors, and its own ways of losing or merging data. If every driver
 handled this itself, there would be dozens of slightly different, slightly wrong
 implementations. The transports layer handles it once:
@@ -32,6 +33,7 @@ flowchart BT
     sl -.implements.-> LIO
     LIO --> scpi[Scpi]
     dg[DatagramChannel]
+    nl[NativeLibrary]
 ```
 
 | You need to… | Ask for | Built from `kind` |
@@ -41,6 +43,7 @@ flowchart BT
 | drive a SCPI instrument | `io: Scpi` | tcp, serial, visa, telnet, ssh |
 | exchange UDP messages | `io: DatagramChannel` | udp |
 | run commands on a host | `session: SshSession` | ssh |
+| call a vendor DLL | `lib: NativeLibrary` | native |
 
 ## Configs: where a device is
 
@@ -55,6 +58,7 @@ transport: {kind: udp, host: 192.168.1.50, port: 9000, local_port: 9001}
 transport: {kind: telnet, host: 10.0.0.9, login_prompt: "login: ", username: admin,
             password: "...", ready_prompt: "> "}
 transport: {kind: ssh, host: 192.168.1.60, username: root, key_file: ~/.ssh/id_ed25519}
+transport: {kind: native, library: acmedio, search_paths: ["C:/Program Files/Acme/bin"]}
 ```
 
 Unknown keys, bad ports and impossible stop bits are rejected before anything opens.
@@ -106,6 +110,16 @@ Serial, VISA and SSH need extras: `pip install 'mastif[serial]'`, `'mastif[visa]
 - Host keys are always checked. `known_hosts: strict` (default) refuses unknown hosts;
   `accept_new` trusts and remembers them. A changed key is always refused.
 - Without `password` or `key_file`, the SSH agent and `~/.ssh/id_*` are tried.
+
+**Native libraries** (ADR-0035):
+
+- Declare each function's prototype with `lib.function(name, restype, argtypes)`
+  before calling it with `lib.call(name, *args)`; undeclared calls are refused.
+- Calls run on one dedicated thread by default (`thread_confined`).
+- `StatusCheck` turns status codes into `ProtocolError` with the vendor's text.
+- Load failures explain themselves: a missing dependency (add `search_paths`), or a
+  32-bit DLL that a 64-bit Python can't load.
+- How-to: [Wrap a vendor DLL](guides/wrap-a-vendor-dll.md).
 
 **VISA** (ADR-0015): errors whose text mentions "timeout" become `TransportTimeout`. The
 per-read timeout argument is ignored; the resource timeout applies.

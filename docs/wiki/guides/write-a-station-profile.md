@@ -46,7 +46,7 @@ sim:                               # replacements when built with sim=True
 | Question | Where it goes |
 |---|---|
 | Which device is it? | `driver:` |
-| Where is it connected? | `config.transport` |
+| Where is it connected? | `config.transport` (`kind`: tcp, serial, visa, udp, telnet, ssh) |
 | How should lines be framed? | `transport.read_termination`, `write_termination`, `encoding`, `timeout` |
 | Which unit must be present? | `expect:` (any `Identity` field, or an `extra` key) |
 | What do tests call it? | `roles:` (a resource name also works as a role) |

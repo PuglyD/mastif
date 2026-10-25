@@ -6,7 +6,9 @@ Why this exists:
     present in the `Registry`:
 
     - ``mastif.udp``: `MessageChannel` over UDP (`UdpMessageChannel`).
-    - ``mastif.line-shell``: `Shell` over a serial or TCP console (`LineShell`).
+    - ``mastif.line-shell``: `Shell` over a serial, TCP, Telnet or SSH console (`LineShell`).
+    - ``mastif.ssh-shell``: `Shell` over SSH command execution, with real exit codes
+      (`SshShell`).
 
 Where it fits:
     A station profile maps a DUT's declared channels to these drivers::
@@ -22,9 +24,10 @@ Where it fits:
 """
 
 from mastif.resources.channels.shell import LineShell
+from mastif.resources.channels.ssh import SshShell
 from mastif.resources.channels.udp import UdpMessageChannel
 
-BUILTIN_DRIVERS: tuple[type, ...] = (LineShell, UdpMessageChannel)
+BUILTIN_DRIVERS: tuple[type, ...] = (LineShell, SshShell, UdpMessageChannel)
 """Driver classes every `Registry` includes by default."""
 
-__all__ = ["BUILTIN_DRIVERS", "LineShell", "UdpMessageChannel"]
+__all__ = ["BUILTIN_DRIVERS", "LineShell", "SshShell", "UdpMessageChannel"]

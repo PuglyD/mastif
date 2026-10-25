@@ -211,6 +211,8 @@ class ShellResult(BaseModel):
         output: Everything the DUT printed in response, without the echoed command and
             prompt.
         exit_code: The command's exit status when the shell can report it, else ``None``.
+        stderr: The command's error output, when the shell keeps it separate (SSH exec
+            does; a console mixes it into ``output`` and leaves this empty).
 
     Example:
         >>> ShellResult(command="uname -r", output="6.1.0", exit_code=0).ok
@@ -222,6 +224,7 @@ class ShellResult(BaseModel):
     command: str
     output: str
     exit_code: int | None = None
+    stderr: str = ""
 
     @property
     def ok(self) -> bool:

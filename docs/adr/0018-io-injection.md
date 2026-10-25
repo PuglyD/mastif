@@ -45,15 +45,16 @@ flowchart LR
 ## 4. Decision
 
 1. **The injectable types are**
-   `IO_TYPES = (StreamTransport, LineIO, Scpi, DatagramChannel)`.
+   `IO_TYPES = (StreamTransport, LineIO, Scpi, DatagramChannel, SshSession)`.
 2. **The combination table:**
 
-   | Requested | tcp | serial | visa | udp |
-   |---|---|---|---|---|
-   | `StreamTransport` | `TcpTransport` | `SerialTransport` | ✗ | ✗ |
-   | `LineIO` | `StreamLineIO(Tcp…)` | `StreamLineIO(Serial…)` | `VisaLineIO` | ✗ |
-   | `Scpi` | `Scpi(StreamLineIO(Tcp…))` | `Scpi(StreamLineIO(Serial…))` | `Scpi(VisaLineIO)` | ✗ |
-   | `DatagramChannel` | ✗ | ✗ | ✗ | `DatagramChannel` |
+   | Requested | tcp | serial | visa | udp | telnet | ssh |
+   |---|---|---|---|---|---|---|
+   | `StreamTransport` | `TcpTransport` | `SerialTransport` | ✗ | ✗ | `TelnetTransport` | `SshStreamTransport` |
+   | `LineIO` | `StreamLineIO(Tcp…)` | `StreamLineIO(Serial…)` | `VisaLineIO` | ✗ | `StreamLineIO(Telnet…)` | `StreamLineIO(SshStream…)` |
+   | `Scpi` | `Scpi(StreamLineIO(Tcp…))` | `Scpi(StreamLineIO(Serial…))` | `Scpi(VisaLineIO)` | ✗ | `Scpi(StreamLineIO(Telnet…))` | `Scpi(StreamLineIO(SshStream…))` |
+   | `DatagramChannel` | ✗ | ✗ | ✗ | `DatagramChannel` | ✗ | ✗ |
+   | `SshSession` | ✗ | ✗ | ✗ | ✗ | ✗ | `SshSession` |
 
    A ✗ raises `DriverDefinitionError("cannot provide <Type> over a '<kind>' transport")`.
 3. **Every returned object has `open()`/`close()`.** Wrappers pass them through. The
@@ -117,9 +118,10 @@ sequenceDiagram
 | What | Where |
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/transports/factory.py` |
-| Tests | `packages/mastif/tests/resources/test_transports.py` (parametrised combination tests) |
+| Tests | `packages/mastif/tests/resources/test_transports.py`, `test_telnet.py`, `test_ssh.py` (parametrised combination tests) |
 | Wiki | `docs/wiki/transports.md` |
 
 ## History
 
 - 2026-10-21: created.
+- 2026-10-25: added the `telnet` and `ssh` columns and `SshSession` as an injectable type (ADR-0032, ADR-0033).

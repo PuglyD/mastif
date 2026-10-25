@@ -45,8 +45,8 @@ flowchart TB
 | `DriverDefinitionError` | importing org code; `Station.build` | a bad id, `Config`, `__init__` parameter or channel; an impossible I/O combination | Fix the driver class. | 0011, 0018 |
 | `ContractMismatch` | importing org code | a driver missing contract methods, or with the wrong parameters | Implement the missing members. | 0008 |
 | `DriverNotFound` | `Registry.get` | a typo in the profile; the SDK isn't installed | Check the id against the listed known ids. | 0012 |
-| `TransportError` | open or run | connection refused; port missing; peer closed; pyserial or pyvisa missing | Check cabling, addresses, extras. | 0014, 0015, 0017 |
-| `TransportTimeout` | run | the device didn't answer in time | Check power, baud rate, prompt, terminators. | 0014, 0015, 0017, 0020 |
+| `TransportError` | open or run | connection refused; port missing; peer closed; pyserial, pyvisa or paramiko missing; SSH host key unknown or changed; SSH authentication failed | Check cabling, addresses, extras, credentials, `known_hosts`. | 0014, 0015, 0017, 0032, 0033 |
+| `TransportTimeout` | open or run | the device didn't answer in time; a Telnet login or ready prompt never appeared; an SSH command didn't finish | Check power, baud rate, prompts, terminators, command timeouts. | 0014, 0015, 0017, 0020, 0032, 0033 |
 | `ProtocolError` | run | non-numeric reply; a SCPI overflow `9.9E37`; errors in the instrument queue; bad exit-code output | Check the command set, range, firmware. | 0016, 0020 |
 | `IdentityMismatch` | open | the wrong device or unit; `expect:` set but the driver can't identify itself | Fix the bench, or the profile's `expect:`. | 0010, 0022 |
 | `ResourceFault` | open or run | `health()` not ok; the device reports a fault | Fix or replace the instrument. | 0010, 0022 |

@@ -11,7 +11,7 @@
 ## 1. Summary
 
 These Pydantic models describe how to reach a device: `TcpConfig`, `SerialConfig`,
-`UdpConfig` and `VisaConfig`. They are joined in the `TransportConfig` union,
+`UdpConfig`, `VisaConfig`, `TelnetConfig` and `SshConfig`. They are joined in the `TransportConfig` union,
 discriminated by a `kind` field. Line framing (terminators, encoding, timeout) is shared
 through `LineSettings`. They appear in station profiles under `transport:`, and are
 validated before anything is opened. The one idea to remember: *addresses are facts of
@@ -48,15 +48,21 @@ flowchart LR
    | `SerialConfig` | `serial` | `port` (name, or a pyserial URL such as `loop://`), `baudrate`, `bytesize` (5–8), `parity` (N/E/O/M/S), `stopbits` (1, 1.5 or 2) | 9600 8N1 |
    | `UdpConfig` | `udp` | `host`, `port`, `local_host`, `local_port` | `0.0.0.0`, port `0` (OS-chosen) |
    | `VisaConfig` | `visa` | `resource`, `backend` | system backend |
+   | `TelnetConfig` | `telnet` | `host`, `port`, optional login (`login_prompt`, `username`, `password_prompt`, `password`), `ready_prompt` | port 23, CRLF lines (ADR-0032) |
+   | `SshConfig` | `ssh` | `host`, `port`, `username`, `password` or `key_file` (+ `key_passphrase`), `known_hosts` (`strict`/`accept_new`), `known_hosts_file` | port 22, strict host keys (ADR-0033) |
 
 2. **`LineSettings`** (`read_termination`, `write_termination`, `encoding`, `timeout > 0`)
-   is the base of the TCP, serial and VISA configs. UDP has no lines, so it doesn't
+   is the base of the TCP, serial, VISA, Telnet and SSH configs. UDP has no lines, so it doesn't
    inherit it.
-3. **`TransportConfig`** is the union of all four, discriminated by `kind`. A driver
+3. **`TransportConfig`** is the union of all six, discriminated by `kind`. A driver
    chooses how strict to be: `transport: TcpConfig` (one kind), `SerialConfig |
    TcpConfig` (several), or `TransportConfig` (any).
 4. **Stop bits** are validated with a validator, not a `Literal`, because `1.5` is a
    float and float literals aren't valid typing.
+5. **Secrets are `pydantic.SecretStr`** (Telnet and SSH passwords, key passphrases), so
+   they never appear in reprs, logs or error messages.
+6. **Cross-field rules use model validators**, e.g. a Telnet `username` requires a
+   `login_prompt` and vice versa.
 
 ## 5. Abstractions
 
@@ -77,7 +83,7 @@ YAML → StationProfile (raw dict) → DriverConfig.model_validate → Transport
 
 | Exception | Raised when | Who catches it |
 |---|---|---|
-| `pydantic.ValidationError` | a wrong type, an out-of-range value, an unknown key, an unknown `kind`, odd stop bits | The station wraps it: `StationError("resource 'x': invalid config: transport.port: ...")`. |
+| `pydantic.ValidationError` | a wrong type, an out-of-range value, an unknown key, an unknown `kind`, odd stop bits, a half-specified Telnet login | The station wraps it: `StationError("resource 'x': invalid config: transport.port: ...")`. |
 
 ## 8. Guarantees and invariants
 
@@ -101,7 +107,6 @@ YAML → StationProfile (raw dict) → DriverConfig.model_validate → Transport
 
 ## 11. Open questions and future work
 
-- SSH and Telnet configs, for shells on networked DUTs.
 - `socket://` TCP-serial bridges already work through pyserial URLs.
 
 ## 12. Code map
@@ -115,3 +120,4 @@ YAML → StationProfile (raw dict) → DriverConfig.model_validate → Transport
 ## History
 
 - 2026-10-21: created.
+- 2026-10-25: added `TelnetConfig` (ADR-0032) and `SshConfig` (ADR-0033) to the union; secrets as `SecretStr`.

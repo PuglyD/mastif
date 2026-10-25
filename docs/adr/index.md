@@ -54,6 +54,9 @@ working in, bottom-up.
 | [0018](0018-io-injection.md) | `transports.factory` | Build the I/O a driver asks for from the profile's transport. |
 | [0019](0019-builtin-udp-channel.md) | `channels.udp` | `mastif.udp`: a `MessageChannel` with no driver code. |
 | [0020](0020-builtin-line-shell.md) | `channels.shell` | `mastif.line-shell`: a prompt-based console as a `Shell`. |
+| [0032](0032-telnet-transport.md) | `transports.telnet` | Telnet as a stream: negotiation stripped, optional login, via `telnetlib`. |
+| [0033](0033-ssh-transports.md) | `transports.ssh` | SSH command sessions with real exit codes, and interactive shells; strict host keys. |
+| [0034](0034-builtin-ssh-shell.md) | `channels.ssh` | `mastif.ssh-shell`: SSH command execution as a `Shell`. |
 
 ## Station: one physical bench
 

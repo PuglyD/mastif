@@ -25,7 +25,7 @@ flowchart LR
     contract -->|tests ask for| role["role psu_main (station)"]
     drv -->|DriverSpec| reg[Registry]
     dutc["@dut class\ndemo.widget-board"] -->|declares| ch["channels:\nconsole: Shell\nctrl: MessageChannel"]
-    ch -->|mapped in profile to| bi["mastif.line-shell / mastif.udp"]
+    ch -->|mapped in profile to| bi["mastif.line-shell / mastif.ssh-shell / mastif.udp"]
     dutc --> reg
     bi --> reg
 ```
@@ -99,7 +99,10 @@ The station builds each channel as a resource of its own, from the profile. It c
 that the channel provides the declared contract, and attaches it before the DUT's
 `open()` runs. Common channels need no code:
 
-- `mastif.line-shell` turns a prompt-based console into a `Shell` (ADR-0020).
+- `mastif.line-shell` turns a prompt-based console (serial, TCP, Telnet or an
+  interactive SSH shell) into a `Shell` (ADR-0020).
+- `mastif.ssh-shell` runs each command over SSH, with real exit codes and separate
+  stderr, as a `Shell` (ADR-0034).
 - `mastif.udp` turns a UDP peer into a `MessageChannel` (ADR-0019).
 
 ### Identity and health

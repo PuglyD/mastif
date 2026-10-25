@@ -1,4 +1,4 @@
-"""``mastif.line-shell``: the built-in `Shell` over a serial or TCP console.
+"""``mastif.line-shell``: the built-in `Shell` over a serial, TCP, Telnet or SSH console.
 
 Why this exists:
     Embedded DUTs very often expose a text console: you type a command, it prints
@@ -21,9 +21,9 @@ import re
 from pydantic import Field
 
 from mastif.resources.driver import DriverConfig, driver
-from mastif.resources.errors import ProtocolError
+from mastif.resources.errors import ProtocolError, TransportTimeout
 from mastif.resources.std import Shell, ShellResult
-from mastif.resources.transports.config import SerialConfig, TcpConfig
+from mastif.resources.transports.config import SerialConfig, SshConfig, TcpConfig, TelnetConfig
 from mastif.resources.transports.stream import StreamTransport
 
 
@@ -40,30 +40,37 @@ class LineShell:
         >>> sh = LineShell(cfg, stream)
         >>> stream.feed(b"version\\r\\n2.1\\r\\n# ")
         >>> sh.execute("version")
-        ShellResult(command='version', output='2.1', exit_code=None)
+        ShellResult(command='version', output='2.1', exit_code=None, stderr='')
     """
 
     class Config(DriverConfig):
         """How to talk to the console.
 
         Attributes:
-            transport: Serial port or TCP (e.g. a terminal server) carrying the console.
+            transport: Serial port, TCP (e.g. a terminal server), Telnet, or an SSH
+                interactive shell carrying the console. For plain command execution
+                over SSH, ``mastif.ssh-shell`` is simpler and reports real exit codes.
             prompt: The text the shell prints when ready for the next command.
             echo: Whether the console echoes typed commands back (most do).
             exit_code_command: Command that prints the last exit status, e.g.
                 ``"echo $?"``; ``None`` if the shell has no such concept.
             sync_on_open: Send an empty line on open and wait for a prompt.
+            settle_time: After that prompt, keep discarding further prompts until the
+                console has been quiet this many seconds. A prompt that was already
+                waiting (after a login banner, say) plus the one answering the empty
+                line would otherwise be mistaken for the first command's output.
             timeout: Default seconds to wait for a command to finish.
 
         Example:
             ``{transport: {kind: serial, port: COM3, baudrate: 115200}, prompt: "# "}``
         """
 
-        transport: SerialConfig | TcpConfig = Field(discriminator="kind")
+        transport: SerialConfig | TcpConfig | TelnetConfig | SshConfig = Field(discriminator="kind")
         prompt: str = "$ "
         echo: bool = True
         exit_code_command: str | None = None
         sync_on_open: bool = True
+        settle_time: float = Field(default=0.2, ge=0)
         timeout: float = Field(default=5.0, gt=0)
 
     def __init__(self, cfg: Config, io: StreamTransport) -> None:
@@ -76,17 +83,30 @@ class LineShell:
         self.io = io
 
     def open(self) -> None:
-        """Synchronise with the console by waiting for a fresh prompt.
+        """Synchronise with the console by waiting for a fresh prompt, then for quiet.
 
         Raises:
             TransportTimeout: If no prompt appears, e.g. wrong baud rate or DUT not booted.
 
         Example:
-            Called by the station after the stream is opened.
+            >>> from mastif_testing import FakeStream
+            >>> s = FakeStream(); s.open()
+            >>> cfg = LineShell.Config.model_validate(
+            ...     {"transport": {"kind": "serial", "port": "COM3"}, "prompt": "# "})
+            >>> s.feed(b"login ok\\r\\n# "); s.feed(b"\\r\\n# ")   # a waiting prompt, then ours
+            >>> sh = LineShell(cfg, s); sh.open()
+            >>> s.feed(b"version\\r\\n2.1\\r\\n# ")
+            >>> sh.execute("version").output
+            '2.1'
         """
         if self.cfg.sync_on_open:
             self.io.write(self.cfg.transport.write_termination)
             self.io.read_until(self.cfg.prompt, self.cfg.timeout)
+            while self.cfg.settle_time > 0:
+                try:
+                    self.io.read_until(self.cfg.prompt, self.cfg.settle_time)
+                except TransportTimeout:
+                    break
 
     def _run(self, command: str, timeout: float) -> str:
         """Send one command and return its output, without the echo and the prompt.

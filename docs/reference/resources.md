@@ -25,8 +25,14 @@ Generated from docstrings. For the concepts, see [Resources](../wiki/resources.m
 
 ::: mastif.resources.transports.datagram
 
+::: mastif.resources.transports.telnet
+
+::: mastif.resources.transports.ssh
+
 ::: mastif.resources.transports.factory
 
 ::: mastif.resources.channels.udp
 
 ::: mastif.resources.channels.shell
+
+::: mastif.resources.channels.ssh

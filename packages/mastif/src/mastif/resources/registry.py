@@ -174,7 +174,7 @@ class Registry:
 
         Example:
             >>> Registry().ids()
-            ['mastif.line-shell', 'mastif.udp']
+            ['mastif.line-shell', 'mastif.ssh-shell', 'mastif.udp']
         """
         return sorted(self._specs)
 

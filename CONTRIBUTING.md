@@ -1,8 +1,15 @@
 # Contributing to mastif
 
+> **External contributions are not accepted at this time.** mastif is dual-licensed
+> (AGPL-3.0-or-later, plus a commercial licence from the author; see
+> [ADR-0031](docs/adr/0031-licensing-and-dependency-policy.md)). Offering the
+> commercial licence requires that the author holds the copyright to all of the code,
+> so pull requests from others can't be merged. Bug reports, questions and feedback are
+> welcome. If contributions open later, they will need a Contributor Licence Agreement.
+
 This guide covers how code gets into mastif: branches, commit messages, versions and
-review. The engineering rules (clean-room, layering, code style, tests) are in
-[`AGENTS.md`](AGENTS.md). Read both before your first change.
+review. It is the maintainer's workflow. The engineering rules (clean-room, layering,
+code style, tests) are in [`AGENTS.md`](AGENTS.md). Read both before your first change.
 
 ---
 
@@ -184,4 +191,4 @@ Number ADRs sequentially and add them to the `mkdocs.yml` nav.
 - [ ] Every new module has its own complete ADR, and changed modules have their ADRs updated.
 - [ ] The wiki is updated: layer page, flows, glossary, error map and guides as relevant.
 - [ ] No employer or customer identifiers; reference projects used for inspiration only, nothing pasted.
-- [ ] Any new dependency has a permissive licence.
+- [ ] Any new dependency has an AGPL-compatible licence (ADR-0031, section 4.6).

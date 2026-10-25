@@ -8,6 +8,11 @@ where it lives.
   flow, errors, and the alternatives rejected. There is one per module. See the
   [ADR index](../adr/index.md).
 
+**AGPL (GNU Affero General Public License)**
+: mastif's licence, version 3 or later. A copyleft licence: whoever receives mastif, or
+  uses a modified version over a network, must be offered the source. Internal use
+  carries no obligations. ADR-0031, [Licensing](licensing.md).
+
 **Aggregate**
 : Combine child verdicts into a parent verdict: the worst wins (ABORTED > ERROR > FAIL >
   WARN > PASS > SKIPPED). `mastif.kernel.verdict.aggregate`. ADR-0005.
@@ -32,6 +37,11 @@ where it lives.
 : Git information embedded into a wheel at build time (`_build_info.py`), so installed
   software knows its commit. ADR-0028.
 
+**CLA (Contributor Licence Agreement)**
+: A contract in which a contributor grants the project owner the right to relicense
+  their contribution. Needed before mastif could accept outside contributions without
+  losing the ability to sell commercial licences. ADR-0031.
+
 **Children**
 : Sub-resources a composite driver reports once open, e.g. the axes of a positioner
   controller. They are reachable by role as `resource.child`.
@@ -51,6 +61,11 @@ where it lives.
 **DriverSpec**
 : The record `@driver`/`@dut` attaches to a class: id, provided contracts, config model,
   injected parameters, channels and state model. ADR-0011.
+
+**Dual licensing**
+: Offering the same code under two licences: the AGPL for everyone, and a commercial
+  licence, sold by the author, without the AGPL's obligations. Requires the author to
+  hold all copyright. ADR-0031.
 
 **Dynaconf**
 : The configuration library behind mastif's `Settings`: multi-format files, merging,

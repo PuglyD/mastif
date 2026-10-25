@@ -1,0 +1,5 @@
+# Licence texts are kept byte-for-byte as published; never convert their line endings.
+LICENSE text eol=lf
+NOTICE text eol=lf
+packages/*/LICENSE text eol=lf
+packages/*/NOTICE text eol=lf

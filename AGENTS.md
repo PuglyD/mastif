@@ -22,7 +22,25 @@ loop types) and UI on top of it.
   project uses a product-specific concept, generalise it (e.g. a product's firmware
   configuration becomes an org-defined loop type). Examples use the fictional orgs `demo`
   and `acme` and simulated devices.
-- Dependencies must use permissive licences (MIT, BSD, Apache-2.0, PSF). No GPL/AGPL/LGPL.
+
+## Licensing and dependencies
+
+mastif is licensed AGPL-3.0-or-later, with a commercial licence offered by the author
+(dual licensing; ADR-0031). Dependencies must therefore be **AGPL-3.0-compatible**:
+
+- **Allowed:** permissive (MIT, BSD, ISC, Apache-2.0, PSF), LGPL (e.g. paramiko),
+  MPL-2.0 (e.g. certifi), and GPL-3.0-compatible licences (GPL-3.0, GPL-2.0-or-later,
+  AGPL-3.0).
+- **Not allowed:** GPL-2.0-only, SSPL, BSL and other source-available licences,
+  non-commercial licences, proprietary code, or code with no licence.
+- **Anything else** (EPL-2.0, CDDL...) needs a written compatibility analysis in an ADR
+  first.
+- Heavy or platform-specific dependencies are optional extras (`mastif[ssh]`), so the
+  core stays light.
+- Never commit vendor binaries (DLLs, shared libraries); users install them on their
+  stations.
+- Never edit `LICENSE` or `NOTICE` copies under `packages/`; copy them from the root.
+- External contributions are not accepted, so the author keeps sole copyright.
 
 ## Layering
 

@@ -5,6 +5,7 @@
 | Area | What exists | ADRs |
 |---|---|---|
 | Repository | uv workspace, ruff, ty, pytest + doctests, import-linter, mkdocs, git flow | 0001 |
+| Licensing | AGPL-3.0-or-later plus commercial licence; AGPL-compatible dependency rule | 0031 |
 | Kernel | units, limits, verdicts, results, ids, errors | 0002–0007 |
 | Infra | Dynaconf settings by dependency injection, logging (Rich console, rotating file, tables), version and build info, bootstrap | 0026–0029 |
 | Resources | contracts, std contracts, identity/health, `@driver`/`@dut`, registry, transports (TCP, serial, VISA, lines, SCPI, UDP), built-in channels | 0008–0020 |

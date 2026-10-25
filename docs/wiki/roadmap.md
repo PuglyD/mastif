@@ -6,6 +6,7 @@
 |---|---|---|
 | Repository | uv workspace, ruff, ty, pytest + doctests, import-linter, mkdocs, git flow | 0001 |
 | Licensing | AGPL-3.0-or-later plus commercial licence; AGPL-compatible dependency rule | 0031 |
+| Runtime design | direct mode now, station runtime later (design only); field notes | 0030 |
 | Kernel | units, limits, verdicts, results, ids, errors | 0002–0007 |
 | Infra | Dynaconf settings by dependency injection, logging (Rich console, rotating file, tables), version and build info, bootstrap | 0026–0029 |
 | Resources | contracts, std contracts, identity/health, `@driver`/`@dut`, registry, transports (TCP, serial, VISA, lines, SCPI, UDP), built-in channels | 0008–0020 |
@@ -32,6 +33,20 @@ These steps are planned in detail in [the plan](../plan.md), Part B.
    - Policies, abort and pause.
    - A run store with snapshots, resume, and standalone task runs.
    - A minimal CLI.
+
+The engine is built in **direct mode** (the test process owns the station) and must
+honour the constraints in [ADR-0030](../adr/0030-execution-topology.md): hardware only
+through `require(role, Contract)`, serialisable contract values, a `ResourceProvider`
+interface, and per-run control leases.
+
+## After the engine: the station runtime
+
+Designed in [ADR-0030](../adr/0030-execution-topology.md), built once the engine works:
+
+- one long-lived process owns the station; the executor and a control GUI use it at
+  once through proxies implementing the same contracts
+- commands on demand, opt-in monitors, a state store with sequence numbers
+- control leases, and child-process hosting for crash-prone or 32-bit vendor DLLs
 
 ## Later
 

@@ -58,6 +58,10 @@ where it lives.
 : A capability a test needs, written as a plain `typing.Protocol`, e.g. `PowerSupply`.
   Tests depend on contracts, never on drivers. ADR-0008.
 
+**Direct mode**
+: The default way to run: the test process builds and owns the `Station`, opens the
+  instruments, measures and closes them. No background process. ADR-0030.
+
 **DriverSpec**
 : The record `@driver`/`@dut` attaches to a class: id, provided contracts, config model,
   injected parameters, channels and state model. ADR-0011.
@@ -130,6 +134,11 @@ where it lives.
 : One of `kernel`, `resources`, `station`, `engine`, `api` and `cli`. Imports only point
   down. ADR-0001.
 
+**Lease (control lease)**
+: Exclusive control of a set of roles, held by one client of the station runtime. A test
+  run leases the roles it requires; GUIs may observe without one. A no-op in direct mode.
+  ADR-0030 (planned).
+
 **Limits**
 : A passing range plus an optional wider warning range. `IndexedLimits` vary per index.
   ADR-0004.
@@ -141,6 +150,11 @@ where it lives.
 : A dimension a plan iterates over, e.g. channel, temperature or firmware profile. Orgs
   will define loop types with enter and exit actions.
 
+**Monitor**
+: Opt-in background polling of a resource's declared side-effect-free readings, configured
+  by a `monitor:` block in the station profile. Runtime mode only; pauses while a test
+  holds the resource by default. ADR-0030 (planned).
+
 **Measurement / Check / Table**
 : The three result kinds. Each computes its own verdict. ADR-0006.
 
@@ -150,6 +164,11 @@ where it lives.
 
 **Profile (station profile)**
 : The YAML facts of one bench: resources, roles and sim overrides. ADR-0021.
+
+**Proxy**
+: A client-side stand-in for a resource in the station runtime. It implements the same
+  contract as the driver and forwards each call to the runtime process. ADR-0030
+  (planned).
 
 **Quantity**
 : A value with a unit: `12 * V`. ADR-0003.
@@ -168,6 +187,11 @@ where it lives.
 : Runs the lifecycle: ordered open with identity and health checks, rollback, safe
   state, reverse close. ADR-0022.
 
+**ResourceProvider**
+: The interface the engine uses to reach hardware: `role`, `require`, `open`,
+  `safe_state`, `close` and `lease`. `Station` provides it in direct mode; a
+  `RemoteStation` client will in runtime mode. ADR-0030.
+
 **Role**
 : The name a test uses for a resource (`psu_main`). The profile maps roles to resources,
   so tests stay portable across benches. ADR-0021, ADR-0023.
@@ -179,6 +203,11 @@ where it lives.
 **SCPI**
 : Standard Commands for Programmable Instruments, the text command language of most
   bench instruments. The `Scpi` helper is ADR-0016.
+
+**Sequence number**
+: A counter attached to every value written into a resource's state. A test accepts
+  only values whose sequence number is at least that of its own command
+  (read-after-write consistency). ADR-0030.
 
 **Sentinel**
 : A special return value meaning "failed", such as `0.0`, `None` or `-1`. Forbidden in
@@ -195,6 +224,15 @@ where it lives.
 **Slot**
 : One DUT position on a multi-DUT fixture. It is carried in ids and profiles today, and
   will be used later. ADR-0007.
+
+**State model**
+: A Pydantic model declared with `@driver(..., state=...)` or `@dut(..., state=...)`,
+  describing a resource's setpoints, output flags and last readings, each stamped with
+  a time and sequence number. ADR-0011, ADR-0030.
+
+**Station runtime**
+: The planned long-lived process that owns a station and serves several clients (the
+  test executor, a control GUI) through proxies. Built after the engine. ADR-0030.
 
 **TRACE / SUCCESS**
 : Extra log levels: TRACE (5) for raw protocol traffic, SUCCESS (25) for positive

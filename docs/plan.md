@@ -169,7 +169,25 @@ sim:   {bench_psu: {driver: demo.psu-sim}, dut: {dut: demo.widget-sim}}
 
 ## Part B: Test execution engine (`mastif/engine/`, author surface in `mastif/api/`)
 
-### B1. Author API (engine-independent and frozen before the spike)
+### B0. Constraints from the execution topology (ADR-0030)
+The engine is built in **direct mode** (the test process owns the station), but must not
+rule out the later **station runtime**, where one process owns the station and clients get
+proxies. So:
+1. **Tasks reach hardware only through `require(role, Contract)`.** No task imports a driver
+   or opens a transport.
+2. **Contract arguments and return values stay serialisable:** `Quantity`, Pydantic models,
+   enums, primitives, `bytes`, and containers of these. Callbacks and nested objects are
+   flagged in review; proxies will need adapters for them.
+3. **The engine talks to a `ResourceProvider` protocol** (`role`, `require`, `open`,
+   `safe_state`, `close`, `lease`), never to `Station` by name. `Station` gains a no-op
+   `lease` when the engine lands; a future `RemoteStation` client implements the same
+   protocol.
+4. **The engine acquires a control lease per run** for exactly the roles the plan requires.
+   In direct mode this is a no-op.
+5. **Measurements are fresh by construction:** a measurement method runs the measurement and
+   returns its value; nothing is read from a cache.
+
+ (engine-independent and frozen before the spike)
 ```python
 class RxGain(TaskConfig):
     target: Quantity = 20 * dB

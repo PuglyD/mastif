@@ -50,6 +50,7 @@ nav:
           - Bootstrap an application: wiki/guides/bootstrap-an-application.md
       - Error map: wiki/errors.md
       - Glossary: wiki/glossary.md
+      - Licensing: wiki/licensing.md
       - Working on mastif: wiki/working-on-mastif.md
       - Roadmap: wiki/roadmap.md
   - Decisions:
@@ -58,6 +59,7 @@ nav:
       - Cross-cutting:
           - 0001 Layered architecture: adr/0001-layered-architecture.md
           - 0002 Error model: adr/0002-error-model.md
+          - 0031 Licensing and dependency policy: adr/0031-licensing-and-dependency-policy.md
       - Kernel:
           - 0003 Units: adr/0003-units.md
           - 0004 Limits and evaluation: adr/0004-limits-and-evaluation.md

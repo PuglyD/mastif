@@ -15,6 +15,7 @@ working in, bottom-up.
 |---|---|---|
 | [0001](0001-layered-architecture.md) | Layered architecture | Seven layers, dependencies point down only, org code is plugged in via entry points. |
 | [0002](0002-error-model.md) | Error model | One typed hierarchy under `MastifError`; the type says what happened, the message says where; no sentinels. |
+| [0031](0031-licensing-and-dependency-policy.md) | Licensing and dependency policy | AGPL-3.0-or-later plus a commercial licence; dependencies must be AGPL-compatible; no outside contributions yet. |
 
 ## Kernel: the shared vocabulary
 

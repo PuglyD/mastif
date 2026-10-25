@@ -19,8 +19,8 @@ It also covers the minimum bootstrap and kernel they depend on. Out of scope for
 - **Multi-DUT:** designed for but not built (`slot` ids run through every model).
 - **Engine base:** chosen by a spike, own engine vs pytest-based.
 - **Python:** 3.12+.
-- **License:** undecided, so the repo is "All rights reserved" for now.
-- **Dependencies:** permissive licences only.
+- **License:** AGPL-3.0-or-later, plus a commercial licence from the author (ADR-0031). No outside contributions for now.
+- **Dependencies:** AGPL-3.0-compatible licences only (ADR-0031; mastif is AGPL-3.0-or-later with a commercial option).
 
 ---
 

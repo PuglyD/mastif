@@ -1,0 +1,24 @@
+mastif
+Copyright (C) 2026 PuglyD <dushomirsky@protonmail.com>
+
+This program is free software: you can redistribute it and/or modify it under the
+terms of the GNU Affero General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+The full licence text is in the LICENSE file.
+
+Commercial licence
+------------------
+The copyright holder also offers mastif under a separate commercial licence, for
+use without the obligations of the AGPL (for example, distributing a proprietary
+SDK or service built on mastif without offering its source code). Contact the
+author at the address above.
+
+Third-party software
+--------------------
+mastif's dependencies are installed separately and remain under their own
+licences. See docs/adr/0031-licensing-and-dependency-policy.md for the policy.

@@ -15,9 +15,15 @@ markdown_extensions:
   - toc: {permalink: true}
   - pymdownx.superfences:
       custom_fences:
+        # Class "diagram", not "mermaid": Material would render it into a closed shadow
+        # root that can't be zoomed. docs/javascripts/diagrams.js renders it instead.
         - name: mermaid
-          class: mermaid
+          class: diagram
           format: !!python/name:pymdownx.superfences.fence_code_format
+extra_css:
+  - stylesheets/diagrams.css
+extra_javascript:
+  - javascripts/diagrams.js
 plugins:
   - search
   - mkdocstrings:

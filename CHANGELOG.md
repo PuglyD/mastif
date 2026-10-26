@@ -70,6 +70,10 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 ### Documentation
 
+- Interactive diagrams: every Mermaid diagram can be zoomed, panned and opened
+  fullscreen, in light and dark themes. Fixed seven diagrams that failed to render
+  (ADR-0008, 0011, 0023, 0026 twice, 0035, and the station wiki page).
+
 - ADR-0030 designs the execution topology: direct mode now (the test process owns the
   station), a shared station runtime later behind the same contracts, with the
   constraints the engine must respect. New wiki page: field notes.

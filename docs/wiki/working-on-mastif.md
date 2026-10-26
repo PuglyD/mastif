@@ -72,3 +72,25 @@ version. See `CONTRIBUTING.md`.
 Every `>>>` example in a docstring is run by `uv run pytest`. If you change behaviour
 and forget an example, CI tells you. For examples that need real hardware, use a prose
 code block (indented, without `>>>`) instead.
+
+## Diagrams
+
+Diagrams are Mermaid, written in ```` ```mermaid ```` fences. The docs render them with
+their own viewer (`docs/javascripts/diagrams.js`) instead of Material's built-in one,
+because Material draws them into a closed shadow root that can't be zoomed. Every
+diagram gets:
+
+- **+ / − / ↺ / ⛶** buttons: zoom in, zoom out, fit, fullscreen
+- **drag** to pan, **Ctrl+scroll** to zoom (plain scroll in fullscreen), **double-click**
+  for fullscreen, **Esc** to close it
+- keyboard, once the diagram has focus: `+` `-` `0` `f` and the arrow keys
+- light and dark themes following the palette toggle
+
+Two Mermaid pitfalls have broken diagrams here before:
+
+- **No `;` in sequence-diagram messages.** Mermaid treats `;` as the end of a
+  statement, so `A->>B: open(); close()` is a syntax error. Write `open(), then close()`.
+- **Quote edge labels that contain parentheses or brackets:** `A -->|"section(key)"| B`.
+
+A diagram that fails to parse shows the error and its source in place of the drawing,
+so check the pages you touched with `uv run mkdocs serve`.

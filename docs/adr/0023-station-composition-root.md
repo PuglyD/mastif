@@ -128,7 +128,7 @@ sequenceDiagram
     S->>M: open_all
     E->>S: require("psu_main", PowerSupply)
     S-->>E: PsuX instance
-    E->>S: safe_state(); close()
+    E->>S: safe_state(), then close()
 ```
 
 ## 7. Errors

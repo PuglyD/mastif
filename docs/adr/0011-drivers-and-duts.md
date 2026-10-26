@@ -156,7 +156,7 @@ sequenceDiagram
     BR->>BR: Config.model_validate(config)
     BR->>F: build_io(Scpi, cfg.transport, logger)
     F-->>BR: Scpi(StreamLineIO(TcpTransport))  (not open)
-    BR->>BR: PsuX(cfg=..., io=...); state = StateModel()
+    BR->>BR: PsuX(cfg=..., io=...), then state = StateModel()
     BR-->>St: BuiltResource(instance, io=[scpi])
 ```
 

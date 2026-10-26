@@ -168,7 +168,7 @@ sequenceDiagram
     participant W as Worker thread
     participant V as Vendor DLL
     St->>L: open()
-    L->>W: start; load acmedio.dll (search_paths registered)
+    L->>W: start, then load acmedio.dll (search_paths registered)
     St->>D: open()
     D->>L: function("ACME_Open", c_int, [c_char_p, POINTER(c_void_p)], check=status)
     D->>L: call("ACME_Open", b"10.0.0.40", byref(handle))

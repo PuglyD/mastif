@@ -105,7 +105,7 @@ sequenceDiagram
     Dec->>C: check_provides("acme.psu-x", PsuX, (PowerSupply,))
     C->>C: contract_members(PowerSupply)
     loop each member
-        C->>C: getattr_static(PsuX, name); bind dummy args
+        C->>C: getattr_static(PsuX, name), then bind dummy args
     end
     alt problems found
         C--xOrg: ContractMismatch("acme.psu-x does not provide PowerSupply: output: missing")

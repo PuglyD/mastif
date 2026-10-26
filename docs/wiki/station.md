@@ -68,8 +68,8 @@ sequenceDiagram
     participant R as each resource (profile order)
     M->>R: open I/O → open channels → open() → identify vs expect → health → children
     Note over M,R: any failure → close what was opened, in reverse → re-raise
-    M->>R: safe_state_all (reverse; never stops early; returns failures)
-    M->>R: close_all (reverse; attempts everything; raises at the end if anything failed)
+    M->>R: safe_state_all (reverse, never stops early, returns failures)
+    M->>R: close_all (reverse, attempts everything, raises at the end if anything failed)
 ```
 
 The operator's scanned serial is checked with `station.open(expect={"dut": {"serial":

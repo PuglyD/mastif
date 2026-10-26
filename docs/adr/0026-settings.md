@@ -56,7 +56,7 @@ flowchart LR
     cs --> S[(Settings)]
     S -->|passed explicitly| st["Station.build(settings=)"]
     st -->|injected| drv["drivers with __init__(..., settings: Settings)"]
-    S -->|section(key, Model)| typed[validated models]
+    S -->|"section(key, Model)"| typed[validated models]
     S --> logs[resolve_logging_config]
     S -->|as_dict| manifest[run manifest - planned]
 ```
@@ -122,7 +122,7 @@ sequenceDiagram
     App->>C: create_settings("config/", defaults=..., envvar_prefix="ACME")
     C->>C: config_files → [00-base.toml, 10-site.yaml]
     C->>D: Dynaconf(settings_files=[...], DEFAULTS..., merge_enabled=True)
-    C->>D: as_dict() (force load; errors → ConfigError)
+    C->>D: as_dict() (force load, errors → ConfigError)
     C-->>App: settings
     App->>St: Station.build(profile, registry, settings=settings)
     St->>Drv: __init__(cfg, io, settings=settings)

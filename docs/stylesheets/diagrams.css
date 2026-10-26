@@ -1,0 +1,125 @@
+/* Interactive Mermaid diagrams: see docs/javascripts/diagrams.js. */
+
+/* Hide the raw source until the viewer replaces it, so pages don't flash code. */
+pre.diagram {
+  visibility: hidden;
+  height: 4rem;
+  overflow: hidden;
+}
+
+.diagram-frame {
+  position: relative;
+  margin: 1em 0;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+  background: var(--md-default-bg-color);
+}
+
+.diagram-viewport {
+  position: relative;
+  overflow: hidden;
+  min-height: 4rem;
+  cursor: grab;
+  touch-action: none; /* the viewer handles dragging itself */
+  outline: none;
+}
+
+.diagram-viewport:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--md-accent-fg-color);
+}
+
+.diagram-viewport.diagram-dragging {
+  cursor: grabbing;
+}
+
+.diagram-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.diagram-stage svg {
+  display: block;
+  max-width: none;
+}
+
+/* Header bar above the diagram: hint on the left, buttons on the right. It never
+   covers the drawing. */
+.diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0.3rem 0.2rem 0.6rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.diagram-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.2rem;
+}
+
+.diagram-button {
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.3rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.diagram-button:hover,
+.diagram-button:focus-visible {
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+}
+
+.diagram-hint {
+  overflow: hidden;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.6rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Fullscreen: the same frame, moved into a fixed overlay. */
+.diagram-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.diagram-frame.diagram-fullscreen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
+
+.diagram-fullscreen .diagram-viewport {
+  flex: 1;
+  height: auto !important;
+}
+
+body.diagram-overlay-open {
+  overflow: hidden;
+}
+
+.diagram-error .diagram-stage {
+  position: static;
+}
+
+.diagram-error pre {
+  margin: 0;
+  padding: 0.8rem;
+  color: var(--md-code-fg-color);
+  white-space: pre-wrap;
+}

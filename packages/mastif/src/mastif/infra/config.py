@@ -59,8 +59,10 @@ from mastif.infra.errors import ConfigError
 Settings = Dynaconf
 """The type to annotate parameters with: ``def __init__(self, settings: Settings)``."""
 
-CONFIG_SUFFIXES = (".toml", ".yaml", ".yml", ".json", ".ini")
-DEFAULT_ENVVAR_PREFIX = "MASTIF"
+CONFIG_SUFFIXES: tuple[str, ...] = (".toml", ".yaml", ".yml", ".json", ".ini")
+"""File suffixes recognised by `config_files` when scanning a configuration directory."""
+DEFAULT_ENVVAR_PREFIX: str = "MASTIF"
+"""Default prefix for environment-variable overrides in `create_settings`."""
 
 # Options mastif passes to Dynaconf that Dynaconf also exposes as settings.
 _DYNACONF_OPTION_KEYS = frozenset(
@@ -83,7 +85,7 @@ def config_files(config_dir: str | Path) -> list[Path]:
     Raises:
         ConfigError: If the directory doesn't exist.
 
-    Example:
+    Examples:
         >>> import tempfile, pathlib
         >>> d = pathlib.Path(tempfile.mkdtemp())
         >>> for name in ("10-site.yaml", "00-base.toml", "notes.txt"):
@@ -132,7 +134,7 @@ def create_settings(
         ConfigError: If the directory or an explicit file doesn't exist, or a file can't
             be parsed.
 
-    Example:
+    Examples:
         >>> s = create_settings(defaults={"station": {"retries": 2, "name": "bench-01"}})
         >>> s.station.retries, s.get("missing", "fallback")
         (2, 'fallback')
@@ -167,7 +169,7 @@ def create_settings(
 def _plain(value: Any) -> Any:
     """Convert Dynaconf's box types into plain dicts and lists, recursively.
 
-    Example:
+    Examples:
         >>> _plain({"a": [{"b": 1}]})
         {'a': [{'b': 1}]}
     """
@@ -196,7 +198,7 @@ def section[M: BaseModel](settings: Settings, key: str, model: type[M]) -> M:
     Raises:
         ConfigError: If the section is missing or doesn't validate.
 
-    Example:
+    Examples:
         >>> from pydantic import BaseModel
         >>> class StationSettings(BaseModel):
         ...     name: str
@@ -232,7 +234,7 @@ def as_dict(settings: Settings) -> dict[str, Any]:
     Returns:
         A JSON-friendly dict.
 
-    Example:
+    Examples:
         >>> as_dict(create_settings(defaults={"station": {"name": "b1"}}))
         {'station': {'name': 'b1'}}
     """

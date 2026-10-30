@@ -101,4 +101,4 @@ it defaults to `"0"`.
 |---|---|
 | Code | `packages/mastif/src/mastif/kernel/` |
 | Tests | `packages/mastif/tests/kernel/`, plus every docstring |
-| API | [reference](../reference/kernel.md) |
+| API | [reference](../reference/kernel/index.md) |

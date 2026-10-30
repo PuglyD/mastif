@@ -5,7 +5,7 @@
 - `Station`: the composition root that builds everything without I/O, resolves roles,
   and opens, makes safe and closes resources through the `ResourceManager`.
 
-Example:
+Examples:
     >>> from mastif.station import StationProfile
     >>> StationProfile.from_yaml("station: bench-01\\nresources: {}").station
     'bench-01'

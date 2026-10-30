@@ -48,7 +48,7 @@ def load_telnetlib() -> ModuleType:
         TransportError: If the module is missing, e.g. a 3.13+ environment installed
             without mastif's dependencies.
 
-    Example:
+    Examples:
         >>> load_telnetlib().Telnet.__name__
         'Telnet'
     """
@@ -66,7 +66,7 @@ def load_telnetlib() -> ModuleType:
 class TelnetTransport(BufferedStream):
     """A Telnet client connection, as a `StreamTransport`.
 
-    Example:
+    Examples:
         Talking to a switch matrix with a Telnet console (needs hardware)::
 
             sw = TelnetTransport(TelnetConfig(host="10.0.0.9"))
@@ -83,7 +83,7 @@ class TelnetTransport(BufferedStream):
             config: Host, port, timeouts and optional login.
             logger: Where to trace I/O.
 
-        Example:
+        Examples:
             >>> TelnetTransport(TelnetConfig(host="10.0.0.9")).name
             'telnet://10.0.0.9:23'
         """
@@ -100,7 +100,7 @@ class TelnetTransport(BufferedStream):
             TransportError: If the connection is refused or fails.
             TransportTimeout: If a login prompt doesn't appear in time.
 
-        Example:
+        Examples:
             With ``login_prompt="login: "`` and ``username="admin"``, waits for
             ``login: ``, sends ``admin\\r\\n``, and likewise for the password.
         """
@@ -133,7 +133,7 @@ class TelnetTransport(BufferedStream):
             TransportTimeout: If the prompt doesn't appear within ``connect_timeout``.
             TransportError: If the connection fails meanwhile.
 
-        Example:
+        Examples:
             ``self._answer("login: ", "admin")``
         """
         self._expect(prompt)
@@ -150,7 +150,7 @@ class TelnetTransport(BufferedStream):
             TransportTimeout: If it doesn't appear within ``connect_timeout``.
             TransportError: If the connection fails meanwhile.
 
-        Example:
+        Examples:
             ``self._expect("Welcome\\r\\n")`` skips a login banner.
         """
         wait = self.config.connect_timeout
@@ -168,7 +168,7 @@ class TelnetTransport(BufferedStream):
     def _disconnect(self) -> None:
         """Close the connection.
 
-        Example:
+        Examples:
             Called by `close`; afterwards the transport can be opened again.
         """
         if self._tn is not None:
@@ -181,7 +181,7 @@ class TelnetTransport(BufferedStream):
         Raises:
             TransportError: If the send fails.
 
-        Example:
+        Examples:
             ``self._send(b"SETA=1\\r\\n")``
         """
         assert self._tn is not None
@@ -199,7 +199,7 @@ class TelnetTransport(BufferedStream):
         Raises:
             TransportError: If the server closed the connection or the read failed.
 
-        Example:
+        Examples:
             Returns ``b"1\\r\\n"`` for the bytes ``IAC WILL ECHO "1\\r\\n"``.
         """
         assert self._tn is not None

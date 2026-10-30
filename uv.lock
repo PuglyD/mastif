@@ -795,6 +795,7 @@ docs = [
     { name = "mkdocs" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extra = ["python"] },
+    { name = "termynal" },
 ]
 
 [package.metadata]
@@ -816,6 +817,7 @@ docs = [
     { name = "mkdocs", specifier = ">=1.6,<2" },
     { name = "mkdocs-material", specifier = ">=9.5" },
     { name = "mkdocstrings", extras = ["python"], specifier = ">=0.27" },
+    { name = "termynal", specifier = ">=0.13,<1" },
 ]
 
 [[package]]
@@ -1513,6 +1515,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b0/39/41a04bc6a978f590c4d20d4a44a3e6351b92d5e39009ad4fd5eb238ef45b/telnetlib_313_and_up-3.13.1.tar.gz", hash = "sha256:93cdf0a35e8b6463853e5bfa134288a9695c7b69b9e6f4bcfb71c0888470288a", size = 12664, upload-time = "2023-12-23T11:13:37.923Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/00/2f/51d0660e373c501653c08b295e8c0287271a04166de6a301e20a0598d88f/telnetlib_313_and_up-3.13.1-py3-none-any.whl", hash = "sha256:f2fe36ba9d0bfd4924d030ada758faeca60c1bf18050a1c4a52ea7600c677897", size = 12953, upload-time = "2023-12-23T11:13:36.092Z" },
+]
+
+[[package]]
+name = "termynal"
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markdown" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/26/8c/ea13868e6008ed964837db011648e3e7766e0ecfa1b42d7b9a4cf0c228e2/termynal-0.14.0.tar.gz", hash = "sha256:2918a1a6cf468497fbb3a72dc3726743988829eef1136d0c78a81df70ec869f6", size = 178022, upload-time = "2026-03-16T16:56:21.539Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/8f/c089f7c9f9fc1da25e6271386e5df84e1f6e0b04d2f0b408939b51b2876f/termynal-0.14.0-py3-none-any.whl", hash = "sha256:b5147545e29256d35148251f5c2d3d23dec1d2fb0b4ba464ff330a7de8b56fc6", size = 11754, upload-time = "2026-03-16T16:56:22.76Z" },
 ]
 
 [[package]]

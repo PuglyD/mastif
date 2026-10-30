@@ -127,4 +127,4 @@ All of the above in the right order, in one call. See the
 |---|---|
 | Code | `packages/mastif/src/mastif/infra/` |
 | Build hook | `packages/mastif/hatch_build.py` |
-| API | [reference](../reference/infra.md) |
+| API | [reference](../reference/infra/index.md) |

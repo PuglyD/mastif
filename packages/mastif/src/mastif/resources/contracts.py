@@ -38,8 +38,10 @@ from typing import Any, Protocol, TypeVar
 from mastif.resources.errors import ContractMismatch
 
 T = TypeVar("T", bound=type)
+"""Class type variable preserving the decorated contract's type."""
 
 type SafeStateAction = str | Callable[[Any], None]
+"""A no-argument method name or a callback receiving the resource to make safe."""
 
 _IGNORED_BASES = {object, Protocol}
 
@@ -53,7 +55,7 @@ class ContractInfo:
         safe_state: How to make a resource that provides this contract safe. Either the
             name of a method taking no arguments, or a function receiving the resource.
 
-    Example:
+    Examples:
         >>> ContractInfo(name="PowerSupply", safe_state="disable").safe_state
         'disable'
     """
@@ -80,7 +82,7 @@ def contract(
     Returns:
         A class decorator that attaches `ContractInfo` and returns the class unchanged.
 
-    Example:
+    Examples:
         >>> from typing import Protocol
         >>> @contract(safe_state=lambda psu: psu.output(False))
         ... class PowerSupply(Protocol):
@@ -95,7 +97,7 @@ def contract(
     def decorate(cls: T) -> T:
         """Attach the metadata to the Protocol class.
 
-        Example:
+        Examples:
             ``decorate(PowerSupply)`` sets ``PowerSupply.__mastif_contract__``.
         """
         setattr(cls, "__mastif_contract__", ContractInfo(name or cls.__name__, safe_state))  # noqa: B010
@@ -113,7 +115,7 @@ def contract_info(proto: type) -> ContractInfo:
     Returns:
         The attached `ContractInfo`, or one with only the class name.
 
-    Example:
+    Examples:
         >>> from typing import Protocol
         >>> class Thermometer(Protocol):
         ...     def read(self) -> float: ...
@@ -138,7 +140,7 @@ def contract_members(proto: type) -> dict[str, Any]:
     Returns:
         Member name to the member object (function or property), in definition order.
 
-    Example:
+    Examples:
         >>> from typing import Protocol
         >>> class Source(Protocol):
         ...     def output(self, enabled: bool) -> None: ...
@@ -175,7 +177,7 @@ def _accepts_same_call(required: Any, provided: Any) -> bool:
     Returns:
         True if every call valid for the contract is valid for the implementation.
 
-    Example:
+    Examples:
         >>> def need(self, v): ...
         >>> def impl_ok(self, v, settle=0.1): ...
         >>> def impl_bad(self): ...
@@ -207,7 +209,7 @@ class ProblemKind(StrEnum):
     Using an enum, not free text, lets tooling react to a problem. For example, a
     driver scaffolder could generate stubs for every `MISSING` member.
 
-    Example:
+    Examples:
         >>> ProblemKind.MISSING.value
         'missing'
     """
@@ -226,7 +228,7 @@ class ContractProblem:
         member: The contract member concerned, e.g. ``"output"``.
         kind: What is wrong with it.
 
-    Example:
+    Examples:
         >>> str(ContractProblem("output", ProblemKind.MISSING))
         'output: missing'
     """
@@ -237,7 +239,7 @@ class ContractProblem:
     def __str__(self) -> str:
         """Render as ``"<member>: <kind>"`` for error messages.
 
-        Example:
+        Examples:
             >>> str(ContractProblem("route", ProblemKind.INCOMPATIBLE_PARAMETERS))
             'route: incompatible parameters'
         """
@@ -262,7 +264,7 @@ def contract_problems(cls: type, proto: type) -> list[ContractProblem]:
     Returns:
         One `ContractProblem` per problem, in contract order; empty if satisfied.
 
-    Example:
+    Examples:
         >>> from typing import Protocol
         >>> class Switch(Protocol):
         ...     def route(self, a: str, b: str) -> None: ...
@@ -305,7 +307,7 @@ def satisfies(cls: type, proto: type) -> bool:
     Returns:
         True if `contract_problems` finds nothing.
 
-    Example:
+    Examples:
         >>> from typing import Protocol
         >>> class Thermometer(Protocol):
         ...     def read(self) -> float: ...
@@ -332,7 +334,7 @@ def check_provides(owner: str, cls: type, contracts: tuple[type, ...]) -> None:
     Raises:
         ContractMismatch: Listing every problem with every contract.
 
-    Example:
+    Examples:
         >>> from typing import Protocol
         >>> class Probe(Protocol):
         ...     def read(self) -> float: ...

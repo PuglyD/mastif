@@ -147,4 +147,4 @@ sequenceDiagram
 |---|---|
 | Code | `packages/mastif/src/mastif/resources/transports/` |
 | Fakes for tests | [Testing kit](testing-kit.md) |
-| API | [reference](../reference/resources.md) |
+| API | [reference](../reference/resources/index.md) |

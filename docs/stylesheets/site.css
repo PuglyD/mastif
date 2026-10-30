@@ -1,0 +1,118 @@
+/* Shared reading and reference styles; Material owns the layout. */
+:root {
+  --md-text-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --md-code-font: "Cascadia Code", Consolas, Menlo, monospace;
+}
+
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #24566a;
+  --md-accent-fg-color: #007c83;
+  --mastif-symbol-class: #6545a0;
+  --mastif-symbol-function: #006d79;
+  --mastif-symbol-attribute: #925400;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #244858;
+  --md-accent-fg-color: #68d4cc;
+  --mastif-symbol-class: #cab1ff;
+  --mastif-symbol-function: #78d9e5;
+  --mastif-symbol-attribute: #f2ca7d;
+}
+
+.md-typeset .mastif-lead {
+  font-size: 1.2em;
+  line-height: 1.65;
+  max-width: 46rem;
+}
+
+.md-typeset .grid.cards > ul > li {
+  border-radius: 0.5rem;
+}
+
+.md-typeset h2 { margin-top: 2em; }
+.md-typeset h2.doc-heading { margin-top: 1.5em; }
+
+.md-typeset .doc-signature {
+  border-left: 0.15rem solid var(--md-accent-fg-color);
+}
+
+.md-typeset .doc-symbol-class { color: var(--mastif-symbol-class); }
+.md-typeset .doc-symbol-method,
+.md-typeset .doc-symbol-function { color: var(--mastif-symbol-function); }
+.md-typeset .doc-symbol-attribute { color: var(--mastif-symbol-attribute); }
+
+.md-typeset .doc-heading code { overflow-wrap: anywhere; }
+
+/* Progressive enhancement: without JS, the full TOC remains available. */
+.md-sidebar--secondary .toc-branch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.4rem;
+  align-items: start;
+}
+
+.md-sidebar--secondary .toc-branch > .md-nav {
+  grid-column: 1 / -1;
+}
+
+.md-sidebar--secondary .toc-branch > .md-nav[hidden] {
+  display: none;
+}
+
+.toc-toggle {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.15rem;
+  border-radius: 0.2rem;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.toc-toggle::before {
+  content: "";
+  width: 0.3rem;
+  height: 0.3rem;
+  border-right: 0.08rem solid currentColor;
+  border-bottom: 0.08rem solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.toc-toggle[aria-expanded="true"]::before { transform: rotate(45deg); }
+.toc-toggle:hover { color: var(--md-accent-fg-color); }
+.toc-toggle:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 1px;
+}
+
+.md-typeset [data-termynal] {
+  margin: 1rem 0;
+  border-radius: 0.6rem;
+  font-family: var(--md-code-font);
+  font-size: 0.75rem;
+  box-shadow: 0 0.3rem 1rem #0002;
+}
+
+.md-typeset .terminal-play {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--md-accent-fg-color);
+  border-radius: 0.25rem;
+  color: var(--md-accent-fg-color);
+  cursor: pointer;
+}
+
+.terminal-play:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .md-typeset [data-termynal] { padding: 3rem 1rem 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset [data-ty-cursor]::after { animation: none; }
+}

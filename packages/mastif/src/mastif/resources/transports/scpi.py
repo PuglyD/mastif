@@ -12,7 +12,7 @@ Where it fits:
     built from the profile's ``transport:`` block. In tests, wrap a
     ``mastif_testing.FakeLineIO`` in `Scpi` to script replies.
 
-Example:
+Examples:
     A complete power-supply driver::
 
         @driver("acme.psu-x", provides=[PowerSupply])
@@ -43,7 +43,7 @@ from mastif.resources.transports.lineio import LineIO
 class Scpi:
     """SCPI conveniences over any `LineIO`.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeLineIO
         >>> scpi = Scpi(FakeLineIO({"*IDN?": "ACME,PSU-X,A123,1.4", "MEAS:VOLT?": "+5.0021E+00"}))
         >>> scpi.identify().serial
@@ -61,7 +61,7 @@ class Scpi:
                 so a rejected command raises immediately. This is slower, but useful
                 while developing a driver.
 
-        Example:
+        Examples:
             ``Scpi(io, check_errors=True)``
         """
         self.io = io
@@ -70,7 +70,7 @@ class Scpi:
     def open(self) -> None:
         """Open the underlying I/O.
 
-        Example:
+        Examples:
             Called by the station before the driver's ``open()``.
         """
         self.io.open()
@@ -78,7 +78,7 @@ class Scpi:
     def close(self) -> None:
         """Close the underlying I/O.
 
-        Example:
+        Examples:
             Called by the station after the driver's ``close()``.
         """
         self.io.close()
@@ -92,7 +92,7 @@ class Scpi:
         Raises:
             ProtocolError: If ``check_errors`` is on and the instrument reports an error.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> io = FakeLineIO()
             >>> Scpi(io).write("OUTP ON")
@@ -113,7 +113,7 @@ class Scpi:
         Returns:
             The reply.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> Scpi(FakeLineIO({"SYST:VERS?": " 1999.0 "})).query("SYST:VERS?")
             '1999.0'
@@ -136,7 +136,7 @@ class Scpi:
         Raises:
             ProtocolError: If the reply isn't a number, or is an overflow or NaN marker.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> Scpi(FakeLineIO({"MEAS:CURR?": "+1.8000E-01"})).query_float("MEAS:CURR?")
             0.18
@@ -165,7 +165,7 @@ class Scpi:
         Returns:
             The quantity.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> Scpi(FakeLineIO({"FREQ?": "2.4E9"})).query_quantity("FREQ?", "Hz").to("GHz")
             Quantity(value=2.4, unit='GHz')
@@ -181,7 +181,7 @@ class Scpi:
         Returns:
             The identity; fields missing from the reply are ``None``.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> Scpi(FakeLineIO({"*IDN?": "ACME, PSU-X, A123, 1.4"})).identify()
             Identity(vendor='ACME', model='PSU-X', serial='A123', revision='1.4', extra={})
@@ -199,7 +199,7 @@ class Scpi:
         Returns:
             Error entries such as ``'-113,"Undefined header"'``; empty if none.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> io = FakeLineIO({"SYST:ERR?": ['-113,"Undefined header"', '0,"No error"']})
             >>> Scpi(io).errors()
@@ -223,7 +223,7 @@ class Scpi:
         Raises:
             ProtocolError: Listing every queued error.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> Scpi(FakeLineIO({"SYST:ERR?": '0,"No error"'})).raise_on_errors()
         """
@@ -237,7 +237,7 @@ class Scpi:
 
         Useful in a driver's ``open()``, so every run starts from a known state.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> io = FakeLineIO()
             >>> Scpi(io).reset()
@@ -256,7 +256,7 @@ class Scpi:
         Raises:
             ProtocolError: If the reply is not ``1``.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeLineIO
             >>> Scpi(FakeLineIO({"*OPC?": "1"})).wait()
         """

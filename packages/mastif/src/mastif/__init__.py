@@ -5,7 +5,7 @@ units and results (`mastif.kernel`), instrument and DUT primitives, and a test
 execution engine. Organisations build their own SDK (contracts, drivers, DUT types)
 and UI on top.
 
-Example:
+Examples:
     >>> import mastif
     >>> mastif.__version__
     '0.1.0.dev0'

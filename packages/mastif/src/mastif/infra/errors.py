@@ -27,7 +27,7 @@ from mastif.kernel.errors import MastifError
 class InfraError(MastifError):
     """Base class for infrastructure errors (configuration, logging, versions).
 
-    Example:
+    Examples:
         >>> issubclass(ConfigError, InfraError) and issubclass(InfraError, MastifError)
         True
     """
@@ -38,7 +38,7 @@ class ConfigError(InfraError):
 
     The message names the file or the setting key, and lists every invalid field.
 
-    Example:
+    Examples:
         >>> raise ConfigError("setting 'station' is missing")
         Traceback (most recent call last):
         ...
@@ -49,7 +49,7 @@ class ConfigError(InfraError):
 class VersionError(InfraError):
     """A distribution's version couldn't be read, typically because it isn't installed.
 
-    Example:
+    Examples:
         >>> raise VersionError("distribution 'acme-sdk' is not installed")
         Traceback (most recent call last):
         ...

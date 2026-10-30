@@ -40,6 +40,7 @@ from mastif.station.profile import ResourceEntry
 type Phase = Literal[
     "opening", "opened", "open_failed", "safe_state", "safe_state_failed", "closed", "close_failed"
 ]
+"""Lifecycle event names emitted by the resource manager."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,7 +52,7 @@ class ResourceEvent:
         phase: What happened.
         detail: Extra information, e.g. the error message or the identity.
 
-    Example:
+    Examples:
         >>> ResourceEvent("bench_psu", "opened", "serial=A123")
         ResourceEvent(resource='bench_psu', phase='opened', detail='serial=A123')
     """
@@ -62,6 +63,7 @@ class ResourceEvent:
 
 
 type Listener = Callable[[ResourceEvent], None]
+"""Callback receiving one resource lifecycle event at a time."""
 
 
 @dataclass
@@ -78,7 +80,7 @@ class ResourceHandle:
         health: What ``health()`` reported, once open.
         is_open: Whether the resource is fully open.
 
-    Example:
+    Examples:
         ``station.resource("bench_psu").identity.serial`` returns ``"A123"`` once the
         station is open.
     """
@@ -97,7 +99,7 @@ class ResourceHandle:
     def instance(self) -> Any:
         """The driver or DUT object itself.
 
-        Example:
+        Examples:
             ``station.resource("bench_psu").instance.measure_current()``
         """
         return self.built.instance
@@ -106,7 +108,7 @@ class ResourceHandle:
     def spec(self) -> DriverSpec:
         """The driver's spec.
 
-        Example:
+        Examples:
             ``handle.spec.id`` returns ``"acme.psu-x"``.
         """
         return self.built.spec
@@ -117,7 +119,7 @@ class ResourceHandle:
         Returns:
             ``state.model_dump()`` for resources declaring ``state=``, else ``None``.
 
-        Example:
+        Examples:
             ``station.resource("dut").state_snapshot()`` returns ``{"booted": True}``.
         """
         state = getattr(self.instance, "state", None)
@@ -129,7 +131,7 @@ class ResourceHandle:
 class ResourceManager:
     """Opens, makes safe and closes a set of resource handles, emitting events.
 
-    Example:
+    Examples:
         Used through `Station`::
 
             station.open()           # ResourceManager.open_all
@@ -150,7 +152,7 @@ class ResourceManager:
             listener: Receives a `ResourceEvent` for every lifecycle step.
             logger: Where lifecycle steps are logged.
 
-        Example:
+        Examples:
             ``ResourceManager(station.handles.values(), listener=events.append)``
         """
         self.handles = list(handles)
@@ -163,7 +165,7 @@ class ResourceManager:
 
         Listener errors are logged and ignored, so a broken UI can't stop a shutdown.
 
-        Example:
+        Examples:
             ``self._emit("bench_psu", "opened")``
         """
         self.log.info("%s: %s %s", resource, phase, detail)
@@ -185,7 +187,7 @@ class ResourceManager:
             ResourceError: From the first resource that failed. Every resource opened
                 before it is closed again.
 
-        Example:
+        Examples:
             ``manager.open_all(expect={"dut": {"serial": "SN-0042"}})``
         """
         extra = expect or {}
@@ -202,7 +204,7 @@ class ResourceManager:
     def _open_one(self, h: ResourceHandle, extra_expect: Mapping[str, object]) -> None:
         """Open one resource (and its channels), verify it, or undo and re-raise.
 
-        Example:
+        Examples:
             Called by `open_all` for each handle in order.
         """
         self._emit(h.name, "opening")
@@ -235,7 +237,7 @@ class ResourceManager:
             IdentityMismatch: If any expected field differs, or there are expectations
                 but the driver can't identify itself.
 
-        Example:
+        Examples:
             ``expect: {serial: A123}`` against a unit reporting ``B999`` raises.
         """
         if has_hook(h.instance, "identify"):
@@ -259,7 +261,7 @@ class ResourceManager:
         Returns:
             The errors raised along the way (closing never stops early).
 
-        Example:
+        Examples:
             ``errors = self._close_one(handle)``
         """
         errors: list[Exception] = []
@@ -292,7 +294,7 @@ class ResourceManager:
             ResourceError: After everything has been attempted, if anything failed to
                 close; the first error is chained as the cause.
 
-        Example:
+        Examples:
             ``manager.close_all()`` at the end of a run.
         """
         errors: list[Exception] = []
@@ -311,7 +313,7 @@ class ResourceManager:
         Returns:
             Resource name to the error it raised; empty if all succeeded.
 
-        Example:
+        Examples:
             ``failures = manager.safe_state_all()`` when an operator presses abort.
         """
         failures: dict[str, Exception] = {}
@@ -329,7 +331,7 @@ class ResourceManager:
     def opened(self) -> list[ResourceHandle]:
         """The resources currently open, in opening order.
 
-        Example:
+        Examples:
             ``[h.name for h in manager.opened]`` returns ``["bench_psu", "dut"]``.
         """
         return list(self._opened)

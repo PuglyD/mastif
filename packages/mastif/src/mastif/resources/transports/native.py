@@ -64,7 +64,7 @@ class StatusCheck:
         error_text: Turns a failing code into the vendor's message, typically by calling
             the library's own error-string function. May return ``str`` or ``bytes``.
 
-    Example:
+    Examples:
         >>> status = StatusCheck(error_text=lambda code: {-3: b"device busy"}.get(code, b"?"))
         >>> status(0, "ACME_SetLine")
         0
@@ -91,7 +91,7 @@ class StatusCheck:
             ProtocolError: If ``status`` is not in ``ok``. If ``error_text`` itself fails,
                 the error is still raised, noting that the text was unavailable.
 
-        Example:
+        Examples:
             >>> StatusCheck(ok=(0, 1))(1, "ACME_Poll")
             1
         """
@@ -122,7 +122,7 @@ class NativeFunction:
         argtypes: The ctypes argument types, in order.
         check: Applied to the return value of every call, if given.
 
-    Example:
+    Examples:
         >>> f = NativeFunction.declare("ACME_GetLine", ctypes.c_int, [ctypes.c_void_p])
         >>> f.argtypes
         (<class 'ctypes.c_void_p'>,)
@@ -156,7 +156,7 @@ class NativeFunction:
             DriverDefinitionError: If ``argtypes`` is not a list or tuple. Leaving it out
                 is exactly the mistake that truncates 64-bit pointers.
 
-        Example:
+        Examples:
             >>> NativeFunction.declare("ACME_Count", ctypes.c_int, None)
             Traceback (most recent call last):
             ...
@@ -180,7 +180,7 @@ def library_candidates(library: str, platform: str = sys.platform) -> list[str]:
     Returns:
         Candidate file names, most literal first.
 
-    Example:
+    Examples:
         >>> library_candidates("acmedio", "win32")
         ['acmedio', 'acmedio.dll']
         >>> library_candidates("acmedio", "linux")
@@ -224,7 +224,7 @@ def resolve_library(
     Returns:
         A path or name for the loader.
 
-    Example:
+    Examples:
         >>> resolve_library("acmedio", ["C:/Acme"], platform="win32",
         ...                 exists=lambda p: p.endswith("acmedio.dll"), find=lambda n: None)
         'C:/Acme...acmedio.dll'
@@ -254,7 +254,7 @@ def load_error_hint(exc: OSError) -> str:
     Returns:
         A sentence or two of advice.
 
-    Example:
+    Examples:
         >>> load_error_hint(OSError("libacme.so: wrong ELF class: ELFCLASS32"))[:30]
         'The file is not a library this'
         >>> load_error_hint(FileNotFoundError("Could not find module 'acmedio'"))[:40]
@@ -292,7 +292,7 @@ def load_error_hint(exc: OSError) -> str:
 def _ctypes_loader(path: str, calling_convention: str) -> Any:
     """Load a library with ctypes: ``WinDLL`` for stdcall, ``CDLL`` for cdecl.
 
-    Example:
+    Examples:
         ``_ctypes_loader("kernel32", "stdcall")`` on Windows.
     """
     if calling_convention == "stdcall":
@@ -303,7 +303,7 @@ def _ctypes_loader(path: str, calling_convention: str) -> Any:
 def _free(lib: Any) -> None:
     """Unload a library loaded by `_ctypes_loader`; objects without a handle are skipped.
 
-    Example:
+    Examples:
         Called by `NativeLibrary.close` on the thread that loaded the library.
     """
     import _ctypes  # the C half of ctypes; provides the unload functions
@@ -320,7 +320,7 @@ def _free(lib: Any) -> None:
 class NativeLibrary:
     """A vendor library, loaded on `open`, with declared functions and confined calls.
 
-    Example:
+    Examples:
         Calling a Windows system DLL (runs on Windows only)::
 
             lib = NativeLibrary(NativeConfig(library="kernel32", calling_convention="stdcall"))
@@ -352,7 +352,7 @@ class NativeLibrary:
             logger: Where to trace calls.
             loader: Loads the library; defaults to ctypes. Tests pass their own.
 
-        Example:
+        Examples:
             >>> NativeLibrary(NativeConfig(library="acmedio")).name
             'native:acmedio'
         """
@@ -372,7 +372,7 @@ class NativeLibrary:
     def is_open(self) -> bool:
         """Whether the library is loaded.
 
-        Example:
+        Examples:
             >>> NativeLibrary(NativeConfig(library="acmedio")).is_open
             False
         """
@@ -382,7 +382,7 @@ class NativeLibrary:
     def path(self) -> str | None:
         """What was handed to the loader, once open; useful in logs and bug reports.
 
-        Example:
+        Examples:
             >>> NativeLibrary(NativeConfig(library="acmedio")).path is None
             True
         """
@@ -398,7 +398,7 @@ class NativeLibrary:
             TransportError: If the library can't be loaded (with a hint), ``stdcall`` is
                 requested outside Windows, or a declared function is missing from it.
 
-        Example:
+        Examples:
             Called by the station before the driver's ``open()``.
         """
         if self._lib is not None:
@@ -426,7 +426,7 @@ class NativeLibrary:
 
         The registration is process-wide and lasts until `close`.
 
-        Example:
+        Examples:
             ``search_paths: ["C:/Program Files/Acme/bin"]`` lets ``acmedio.dll`` find
             ``acmeusb.dll`` next to it.
         """
@@ -444,7 +444,7 @@ class NativeLibrary:
         Raises:
             TransportError: With a hint from `load_error_hint`.
 
-        Example:
+        Examples:
             Runs on the worker thread when calls are confined.
         """
         assert self._path is not None
@@ -461,7 +461,7 @@ class NativeLibrary:
         Raises:
             TransportError: If the library doesn't export it.
 
-        Example:
+        Examples:
             Called by `open` and by `function` once the library is loaded.
         """
         try:
@@ -501,7 +501,7 @@ class NativeLibrary:
             DriverDefinitionError: If ``argtypes`` is missing or not a list.
             TransportError: If the library is open and doesn't export ``name``.
 
-        Example:
+        Examples:
             >>> lib = NativeLibrary(NativeConfig(library="acmedio"))
             >>> lib.function("ACME_Count", ctypes.c_int, []).name
             'ACME_Count'
@@ -533,7 +533,7 @@ class NativeLibrary:
                 don't match the declared types.
             ProtocolError: If the declaration's status check fails.
 
-        Example:
+        Examples:
             ``lib.call("ACME_SetLine", handle, 3, 1)`` returns ``0``.
         """
         name = fn if isinstance(fn, str) else fn.name
@@ -563,7 +563,7 @@ class NativeLibrary:
     def _run(self, work: Callable[[], Any]) -> Any:
         """Run ``work`` on the worker thread, or inline if unconfined or already on it.
 
-        Example:
+        Examples:
             ``self._run(lambda: target(*args))``
         """
         if self._worker is None or threading.get_ident() == self._worker_ident:
@@ -576,7 +576,7 @@ class NativeLibrary:
         Safe to call repeatedly. Declarations are kept, so `open` can be called again.
         Unload errors are logged, never raised: closing must always finish.
 
-        Example:
+        Examples:
             Called by the station after the driver's ``close()``.
         """
         lib, self._lib = self._lib, None
@@ -594,7 +594,7 @@ class NativeLibrary:
     def _shutdown(self) -> None:
         """Stop the worker thread and remove the DLL search directories.
 
-        Example:
+        Examples:
             Called by `close`, and by `open` when loading fails.
         """
         if self._worker is not None:

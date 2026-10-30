@@ -1,18 +1,45 @@
 site_name: mastif
 site_description: A domain-neutral framework for automated test equipment
+repo_url: https://github.com/PuglyD/mastif
+repo_name: PuglyD/mastif
+watch:
+  - packages/mastif/src
+  - packages/mastif-testing/src
 theme:
   name: material
+  font: false
   palette:
     - scheme: default
       toggle: {icon: material/brightness-7, name: Dark mode}
     - scheme: slate
       toggle: {icon: material/brightness-4, name: Light mode}
-  features: [navigation.tabs, navigation.sections, navigation.top, content.code.copy, search.highlight]
+  features:
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - search.suggest
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
   - def_list
   - tables
   - toc: {permalink: true}
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: [docs]
+      check_paths: true
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.superfences:
       custom_fences:
         # Class "diagram", not "mermaid": Material would render it into a closed shadow
@@ -22,45 +49,63 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 extra_css:
   - stylesheets/diagrams.css
+  - stylesheets/site.css
 extra_javascript:
   - javascripts/diagrams.js
+  - javascripts/terminals.js
+  - javascripts/toc.js
 plugins:
   - search
+  - termynal:
+      title: mastif · simulated example
+      buttons: macos
   - mkdocstrings:
       handlers:
         python:
           paths: [packages/mastif/src, packages/mastif-testing/src]
           options:
             docstring_style: google
+            show_if_no_docstring: true
+            filters: []
             show_source: false
             members_order: source
             show_root_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            docstring_section_style: spacy
+            heading_level: 2
 nav:
-  - Home: index.md
-  - Wiki:
+  - Overview:
+      - index.md
+      - Guided walkthrough: wiki/walkthrough.md
+      - Project status: wiki/roadmap.md
+      - Licensing: wiki/licensing.md
+  - Learn:
       - Start here: wiki/start-here.md
-      - Architecture: wiki/architecture.md
+      - Your first measurement: wiki/first-measurement.md
+      - Write a driver: wiki/guides/write-a-driver.md
+  - Guides:
+      - Write a DUT type: wiki/guides/write-a-dut.md
+      - Write a station profile: wiki/guides/write-a-station-profile.md
+      - Wrap a vendor DLL: wiki/guides/wrap-a-vendor-dll.md
+      - Test your driver: wiki/guides/test-your-driver.md
+      - Bootstrap an application: wiki/guides/bootstrap-an-application.md
+  - Architecture:
+      - System overview: wiki/architecture.md
       - Life of a station: wiki/life-of-a-station.md
-      - Layers:
+      - Concepts:
           - Kernel: wiki/kernel.md
           - Infra: wiki/infra.md
           - Resources: wiki/resources.md
           - Transports: wiki/transports.md
           - Station: wiki/station.md
           - Testing kit: wiki/testing-kit.md
-      - Guides:
-          - Write a driver: wiki/guides/write-a-driver.md
-          - Write a DUT type: wiki/guides/write-a-dut.md
-          - Write a station profile: wiki/guides/write-a-station-profile.md
-          - Wrap a vendor DLL: wiki/guides/wrap-a-vendor-dll.md
-          - Test your driver: wiki/guides/test-your-driver.md
-          - Bootstrap an application: wiki/guides/bootstrap-an-application.md
       - Field notes: wiki/field-notes.md
       - Error map: wiki/errors.md
       - Glossary: wiki/glossary.md
-      - Licensing: wiki/licensing.md
-      - Working on mastif: wiki/working-on-mastif.md
-      - Roadmap: wiki/roadmap.md
   - Decisions:
       - Index: adr/index.md
       - Template: adr/0000-template.md
@@ -106,9 +151,56 @@ nav:
           - 0028 Version information: adr/0028-version-information.md
           - 0029 Bootstrap: adr/0029-bootstrap.md
   - API reference:
-      - Kernel: reference/kernel.md
-      - Infra: reference/infra.md
-      - Resources: reference/resources.md
-      - Station: reference/station.md
-      - mastif-testing: reference/testing.md
-  - Plan: plan.md
+      - Kernel:
+          - reference/kernel/index.md
+          - Units and quantities: reference/kernel/units.md
+          - Limits and evaluation: reference/kernel/limits.md
+          - Verdicts and aggregation: reference/kernel/verdict.md
+          - Results: reference/kernel/results.md
+          - Identifiers and positions: reference/kernel/ids.md
+          - Errors: reference/kernel/errors.md
+      - Infrastructure:
+          - reference/infra/index.md
+          - Settings: reference/infra/config.md
+          - Logging: reference/infra/logs.md
+          - Version information: reference/infra/version.md
+          - Application bootstrap: reference/infra/bootstrap.md
+          - Errors: reference/infra/errors.md
+      - Resources:
+          - reference/resources/index.md
+          - Contracts: reference/resources/contracts.md
+          - Standard capabilities: reference/resources/std.md
+          - Drivers and DUTs: reference/resources/driver.md
+          - Identity and health: reference/resources/identity.md
+          - Driver registry: reference/resources/registry.md
+          - Transports:
+              - reference/resources/transports/index.md
+              - Configuration: reference/resources/transports/config.md
+              - Byte streams: reference/resources/transports/stream.md
+              - Line I/O: reference/resources/transports/lineio.md
+              - SCPI: reference/resources/transports/scpi.md
+              - Datagrams: reference/resources/transports/datagram.md
+              - Telnet: reference/resources/transports/telnet.md
+              - SSH: reference/resources/transports/ssh.md
+              - Native libraries: reference/resources/transports/native.md
+              - I/O factory: reference/resources/transports/factory.md
+          - Channels:
+              - reference/resources/channels/index.md
+              - UDP messages: reference/resources/channels/udp.md
+              - Line shell: reference/resources/channels/shell.md
+              - SSH shell: reference/resources/channels/ssh.md
+          - Errors: reference/resources/errors.md
+      - Station:
+          - reference/station/index.md
+          - Profiles: reference/station/profile.md
+          - Composition and role resolution: reference/station/station.md
+          - Resource lifecycle: reference/station/manager.md
+          - Errors: reference/station/errors.md
+      - Testing kit:
+          - reference/testing/index.md
+          - Fakes: reference/testing/fakes.md
+          - Conformance checks: reference/testing/conformance.md
+  - Contributing:
+      - Working on mastif: wiki/working-on-mastif.md
+      - Documentation style: wiki/documentation-style.md
+      - Implementation plan: plan.md

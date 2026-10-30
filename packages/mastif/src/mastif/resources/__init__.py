@@ -10,7 +10,7 @@ hardware:
 - **Registry** (`registry`): finds org drivers through entry points, with no import side
   effects.
 
-Example:
+Examples:
     >>> from mastif.resources import Identity
     >>> Identity(serial="A123").mismatches({"serial": "A123"})
     {}

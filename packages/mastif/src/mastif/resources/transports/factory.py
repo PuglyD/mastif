@@ -60,7 +60,7 @@ IO_TYPES: tuple[type, ...] = (
 def _stream(config: TransportConfig, logger: logging.Logger | None) -> StreamTransport | None:
     """Build a byte stream for stream-capable configs, else return ``None``.
 
-    Example:
+    Examples:
         ``_stream(TcpConfig(host="h", port=1), None)`` returns a `TcpTransport`.
     """
     if isinstance(config, TcpConfig):
@@ -77,7 +77,7 @@ def _stream(config: TransportConfig, logger: logging.Logger | None) -> StreamTra
 def _line_io(config: TransportConfig, logger: logging.Logger | None) -> LineIO | None:
     """Build line I/O for line-capable configs, else return ``None``.
 
-    Example:
+    Examples:
         ``_line_io(VisaConfig(resource="GPIB0::5::INSTR"), None)`` returns a `VisaLineIO`.
     """
     if isinstance(config, VisaConfig):
@@ -108,7 +108,7 @@ def build_io(want: type, config: TransportConfig, logger: logging.Logger | None 
         DriverDefinitionError: If ``want`` can't be built from this transport kind,
             e.g. ``Scpi`` over UDP.
 
-    Example:
+    Examples:
         >>> io = build_io(Scpi, TcpConfig(host="10.0.0.5", port=5025))
         >>> type(io).__name__, type(io.io).__name__
         ('Scpi', 'StreamLineIO')

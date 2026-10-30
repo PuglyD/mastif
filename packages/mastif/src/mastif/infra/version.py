@@ -53,7 +53,7 @@ class PackageVersion(BaseModel):
         minor: Second release number (0 if absent).
         patch: Third release number (0 if absent).
 
-    Example:
+    Examples:
         >>> v = PackageVersion.parse("acme-sdk", "1.2.0rc1")
         >>> (v.major, v.minor, v.patch, v.is_prerelease)
         (1, 2, 0, True)
@@ -74,7 +74,7 @@ class PackageVersion(BaseModel):
         Raises:
             VersionError: If the string doesn't start with a release number.
 
-        Example:
+        Examples:
             >>> PackageVersion.parse("x", "2.5").minor
             5
             >>> PackageVersion.parse("x", "banana")
@@ -97,7 +97,7 @@ class PackageVersion(BaseModel):
         Raises:
             VersionError: If the distribution isn't installed.
 
-        Example:
+        Examples:
             >>> PackageVersion.of("mastif").distribution
             'mastif'
         """
@@ -111,7 +111,7 @@ class PackageVersion(BaseModel):
     def is_prerelease(self) -> bool:
         """True for dev, alpha, beta and rc versions, which shouldn't run production tests.
 
-        Example:
+        Examples:
             >>> PackageVersion.parse("x", "0.4.0.dev0").is_prerelease
             True
         """
@@ -133,7 +133,7 @@ class GitInfo(BaseModel):
         dirty: True if the tree had uncommitted changes.
         captured_at: When this information was captured (UTC, ISO 8601).
 
-    Example:
+    Examples:
         >>> GitInfo.unavailable().source
         'unavailable'
     """
@@ -154,7 +154,7 @@ class GitInfo(BaseModel):
     def unavailable(cls) -> "GitInfo":
         """Git information that couldn't be obtained, stated explicitly.
 
-        Example:
+        Examples:
             >>> GitInfo.unavailable().commit is None
             True
         """
@@ -174,7 +174,7 @@ class GitInfo(BaseModel):
         Returns:
             The git information, or `unavailable`.
 
-        Example:
+        Examples:
             >>> import tempfile
             >>> GitInfo.from_git(tempfile.mkdtemp()).source
             'unavailable'
@@ -183,7 +183,7 @@ class GitInfo(BaseModel):
         def git(*args: str) -> str | None:
             """Run one git command and return its stripped output, or ``None`` on failure.
 
-            Example:
+            Examples:
                 ``git("rev-parse", "HEAD")``
             """
             try:
@@ -222,7 +222,7 @@ class GitInfo(BaseModel):
             The embedded information, or ``None`` if the package has no build info (for
             example an editable development install).
 
-        Example:
+        Examples:
             >>> GitInfo.embedded("json") is None
             True
         """
@@ -239,7 +239,7 @@ class GitInfo(BaseModel):
     def capture(cls, module: str | None = None, cwd: str | Path | None = None) -> "GitInfo":
         """Return the best available git information: embedded, then runtime, else unavailable.
 
-        Example:
+        Examples:
             >>> GitInfo.capture("json").source in {"runtime", "unavailable"}
             True
         """
@@ -257,7 +257,7 @@ class VersionInfo(BaseModel):
         package: The installed version.
         git: The source-tree state.
 
-    Example:
+    Examples:
         >>> info = VersionInfo(package=PackageVersion.parse("acme-sdk", "1.2.0"),
         ...                    git=GitInfo(source="runtime", short_commit="abc1234",
         ...                                branch="main", dirty=True))
@@ -285,7 +285,7 @@ class VersionInfo(BaseModel):
         Raises:
             VersionError: If the distribution isn't installed.
 
-        Example:
+        Examples:
             >>> VersionInfo.load("mastif").package.distribution
             'mastif'
         """
@@ -297,7 +297,7 @@ class VersionInfo(BaseModel):
     def summary(self) -> str:
         """One line for logs and report headers.
 
-        Example:
+        Examples:
             >>> VersionInfo(package=PackageVersion.parse("m", "0.1.0"),
             ...             git=GitInfo.unavailable()).summary()
             'm 0.1.0 | git info unavailable'
@@ -315,7 +315,7 @@ class VersionInfo(BaseModel):
     def __str__(self) -> str:
         """Same as `summary`.
 
-        Example:
+        Examples:
             ``print(VersionInfo.load("mastif"))``
         """
         return self.summary()

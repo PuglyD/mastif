@@ -78,6 +78,11 @@ mastif.cli → mastif.api → mastif.engine → mastif.station → mastif.resour
   document their parameters under `Args:`.
 - Docstring examples are written as doctests (`>>>`) and run by `uv run pytest`
   (`--doctest-modules`), so they can never go stale.
+- Use the Google-style section heading `Examples:` (plural), even for one example.
+  `Example:` is parsed as prose and renders doctest prompts as Markdown blockquotes.
+- Declare exported constants individually with type annotations and short attribute
+  docstrings. Document public type aliases too; tuple-unpacked globals are not reliably
+  indexed by the API documentation parser.
 
 ## Git workflow
 
@@ -105,6 +110,14 @@ today and knows nothing about it. They should come away understanding *what* exi
 *why* it exists, and *how it connects to the rest of the system*.
 
 **Style.**
+- Follow [`docs/wiki/documentation-style.md`](docs/wiki/documentation-style.md) for
+  reader journeys, runnable examples, API links, and terminal demonstrations.
+- Use a technical, friendly tone. Assume engineering knowledge, not familiarity with
+  mastif. Introduce the problem before naming the abstraction that solves it.
+- Link related ADRs where their decisions matter, and explain the relationship.
+  Give diagrams ordinary text links to the concepts and decisions they introduce.
+- Distinguish implemented behaviour from proposed designs. State actual guarantees
+  and failure limits instead of unconditional claims about hardware outcomes.
 - **First principles.** Start from the real-world problem, e.g. "a cable falls out
   mid-run", and derive the design from it. Never start from the code.
 - **Systems thinking.** Always place the thing in the wider system: what calls it, what

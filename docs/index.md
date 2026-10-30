@@ -1,33 +1,70 @@
-# mastif
+---
+hide:
+  - toc
+---
 
-**mastif** is a domain-neutral framework for **automated test equipment (ATE)**: the
-software that drives power supplies, signal generators, switches and the device under
-test (DUT), runs test plans, and records trustworthy results.
+# Test systems change. Your test logic shouldn't have to.
 
-It has two parts:
+**mastif is a Python framework for automated test equipment (ATE): software that
+connects instruments, exercises a device under test, and records the evidence.**
+{ .mastif-lead }
 
-- **The core.** A test execution engine (planned), primitives for instruments and
-  DUTs, and the vocabulary of results.
-- **A generic API.** A stable Python API, plus a network service (planned).
+A bench gets a new power supply. A product needs a different console protocol.
+A test moves from a developer's laptop to a production station. Those changes should
+not require rewriting how you express a measurement or decide whether it passes.
 
-Organisations build their own **SDK** on top: their contracts, drivers, DUT types and
-test packages. They also attach their own **UI**. mastif contains nothing specific to
-any one company or product.
+mastif separates **what a test needs**, **how hardware provides it**, and **which
+devices are connected to this station**. Your organisation supplies its drivers,
+product knowledge, test packages, and user interface.
 
-## How to read this wiki
+[Take the guided walkthrough](wiki/walkthrough.md){ .md-button .md-button--primary }
+[Try your first measurement](wiki/first-measurement.md){ .md-button }
 
-| If you want to… | Read |
+## Explore mastif
+
+<div class="grid cards" markdown>
+
+-   **Learn by doing**
+
+    Start with a simulated reading, give it units and limits, and inspect its verdict.
+    No instruments or vendor software required.
+
+    [Start learning](wiki/start-here.md)
+
+-   **Understand the system**
+
+    Follow the boundaries between a test, an organisation's SDK, and a physical station.
+
+    [Explore the architecture](wiki/architecture.md)
+
+-   **Build an integration**
+
+    Describe a device's capabilities, write a driver, and connect it through a profile.
+
+    [Write a driver](wiki/guides/write-a-driver.md)
+
+-   **Find a precise answer**
+
+    Look up Python signatures and types, or follow an architecture decision record
+    (ADR) to its rationale and trade-offs.
+
+    [API reference](reference/resources/identity.md) · [Design decisions](adr/index.md)
+
+</div>
+
+## One framework, organisation-specific systems
+
+| mastif provides | Your organisation provides |
 |---|---|
-| Get oriented on your first day | [Start here](wiki/start-here.md) |
-| See the whole system at once | [Architecture](wiki/architecture.md) |
-| Follow one run from profile to results | [Life of a station](wiki/life-of-a-station.md) |
-| Look up a term | [Glossary](wiki/glossary.md) |
-| Understand an exception | [Error map](wiki/errors.md) |
-| Write a driver, DUT type or station profile | [Guides](wiki/guides/write-a-driver.md) |
-| Know *why* something is the way it is | [Decisions (ADRs)](adr/index.md) |
-| Look up a function's signature | [API reference](reference/kernel.md) |
+| Units, limits, results, and verdicts | Product acceptance criteria |
+| Resource contracts and driver integration | Device drivers and additional capabilities |
+| Station composition and lifecycle handling | Bench profiles and device-specific shutdown actions |
+| Planned execution and API layers | Test packages, workflows, and user interfaces |
 
-## Status
+Read [the system overview](wiki/architecture.md) for the dependency rules and extension points.
 
-The kernel, the resources layer, the station layer and the testing kit are built and
-tested. The engine is the next step. See the [roadmap](wiki/roadmap.md).
+!!! info "Current implementation and future design"
+    This checkout includes the kernel, infrastructure, resources, station, and testing
+    packages. Engine, runtime, and application API designs are future work and subject
+    to revision. Architecture pages distinguish planned flows from executable examples.
+    See the [project roadmap](wiki/roadmap.md).

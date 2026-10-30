@@ -19,7 +19,7 @@ Rules:
     layers. Every other layer (resources, station, engine, API) imports from it, and the
     import-linter contract in ``pyproject.toml`` enforces that direction.
 
-Example:
+Examples:
     >>> from mastif.kernel import Limits, Measurement, Verdict
     >>> from mastif.kernel.units import V
     >>> Measurement("rail_5v", 5.02 * V, Limits.between(4.75 * V, 5.25 * V)).verdict

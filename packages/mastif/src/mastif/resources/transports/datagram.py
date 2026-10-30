@@ -33,14 +33,16 @@ from mastif.resources.errors import TransportError, TransportTimeout
 from mastif.resources.transports.config import UdpConfig
 
 type Handler = Callable[[bytes], None]
+"""Subscriber callback receiving a datagram payload."""
 type Matcher = Callable[[bytes], bool]
+"""Predicate deciding whether a received datagram matches a pending request."""
 
 
 @dataclass
 class _Pending:
     """One `request` waiting for its reply.
 
-    Example:
+    Examples:
         ``_Pending(match=lambda m: m.startswith(b"TEMP "))`` until a matching datagram arrives.
     """
 
@@ -52,7 +54,7 @@ class _Pending:
 class DatagramChannel:
     """A UDP endpoint talking to one peer, implementing `MessageChannel`.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeDatagramPeer
         >>> with FakeDatagramPeer(lambda msg: b"PONG " + msg) as peer:
         ...     ch = DatagramChannel(UdpConfig(host="127.0.0.1", port=peer.port))
@@ -70,7 +72,7 @@ class DatagramChannel:
             config: Peer address and local binding.
             logger: Where to trace messages.
 
-        Example:
+        Examples:
             >>> DatagramChannel(UdpConfig(host="192.168.1.50", port=9000)).name
             '192.168.1.50:9000'
         """
@@ -87,7 +89,7 @@ class DatagramChannel:
     def is_open(self) -> bool:
         """Whether the socket is bound and the reader is running.
 
-        Example:
+        Examples:
             ``ch.is_open`` is False until ``ch.open()``.
         """
         return self._sock is not None
@@ -99,7 +101,7 @@ class DatagramChannel:
         Raises:
             TransportError: If the channel is not open.
 
-        Example:
+        Examples:
             ``ch.local_port`` returns e.g. ``54012`` after `open`.
         """
         return self._require_sock().getsockname()[1]
@@ -110,7 +112,7 @@ class DatagramChannel:
         Raises:
             TransportError: If the local address can't be bound.
 
-        Example:
+        Examples:
             Called by the station when the channel's resource is opened.
         """
         if self._sock is not None:
@@ -134,7 +136,7 @@ class DatagramChannel:
 
         Waiting requests fail with `TransportError` instead of hanging until timeout.
 
-        Example:
+        Examples:
             Called by the station when the run ends.
         """
         sock, self._sock = self._sock, None
@@ -158,7 +160,7 @@ class DatagramChannel:
         Raises:
             TransportError: If the channel is closed or the send fails.
 
-        Example:
+        Examples:
             ``ch.send(b"LED ON")``
         """
         sock = self._require_sock()
@@ -194,7 +196,7 @@ class DatagramChannel:
             TransportTimeout: If no matching reply arrives on any attempt.
             TransportError: If the channel is closed while waiting.
 
-        Example:
+        Examples:
             ``ch.request(b"TEMP?", match=lambda m: m.startswith(b"TEMP "), retries=2)``
         """
         pending = _Pending(match)
@@ -224,7 +226,7 @@ class DatagramChannel:
         Returns:
             A function that removes the subscription.
 
-        Example:
+        Examples:
             ``stop = ch.subscribe(status_log.append)``, then later ``stop()``
         """
         with self._lock:
@@ -233,7 +235,7 @@ class DatagramChannel:
         def unsubscribe() -> None:
             """Remove this subscription; calling it twice is harmless.
 
-            Example:
+            Examples:
                 ``unsubscribe()``
             """
             with self._lock:
@@ -245,7 +247,7 @@ class DatagramChannel:
     def _require_sock(self) -> socket.socket:
         """Return the socket, or raise if the channel is closed.
 
-        Example:
+        Examples:
             Guards `send` and `local_port`.
         """
         if self._sock is None:
@@ -255,7 +257,7 @@ class DatagramChannel:
     def _read_loop(self) -> None:
         """Receive datagrams until closed and dispatch each one.
 
-        Example:
+        Examples:
             Runs on the ``mastif-udp-<peer>`` thread started by `open`.
         """
         while (sock := self._sock) is not None:
@@ -277,7 +279,7 @@ class DatagramChannel:
         Matcher or handler exceptions are logged and treated as "not interested", so a
         bug in one listener can't stop the channel.
 
-        Example:
+        Examples:
             ``self._dispatch(b"TEMP 41.5")`` completes a pending ``TEMP?`` request.
         """
         with self._lock:

@@ -53,7 +53,7 @@ class _UnitDef:
     one unit expressed in the dimension's base unit (``mV`` has factor ``1e-3`` in
     dimension ``V``). ``log`` marks dB-family units, which follow different arithmetic.
 
-    Example:
+    Examples:
         >>> _UnitDef("V", 1e-3)
         _UnitDef(dimension='V', factor=0.001, log=False)
     """
@@ -76,7 +76,7 @@ def _scaled(base: str, prefixes: dict[str, float]) -> dict[str, _UnitDef]:
     Returns:
         Mapping of symbol to definition, including the base unit itself.
 
-    Example:
+    Examples:
         >>> sorted(_scaled("V", {"m": 1e-3}))
         ['V', 'mV']
         >>> _scaled("V", {"m": 1e-3})["mV"].factor
@@ -120,7 +120,7 @@ def _lookup(symbol: str) -> _UnitDef:
     Returns:
         The built-in definition, or a standalone dimension for unknown symbols.
 
-    Example:
+    Examples:
         >>> _lookup("mA").dimension
         'A'
         >>> _lookup("psi")
@@ -142,7 +142,7 @@ def convertible(a: str, b: str) -> bool:
     Returns:
         True if both units share a dimension.
 
-    Example:
+    Examples:
         >>> convertible("mV", "kV")
         True
         >>> convertible("V", "A")
@@ -171,7 +171,7 @@ def convert(value: float, from_unit: str, to_unit: str) -> float:
     Raises:
         UnitError: If the units have different dimensions.
 
-    Example:
+    Examples:
         >>> convert(1500.0, "mV", "V")
         1.5
         >>> convert(1.0, "V", "A")
@@ -200,7 +200,7 @@ class Quantity(BaseModel):
         value: The magnitude. NaN is rejected.
         unit: The unit symbol; ``""`` means dimensionless.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import V, mV
         >>> q = 3.3 * V
         >>> q
@@ -235,7 +235,7 @@ class Quantity(BaseModel):
             ValueError: If the magnitude is NaN (reported by Pydantic as a validation
                 error).
 
-        Example:
+        Examples:
             >>> Quantity(value=float("nan"), unit="V")
             Traceback (most recent call last):
             ...
@@ -250,7 +250,7 @@ class Quantity(BaseModel):
     def is_log(self) -> bool:
         """Whether the unit is logarithmic (dB family), which changes arithmetic rules.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import dBm, mW
             >>> (0 * dBm).is_log, (1 * mW).is_log
             (True, False)
@@ -272,7 +272,7 @@ class Quantity(BaseModel):
         Raises:
             UnitError: If the units have different dimensions.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import GHz
             >>> (2.4 * GHz).to("Hz")
             Quantity(value=2400000000.0, unit='Hz')
@@ -291,7 +291,7 @@ class Quantity(BaseModel):
         Returns:
             The magnitude as a float.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import mA
             >>> (250 * mA).magnitude("A")
             0.25
@@ -315,7 +315,7 @@ class Quantity(BaseModel):
         Raises:
             TypeError: If the operand is neither a number nor a quantity.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V
             >>> (1 * V)._coerce(2)
             Quantity(value=2.0, unit='')
@@ -340,7 +340,7 @@ class Quantity(BaseModel):
         Raises:
             UnitError: If the dimensions differ or the dB combination has no meaning.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V, mV, dB, dBm
             >>> 1 * V + 500 * mV
             Quantity(value=1.5, unit='V')
@@ -367,7 +367,7 @@ class Quantity(BaseModel):
         Raises:
             UnitError: If the dimensions differ or the dB combination has no meaning.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import dBm
             >>> (5 * dBm) - (-15 * dBm)
             Quantity(value=20.0, unit='dB')
@@ -392,7 +392,7 @@ class Quantity(BaseModel):
         Raises:
             UnitError: If this quantity is logarithmic.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import mA
             >>> (100 * mA) * 3
             Quantity(value=300.0, unit='mA')
@@ -414,7 +414,7 @@ class Quantity(BaseModel):
         Returns:
             The scaled quantity.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V
             >>> (9 * V) / 3
             Quantity(value=3.0, unit='V')
@@ -427,7 +427,7 @@ class Quantity(BaseModel):
         Returns:
             The negated quantity.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import dB
             >>> -(3 * dB)
             Quantity(value=-3.0, unit='dB')
@@ -446,7 +446,7 @@ class Quantity(BaseModel):
         Raises:
             UnitError: If the dimensions differ.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V, mV
             >>> (1 * V)._cmp_value(250 * mV)
             0.25
@@ -456,7 +456,7 @@ class Quantity(BaseModel):
     def __lt__(self, other: object) -> bool:
         """Less than, after converting ``other`` to this unit.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import A, mA
             >>> 300 * mA < 1 * A
             True
@@ -466,7 +466,7 @@ class Quantity(BaseModel):
     def __le__(self, other: object) -> bool:
         """Less than or equal, after converting ``other`` to this unit.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V, mV
             >>> 1 * V <= 1000 * mV
             True
@@ -476,7 +476,7 @@ class Quantity(BaseModel):
     def __gt__(self, other: object) -> bool:
         """Greater than, after converting ``other`` to this unit.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import GHz, MHz
             >>> 1 * GHz > 999 * MHz
             True
@@ -486,7 +486,7 @@ class Quantity(BaseModel):
     def __ge__(self, other: object) -> bool:
         """Greater than or equal, after converting ``other`` to this unit.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import s, ms
             >>> 1 * s >= 1000 * ms
             True
@@ -499,7 +499,7 @@ class Quantity(BaseModel):
         A tiny relative tolerance (1e-12) absorbs floating-point noise from conversions,
         so ``2400 * MHz == 2.4 * GHz`` holds.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import GHz, MHz, V, A
             >>> 2400 * MHz == 2.4 * GHz
             True
@@ -515,7 +515,7 @@ class Quantity(BaseModel):
     def __hash__(self) -> int:
         """Hash on the value in the dimension's base unit, consistent with ``==``.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V, mV
             >>> hash(1 * V) == hash(1000 * mV)
             True
@@ -526,7 +526,7 @@ class Quantity(BaseModel):
     def __str__(self) -> str:
         """Render for humans (logs, reports) as ``"<value> <unit>"``.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import dBm
             >>> str(-10.5 * dBm)
             '-10.5 dBm'
@@ -555,7 +555,7 @@ def _log_add(a: Quantity, b: Quantity, sign: float) -> Quantity:
     Raises:
         UnitError: For combinations with no meaning (``dBm + dBm``, dB with linear).
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import dB, dBm
         >>> _log_add(10 * dBm, 3 * dB, 1.0)
         Quantity(value=13.0, unit='dBm')
@@ -584,7 +584,7 @@ class Unit:
     than ``Quantity(value=12, unit="V")``. The common constants are defined at the bottom
     of this module. Orgs can create their own for any symbol.
 
-    Example:
+    Examples:
         >>> psi = Unit("psi")
         >>> 30 * psi
         Quantity(value=30.0, unit='psi')
@@ -598,7 +598,7 @@ class Unit:
         Args:
             symbol: Unit symbol, e.g. ``"V"`` or an org-specific ``"rpm"``.
 
-        Example:
+        Examples:
             >>> Unit("rpm").symbol
             'rpm'
         """
@@ -613,7 +613,7 @@ class Unit:
         Returns:
             The quantity ``value`` in this unit.
 
-        Example:
+        Examples:
             >>> 5 * Unit("V")
             Quantity(value=5.0, unit='V')
         """
@@ -624,7 +624,7 @@ class Unit:
     def __repr__(self) -> str:
         """Render as ``Unit('V')`` for debugging.
 
-        Example:
+        Examples:
             >>> Unit("V")
             Unit('V')
         """
@@ -644,7 +644,7 @@ def as_quantity(value: Any, unit: str = "") -> Quantity:
     Returns:
         The quantity.
 
-    Example:
+    Examples:
         >>> as_quantity(5, "V")
         Quantity(value=5.0, unit='V')
         >>> from mastif.kernel.units import mV
@@ -656,21 +656,68 @@ def as_quantity(value: Any, unit: str = "") -> Quantity:
     return Quantity(value=float(value), unit=unit)
 
 
-V, mV, uV, kV = Unit("V"), Unit("mV"), Unit("uV"), Unit("kV")
-A, mA, uA = Unit("A"), Unit("mA"), Unit("uA")
-W, mW = Unit("W"), Unit("mW")
-Hz, kHz, MHz, GHz = Unit("Hz"), Unit("kHz"), Unit("MHz"), Unit("GHz")
-s, ms, us, ns = Unit("s"), Unit("ms"), Unit("us"), Unit("ns")
-ohm, kohm = Unit("ohm"), Unit("kohm")
-deg, rad, degC = Unit("deg"), Unit("rad"), Unit("degC")
-dB, dBm = Unit("dB"), Unit("dBm")
-percent = Unit("%")
+V: Unit = Unit("V")
+"""Volts; multiply a magnitude by this unit, e.g. `12 * V`."""
+mV: Unit = Unit("mV")
+"""Millivolts, one thousandth of a volt; e.g. `500 * mV`."""
+uV: Unit = Unit("uV")
+"""Microvolts, one millionth of a volt; e.g. `20 * uV`."""
+kV: Unit = Unit("kV")
+"""Kilovolts, one thousand volts; e.g. `2 * kV`."""
+A: Unit = Unit("A")
+"""Amperes of electric current; e.g. `2 * A`."""
+mA: Unit = Unit("mA")
+"""Milliamperes, one thousandth of an ampere; e.g. `180 * mA`."""
+uA: Unit = Unit("uA")
+"""Microamperes, one millionth of an ampere; e.g. `50 * uA`."""
+W: Unit = Unit("W")
+"""Watts of power; e.g. `5 * W`."""
+mW: Unit = Unit("mW")
+"""Milliwatts, one thousandth of a watt; e.g. `10 * mW`."""
+Hz: Unit = Unit("Hz")
+"""Hertz of frequency; e.g. `50 * Hz`."""
+kHz: Unit = Unit("kHz")
+"""Kilohertz, one thousand hertz; e.g. `100 * kHz`."""
+MHz: Unit = Unit("MHz")
+"""Megahertz, one million hertz; e.g. `10 * MHz`."""
+GHz: Unit = Unit("GHz")
+"""Gigahertz, one billion hertz; e.g. `2.4 * GHz`."""
+s: Unit = Unit("s")
+"""Seconds of time; e.g. `2 * s`."""
+ms: Unit = Unit("ms")
+"""Milliseconds, one thousandth of a second; e.g. `100 * ms`."""
+us: Unit = Unit("us")
+"""Microseconds, one millionth of a second; e.g. `50 * us`."""
+ns: Unit = Unit("ns")
+"""Nanoseconds, one billionth of a second; e.g. `10 * ns`."""
+ohm: Unit = Unit("ohm")
+"""Ohms of resistance; e.g. `50 * ohm`."""
+kohm: Unit = Unit("kohm")
+"""Kilohms, one thousand ohms; e.g. `10 * kohm`."""
+deg: Unit = Unit("deg")
+"""Degrees of angle; e.g. `90 * deg`."""
+rad: Unit = Unit("rad")
+"""Radians of angle; e.g. `1 * rad`."""
+degC: Unit = Unit("degC")
+"""Degrees Celsius of temperature; e.g. `25 * degC`."""
+dB: Unit = Unit("dB")
+"""Decibels of logarithmic gain or loss; e.g. `3 * dB`."""
+dBm: Unit = Unit("dBm")
+"""Logarithmic power relative to one milliwatt; e.g. `0 * dBm`."""
+percent: Unit = Unit("%")
+"""Percentage quantities; e.g. `95 * percent`."""
 
 # Documentation aliases for contract signatures, e.g. ``def set_voltage(self, v: Volts)``.
 # They tell readers the intended dimension but are not checked statically.
 type Volts = Quantity
+"""Quantity alias documenting voltage intent; not a distinct dimension-checked type."""
 type Amps = Quantity
+"""Quantity alias documenting current intent; not a distinct dimension-checked type."""
 type Watts = Quantity
+"""Quantity alias documenting power intent; not a distinct dimension-checked type."""
 type Hertz = Quantity
+"""Quantity alias documenting frequency intent; not a distinct dimension-checked type."""
 type Seconds = Quantity
+"""Quantity alias documenting time intent; not a distinct dimension-checked type."""
 type Decibels = Quantity
+"""Quantity alias documenting logarithmic intent; not a distinct dimension-checked type."""

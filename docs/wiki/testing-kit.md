@@ -62,4 +62,4 @@ naming the exact step: `"acme.psu-x: step 'identify' failed: ..."`.
 |---|---|
 | Code | `packages/mastif-testing/src/mastif_testing/` |
 | Guide | [Test your driver](guides/test-your-driver.md) |
-| API | [reference](../reference/testing.md) |
+| API | [reference](../reference/testing/index.md) |

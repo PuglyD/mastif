@@ -70,6 +70,26 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 ### Documentation
 
+- Exposed private classes, functions, methods, and attributes in module reference pages.
+- Enabled undocumented public members in the API reference, made unit constants
+  individually discoverable, and documented public globals and aliases across both
+  packages. Added reference coverage for health readings and the built-in driver tuple.
+- Split API reference modules into dedicated pages under collapsible layer categories;
+  added nested Transport and Channel navigation, with overview pages and ADR links.
+- Standardised API reference source folders: every section now has its own `index.md`,
+  with updated navigation and links and unchanged published section URLs.
+- Collapsible nested sections in the right-hand table of contents, with accessible
+  toggle buttons and automatic expansion for deep links.
+- Fixed API example rendering by using recognised Google-style `Examples:` sections
+  throughout both packages. Doctest prompts now render as highlighted Python sessions
+  rather than nested blockquotes. Local previews also watch the reference source files.
+- First documentation redesign slice for issue #1: reader-oriented navigation,
+  an engineering walkthrough, a runnable measurement tutorial with Termynal playback,
+  highlighted API signatures and symbol labels, and a focused identity/health reference.
+- Reworked resource explanations and linked ADR-0022 to concepts and related decisions;
+  clarified lifecycle guarantees against the current implementation. Added a shared
+  documentation writing guide and contributor-agent instructions.
+
 - Interactive diagrams: every Mermaid diagram can be zoomed, panned and opened
   fullscreen, in light and dark themes. Fixed seven diagrams that failed to render
   (ADR-0008, 0011, 0023, 0026 twice, 0035, and the station wiki page).

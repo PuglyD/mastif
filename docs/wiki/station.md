@@ -93,4 +93,4 @@ close**, even if your code raised.
 | Code | `packages/mastif/src/mastif/station/` |
 | Guide | [Write a station profile](guides/write-a-station-profile.md) |
 | Flow | [Life of a station](life-of-a-station.md) |
-| API | [reference](../reference/station.md) |
+| API | [reference](../reference/station/index.md) |

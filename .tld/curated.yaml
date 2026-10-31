@@ -1,0 +1,756 @@
+# Hand-written parts of the map: non-code elements, overview positions, and connector wording.
+# generate_architecture.py merges this with what it reads from the source.
+root_positions:
+  kernel:
+  - 860
+  - 380
+  infra:
+  - 430
+  - 380
+  resources:
+  - 860
+  - 0
+  station:
+  - 430
+  - 0
+  testing:
+  - 860
+  - -380
+elements:
+  application:
+    name: Application / test script
+    kind: client
+    description: Current entry point is an organisation's Python application, notebook, or test script. It composes services
+      and a Station explicitly, calls capabilities by role, and records kernel results. This is not an implemented mastif
+      CLI or engine.
+    technology: Python
+    file_path: docs/wiki/life-of-a-station.md
+    tags:
+    - external
+    - current
+    has_view: false
+    bypass_noise_gate: false
+    placements:
+    - parent: root
+      position_x: 0
+      position_y: 0
+  hardware:
+    name: Instruments & DUTs
+    kind: external
+    description: External bench devices reached over TCP, serial, VISA, UDP, Telnet, SSH, or a locally installed vendor library.
+      This box represents the system boundary, not code shipped in mastif.
+    file_path: docs/wiki/transports.md
+    tags:
+    - external
+    - hardware
+    has_view: false
+    bypass_noise_gate: false
+    placements:
+    - parent: root
+      position_x: 1290
+      position_y: 0
+  org-sdk:
+    name: Organisation SDK / plugins
+    kind: external
+    description: External packages define product-specific contracts, decorated drivers, and DUT types. Installed packages
+      advertise them through the mastif.drivers entry-point group; core does not import fixed organisation package names.
+    technology: Python
+    file_path: docs/wiki/guides/write-a-driver.md
+    tags:
+    - external
+    - extension
+    has_view: false
+    bypass_noise_gate: false
+    placements:
+    - parent: root
+      position_x: 1290
+      position_y: -380
+  planned:
+    name: Planned execution platform
+    kind: planned
+    description: Design-only scope. The source tree currently has no engine, API, or CLI layers. A persistent station runtime
+      and network service are future work, not an existing execution path.
+    technology: Python
+    file_path: docs/wiki/roadmap.md
+    tags:
+    - planned
+    has_view: true
+    view_label: Planned boundaries
+    bypass_noise_gate: false
+    placements:
+    - parent: root
+      position_x: 0
+      position_y: -380
+  future-api:
+    name: Python API / service — planned
+    kind: service
+    description: Planned public facade over engine and station, with a later separate network-service distribution. This is
+      an architectural direction, not a current HTTP endpoint.
+    technology: Python
+    file_path: docs/wiki/roadmap.md
+    tags:
+    - planned
+    has_view: false
+    bypass_noise_gate: true
+    placements:
+    - parent: planned
+      position_x: 430
+      position_y: 0
+  future-cli:
+    name: CLI — planned
+    kind: client
+    description: Proposed command-line entry points for running and validating plans. No mastif.cli source package exists
+      yet.
+    technology: Python
+    file_path: docs/adr/0001-layered-architecture.md
+    tags:
+    - planned
+    has_view: false
+    bypass_noise_gate: true
+    placements:
+    - parent: planned
+      position_x: 0
+      position_y: 0
+  future-engine:
+    name: Test execution engine — planned
+    kind: planned
+    description: Planned task authoring, plan expansion, execution state machine, events, snapshots, and run storage. The
+      engine design has not yet become a source package.
+    technology: Python
+    file_path: docs/plan.md
+    tags:
+    - planned
+    has_view: false
+    bypass_noise_gate: true
+    placements:
+    - parent: planned
+      position_x: 860
+      position_y: 0
+  future-runtime:
+    name: Persistent station runtime — planned
+    kind: service
+    description: Design-only alternative to direct mode. A long-lived process would own hardware and serve multiple clients
+      through contract proxies, leases, and optional monitors. Distinct from infra.bootstrap.Runtime.
+    technology: Python
+    file_path: docs/adr/0030-execution-topology.md
+    tags:
+    - planned
+    has_view: false
+    bypass_noise_gate: true
+    placements:
+    - parent: planned
+      position_x: 860
+      position_y: 360
+  test-suites:
+    name: Driver / framework test suites
+    kind: client
+    description: Tests arrange fake responses, exercise the same resource-construction boundaries used in production, and
+      assert commands, outputs, and lifecycle behaviour.
+    technology: Python / pytest
+    file_path: packages
+    tags:
+    - implemented
+    - testing
+    has_view: false
+    bypass_noise_gate: true
+    placements:
+    - parent: testing
+      position_x: 0
+      position_y: 0
+connectors:
+- view: infra
+  source: bootstrap
+  target: logging
+  label: configures next
+  description: bootstrap resolves logging configuration from settings/config_dir then calls configure_logging.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: infra
+  source: bootstrap
+  target: settings
+  label: loads first
+  description: bootstrap calls create_settings before logging or version reporting.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: infra
+  source: bootstrap
+  target: versions
+  label: loads optional version
+  description: bootstrap calls VersionInfo.load only when a distribution is supplied.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: infra
+  source: infra-errors
+  target: kernel-errors
+  label: extends MastifError
+  description: infra/errors.py defines InfraError(MastifError).
+  relationship: inheritance
+  direction: forward
+  style: bezier
+- view: infra
+  source: logging
+  target: results
+  label: formats Table
+  description: infra/logs.py imports kernel.results.Table for rich table output. Results remain owned by the Kernel view.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: infra
+  source: logging
+  target: settings
+  label: reads logging configuration
+  description: infra/logs.py imports Settings and _plain and resolves application logging configuration.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: infra
+  source: settings
+  target: infra-errors
+  label: configuration failures
+  description: infra/config.py raises ConfigError when settings cannot be resolved or validated.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: infra
+  source: versions
+  target: infra-errors
+  label: version failures
+  description: infra/version.py uses VersionError for unavailable or invalid package version metadata.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: kernel
+  source: limits
+  target: kernel-errors
+  label: rejects malformed bounds
+  description: kernel/limits.py raises LimitsError and UnitError for invalid criteria and comparisons.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: kernel
+  source: limits
+  target: quantities
+  label: normalises comparison units
+  description: kernel/limits.py imports Quantity and convert to compare readings with unit-bearing bounds.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: kernel
+  source: limits
+  target: verdicts
+  label: returns Verdict
+  description: evaluate(value, limits) returns a Verdict.
+  relationship: returns
+  direction: forward
+  style: bezier
+- view: kernel
+  source: quantities
+  target: kernel-errors
+  label: rejects invalid units
+  description: kernel/units.py raises UnitError for incompatible or invalid quantity operations.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: kernel
+  source: results
+  target: limits
+  label: evaluates acceptance criteria
+  description: Measurement and Table use Limits, IndexedLimits, and evaluate from kernel/limits.py.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: kernel
+  source: results
+  target: quantities
+  label: stores magnitudes & units
+  description: kernel/results.py imports Quantity and normalises unit-bearing values in Measurement.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: kernel
+  source: results
+  target: verdicts
+  label: records / aggregates outcomes
+  description: kernel/results.py imports Verdict and aggregate for result verdict computation.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: planned
+  source: future-api
+  target: future-engine
+  label: planned facade
+  description: ADR-0001 and roadmap describe an API facade over future engine execution.
+  relationship: planned
+  direction: forward
+  style: bezier
+- view: planned
+  source: future-cli
+  target: future-api
+  label: planned dependency
+  description: ADR-0001 defines the intended cli -> api -> engine dependency order; these packages are not yet implemented.
+  relationship: planned
+  direction: forward
+  style: bezier
+- view: planned
+  source: future-engine
+  target: future-runtime
+  label: later proxy-based mode
+  description: ADR-0030 describes a later executor delegating hardware ownership to the persistent runtime.
+  relationship: planned
+  direction: forward
+  style: bezier
+- view: planned
+  source: future-engine
+  target: station
+  label: planned direct execution
+  description: ADR-0001 and ADR-0030 describe the future engine owning a Station in direct mode.
+  relationship: planned
+  direction: forward
+  style: bezier
+- view: planned
+  source: future-runtime
+  target: station
+  label: planned exclusive hardware owner
+  description: ADR-0030 assigns the long-lived runtime process ownership of the Station; no runtime service exists yet.
+  relationship: planned
+  direction: forward
+  style: bezier
+- view: resources
+  source: builtin-channels
+  target: contracts
+  label: implements Shell / MessageChannel
+  description: channels/shell.py and ssh.py declare Shell; channels/udp.py declares MessageChannel through driver decorators
+    and std contracts.
+  relationship: implementation
+  direction: forward
+  style: bezier
+- view: resources
+  source: builtin-channels
+  target: transports
+  label: requests injected communication
+  description: Built-in channels request LineIO, SshSession, or DatagramChannel constructor inputs.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: resources
+  source: driver-registry
+  target: builtin-channels
+  label: includes built-ins
+  description: Registry.__init__ imports BUILTIN_DRIVERS when builtin=True and adds their classes.
+  relationship: discovery
+  direction: forward
+  style: bezier
+- view: resources
+  source: driver-registry
+  target: driver-spec
+  label: indexes specifications
+  description: Registry.add calls spec_of and stores DriverSpec by driver ID.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: resources
+  source: driver-registry
+  target: resource-errors
+  label: missing / duplicate ID
+  description: Registry.get raises DriverNotFound; Registry.add rejects duplicate IDs with DriverDefinitionError.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: resources
+  source: driver-spec
+  target: contracts
+  label: validates provides
+  description: 'driver.py: _decorate calls check_provides for declared capability interfaces.'
+  relationship: validation
+  direction: forward
+  style: bezier
+- view: resources
+  source: resource-builder
+  target: driver-spec
+  label: reads constructor plan
+  description: build_resource uses the DriverSpec config model and inspected injection plan to instantiate spec.cls.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: resources
+  source: resource-builder
+  target: resource-errors
+  label: rejects invalid construction
+  description: driver.py raises DriverDefinitionError for incompatible or missing injection inputs.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: resources
+  source: resource-builder
+  target: settings
+  label: injects requested settings
+  description: build_resource accepts settings and passes them to constructors that explicitly request Settings.
+  relationship: injection
+  direction: forward
+  style: bezier
+- view: resources
+  source: resource-builder
+  target: transports
+  label: calls I/O factory
+  description: build_resource invokes the supplied io_factory for each requested I/O parameter and returns BuiltResource with
+    the created objects.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: resources
+  source: resource-errors
+  target: kernel-errors
+  label: extends MastifError
+  description: resources/errors.py defines ResourceError(MastifError).
+  relationship: inheritance
+  direction: forward
+  style: bezier
+- view: resources
+  source: scpi
+  target: identity
+  label: parses device identity
+  description: transports/scpi.py imports Identity and produces a model from instrument identification responses. Source endpoint
+    is in the I/O drill-down.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: resources
+  source: transports
+  target: resource-errors
+  label: reports transport / protocol failures
+  description: Transport implementations raise TransportError, TransportTimeout, and ProtocolError, preserving failure categories.
+  relationship: raises
+  direction: forward
+  style: bezier
+- view: root
+  source: application
+  target: infra
+  label: bootstraps services
+  description: 'infra/bootstrap.py: bootstrap is called explicitly by the application, returning Runtime settings and version
+    information.'
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: root
+  source: application
+  target: kernel
+  label: evaluates & records results
+  description: docs/examples/first_measurement.py constructs Limits and Measurement from unit-bearing readings.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: root
+  source: application
+  target: station
+  label: builds / opens / requires
+  description: 'station/station.py: Station.build, require, open, and context-manager methods expose the current direct-use
+    entry point.'
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: root
+  source: infra
+  target: kernel
+  label: formats result data
+  description: infra/logs.py imports Table and Verdict; infra/errors.py extends MastifError.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: root
+  source: planned
+  target: station
+  label: future orchestration
+  description: 'ADR-0001 and roadmap: a future engine will build/open a Station and resolve task capabilities. This edge is
+    design-only.'
+  relationship: planned
+  direction: forward
+  style: bezier
+- view: root
+  source: resources
+  target: hardware
+  label: device I/O
+  description: Transport implementations open configured device connections or native-library sessions; drivers invoke the
+    injected I/O interfaces.
+  relationship: communication
+  direction: forward
+  style: bezier
+- view: root
+  source: resources
+  target: infra
+  label: accepts injected Settings
+  description: resources/driver.py imports Settings; build_resource injects settings into constructor parameters that request
+    them.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: root
+  source: resources
+  target: kernel
+  label: uses quantities & typed errors
+  description: resources/std.py and transports/scpi.py use Quantity; resources/errors.py extends MastifError.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: root
+  source: resources
+  target: org-sdk
+  label: discovers installed drivers
+  description: 'resources/registry.py: Registry.discover uses importlib.metadata.entry_points(group="mastif.drivers") and
+    ep.load; no fixed organisation package names.'
+  relationship: discovery
+  direction: forward
+  style: bezier
+- view: root
+  source: station
+  target: infra
+  label: receives Settings
+  description: station/station.py imports Settings and accepts settings in Station.build, forwarding them to resource construction.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: root
+  source: station
+  target: resources
+  label: constructs & manages drivers
+  description: Station._build_handle calls Registry.get and build_resource; ResourceManager calls driver lifecycle hooks.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: root
+  source: testing
+  target: resources
+  label: exercises contracts & lifecycle
+  description: mastif_testing/conformance.py imports contract_problems, build_resource, call_hook, and make_safe.
+  relationship: testing
+  direction: forward
+  style: bezier
+- view: station
+  source: lifecycle
+  target: handles
+  label: opens / closes / updates state
+  description: ResourceManager._open_one and _close_one operate on handle.built.io, handle.channels, driver hooks, and handle.is_open.
+  relationship: lifecycle
+  direction: forward
+  style: bezier
+- view: station
+  source: lifecycle
+  target: lifecycle-events
+  label: emits phase events
+  description: ResourceManager._emit calls the optional listener with ResourceEvent and catches callback exceptions.
+  relationship: callback
+  direction: forward
+  style: bezier
+- view: station
+  source: lifecycle
+  target: verification
+  label: verifies during opening
+  description: ResourceManager._open_one invokes _verify_identity, then health; failures roll back the partially opened resource.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: station
+  source: roles
+  target: contracts
+  label: checks requested capability
+  description: Station.require uses the resolved DriverSpec and contract metadata to reject incompatible roles.
+  relationship: validation
+  direction: forward
+  style: bezier
+- view: station
+  source: roles
+  target: handles
+  label: returns capability provider
+  description: Station.role and require resolve a resource/channel/child instance from the station handles and check its contract.
+  relationship: reads
+  direction: forward
+  style: bezier
+- view: station
+  source: roles
+  target: profile
+  label: resolves role mapping
+  description: Station.role calls profile.target_of(role).
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: station
+  source: shutdown
+  target: lifecycle
+  label: safe_state_all / close_all
+  description: Station.safe_state, close, and __exit__ delegate cleanup to ResourceManager.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: station
+  source: station-build
+  target: driver-registry
+  label: looks up driver ID
+  description: Station._build_handle calls registry.get(entry.driver). Off-view endpoint belongs to Resources.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: station
+  source: station-build
+  target: handles
+  label: assembles resource handles
+  description: Station._build_handle creates ResourceHandle and recursively attaches child channel handles.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: station
+  source: station-build
+  target: lifecycle
+  label: creates manager
+  description: Station.__init__ constructs ResourceManager(handles.values(), listener, logger).
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: station
+  source: station-build
+  target: profile
+  label: reads entries(sim)
+  description: Station.build iterates profile.entries(sim), applying profile-selected simulation replacements.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: station
+  source: station-build
+  target: resource-builder
+  label: builds with injected I/O
+  description: Station._build_handle calls build_resource with spec, config, name, io_factory, logger, and settings.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: station
+  source: verification
+  target: identity
+  label: compares reports
+  description: ResourceManager._verify_identity calls Identity.mismatches; _open_one stores Health and rejects ok=false.
+  relationship: validation
+  direction: forward
+  style: bezier
+- view: testing
+  source: contract-tests
+  target: contracts
+  label: checks contract_problems
+  description: conformance.assert_satisfies calls resources.contracts.contract_problems.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: testing
+  source: lifecycle-tests
+  target: resource-builder
+  label: builds with caller-provided I/O
+  description: check_lifecycle defines an injection factory and calls build_resource, then invokes driver hooks and make_safe.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: testing
+  source: test-suites
+  target: contract-tests
+  label: asserts capability shape
+  description: The conformance tests invoke assert_satisfies with implementations and capability contracts.
+  relationship: testing
+  direction: forward
+  style: bezier
+- view: testing
+  source: test-suites
+  target: fakes
+  label: arranges scripted responses
+  description: packages/mastif/tests/resources/test_drivers.py supplies FakeLineIO and FakeStream; test_native.py uses FakeNativeLibrary.
+    Companion conformance tests live under packages/mastif-testing/tests.
+  relationship: testing
+  direction: forward
+  style: bezier
+- view: testing
+  source: test-suites
+  target: lifecycle-tests
+  label: checks lifecycle behaviour
+  description: packages/mastif-testing/tests/test_conformance.py exercises lifecycle reports and failures; packages/mastif/tests/resources/test_native.py
+    supplies fake native I/O to check_lifecycle.
+  relationship: testing
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: datagrams
+  label: builds UDP channel
+  description: build_io returns DatagramChannel when want is DatagramChannel and config is UdpConfig.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: lines
+  label: builds line I/O
+  description: factory._line_io returns VisaLineIO or wraps a byte stream with StreamLineIO.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: native
+  label: builds native-library wrapper
+  description: build_io returns NativeLibrary for NativeConfig; library/session opening is deferred.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: scpi
+  label: wraps LineIO with Scpi
+  description: build_io(Scpi, config) obtains _line_io and constructs Scpi(line).
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: ssh
+  label: builds command session
+  description: build_io returns SshSession when the requested type and SshConfig match.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: streams
+  label: builds byte streams
+  description: factory._stream creates TCP, serial, Telnet, or interactive SSH stream implementations.
+  relationship: creates
+  direction: forward
+  style: bezier
+- view: transports
+  source: io-factory
+  target: transport-config
+  label: selects by config type
+  description: build_io dispatches on TcpConfig, SerialConfig, VisaConfig, UdpConfig, TelnetConfig, SshConfig, and NativeConfig.
+  relationship: dependency
+  direction: forward
+  style: bezier
+- view: transports
+  source: lines
+  target: streams
+  label: frames stream bytes
+  description: StreamLineIO implements line framing over its StreamTransport. VisaLineIO is a separate backend and does not
+    use this edge.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: transports
+  source: scpi
+  target: lines
+  label: writes / queries lines
+  description: Scpi delegates communication to its injected LineIO object.
+  relationship: calls
+  direction: forward
+  style: bezier
+- view: transports
+  source: scpi
+  target: quantities
+  label: returns unit-bearing readings
+  description: transports/scpi.py imports Quantity and constructs typed quantity results.
+  relationship: creates
+  direction: forward
+  style: bezier

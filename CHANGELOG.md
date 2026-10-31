@@ -70,6 +70,10 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 ### Documentation
 
+- Added an editable tlDiagram architecture map with source-linked Python elements,
+  evidenced relationships, responsibility-based drill-downs, and explicitly planned work.
+  Every implemented layer expands to modules, classes, functions, members, and types,
+  with connectors generated from the source AST and hand-written wording kept in `.tld/curated.yaml`.
 - Exposed private classes, functions, methods, and attributes in module reference pages.
 - Enabled undocumented public members in the API reference, made unit constants
   individually discoverable, and documented public globals and aliases across both

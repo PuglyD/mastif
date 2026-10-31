@@ -1,0 +1,16 @@
+flowchart LR
+  n_identifiers["mastif.kernel.ids"]
+  n_mastif_kernel___all__["__all__ · kernel"]
+  n_mastif_kernel_errors["mastif.kernel.errors"]
+  n_mastif_kernel_limits["mastif.kernel.limits"]
+  n_mastif_kernel_units["mastif.kernel.units"]
+  n_results["mastif.kernel.results"]
+  n_verdicts["mastif.kernel.verdict"]
+  n_mastif_kernel_limits -->|imports LimitsError, UnitError| n_mastif_kernel_errors
+  n_mastif_kernel_limits -->|imports Quantity, convert| n_mastif_kernel_units
+  n_mastif_kernel_limits -->|imports Verdict| n_verdicts
+  n_mastif_kernel_units -->|imports UnitError| n_mastif_kernel_errors
+  n_results -->|imports LimitsError| n_mastif_kernel_errors
+  n_results -->|imports IndexedLimits, Limits, evaluate| n_mastif_kernel_limits
+  n_results -->|imports Quantity| n_mastif_kernel_units
+  n_results -->|records / aggregates outcomes| n_verdicts

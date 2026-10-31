@@ -1,0 +1,14 @@
+flowchart LR
+  n_infra_errors["mastif.infra.errors"]
+  n_logging["mastif.infra.logs"]
+  n_mastif_infra___all__["__all__ · infra"]
+  n_mastif_infra_bootstrap["mastif.infra.bootstrap"]
+  n_mastif_infra_config["mastif.infra.config"]
+  n_mastif_infra_version["mastif.infra.version"]
+  n_logging -->|imports ConfigError| n_infra_errors
+  n_logging -->|imports Settings, _plain| n_mastif_infra_config
+  n_mastif_infra_bootstrap -->|imports configure_logging, resolve_logging_config| n_logging
+  n_mastif_infra_bootstrap -->|imports DEFAULT_ENVVAR_PREFIX, Settings, create_settings| n_mastif_infra_config
+  n_mastif_infra_bootstrap -->|imports VersionInfo| n_mastif_infra_version
+  n_mastif_infra_config -->|imports ConfigError| n_infra_errors
+  n_mastif_infra_version -->|imports VersionError| n_infra_errors

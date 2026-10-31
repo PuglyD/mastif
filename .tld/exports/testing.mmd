@@ -1,0 +1,6 @@
+flowchart LR
+  n_fakes["mastif_testing.fakes"]
+  n_mastif_testing___all__["__all__ · mastif_testing"]
+  n_mastif_testing_conformance["mastif_testing.conformance"]
+  n_test_suites["Driver / framework test suites"]
+  n_test_suites -->|arranges scripted responses| n_fakes

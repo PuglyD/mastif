@@ -37,6 +37,7 @@ from mastif.kernel.units import Quantity, convert
 from mastif.kernel.verdict import Verdict
 
 type Bound = float | Quantity | None
+"""Range endpoint: a bare magnitude, a quantity with units, or `None` for no bound."""
 
 
 def _split(bound: Bound) -> tuple[float | None, str | None]:
@@ -51,7 +52,7 @@ def _split(bound: Bound) -> tuple[float | None, str | None]:
     Returns:
         ``(magnitude, unit)``; the unit is ``None`` for bare numbers and for ``None``.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import V
         >>> _split(5 * V)
         (5.0, 'V')
@@ -76,7 +77,7 @@ class Range(BaseModel):
         inclusive: Whether a value exactly on a bound counts as inside.
         unit: Unit of both bounds; ``None`` means the range is unitless.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import V, mV
         >>> r = Range(4500 * mV, 5.5 * V)
         >>> r.low, r.high, r.unit
@@ -117,7 +118,7 @@ class Range(BaseModel):
             UnitError: If the bounds have incompatible units.
             LimitsError: If the range has no bounds or ``low > high``.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import dB
             >>> Range(18 * dB, 22 * dB)
             Range(low=18.0, high=22.0, inclusive=True, unit='dB')
@@ -143,7 +144,7 @@ class Range(BaseModel):
         Raises:
             UnitError: If the two bounds have incompatible units.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V, mV
             >>> Range._accept_quantities({"low": 1 * V, "high": 1500 * mV})
             {'low': 1.0, 'high': 1.5, 'unit': 'V'}
@@ -172,7 +173,7 @@ class Range(BaseModel):
         Raises:
             LimitsError: If both bounds are missing or ``low > high``.
 
-        Example:
+        Examples:
             >>> Range(2.0, 1.0)
             Traceback (most recent call last):
             ...
@@ -196,7 +197,7 @@ class Range(BaseModel):
         Returns:
             True if the value is inside the range.
 
-        Example:
+        Examples:
             >>> Range(4.75, 5.25).contains(5.25)
             True
             >>> Range(4.75, 5.25, inclusive=False).contains(5.25)
@@ -224,7 +225,7 @@ class Range(BaseModel):
             UnitError: If a unitless range is mixed with a unit-bearing one, or the
                 dimensions differ.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V
             >>> Range(4.5 * V, 5.5 * V).in_unit("mV")
             Range(low=4500.0, high=5500.0, inclusive=True, unit='mV')
@@ -238,7 +239,7 @@ class Range(BaseModel):
         def conv(x: float | None) -> float | None:
             """Convert one bound, leaving an open bound open.
 
-            Example:
+            Examples:
                 ``conv(None)`` returns ``None``; ``conv(4.5)`` returns ``4500.0`` for V to mV.
             """
             return None if x is None else convert(x, src, unit)
@@ -265,7 +266,7 @@ class Limits(BaseModel):
         passing: Range for PASS.
         warning: Wider range for WARN, or ``None`` for no marginal zone.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import V
         >>> lim = Limits.between(4.75 * V, 5.25 * V, warn_low=4.5 * V, warn_high=5.5 * V)
         >>> evaluate(5.4 * V, lim)
@@ -290,7 +291,7 @@ class Limits(BaseModel):
         Raises:
             LimitsError: If the warning range does not contain the passing range.
 
-        Example:
+        Examples:
             >>> Limits.between(0.0, 10.0, warn_low=1.0)
             Traceback (most recent call last):
             ...
@@ -311,7 +312,7 @@ class Limits(BaseModel):
     def unit(self) -> str | None:
         """Unit the limits are expressed in (the passing range's unit).
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import mA
             >>> Limits.at_most(250 * mA).unit
             'mA'
@@ -343,7 +344,7 @@ class Limits(BaseModel):
         Returns:
             The limits.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V
             >>> lim = Limits.between(4.75 * V, 5.25 * V)
             >>> evaluate(5 * V, lim), evaluate(6 * V, lim)
@@ -374,7 +375,7 @@ class Limits(BaseModel):
         Returns:
             The limits.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import dBm
             >>> evaluate(9.5 * dBm, Limits.at_least(10 * dBm, warn_low=9 * dBm))
             <Verdict.WARN: 'warn'>
@@ -393,7 +394,7 @@ class Limits(BaseModel):
         Returns:
             The limits.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import mA
             >>> evaluate(300 * mA, Limits.at_most(250 * mA))
             <Verdict.FAIL: 'fail'>
@@ -422,7 +423,7 @@ class IndexedLimits(BaseModel):
             ``"7"`` name the same index, including after a JSON round trip.
         default: Limits for indices not listed; ``None`` makes unlisted indices an error.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import dBm
         >>> normal = Limits.between(9 * dBm, 11 * dBm)
         >>> long_cable = Limits.between(8 * dBm, 10 * dBm)
@@ -450,7 +451,7 @@ class IndexedLimits(BaseModel):
         Returns:
             The mapping with ``str`` keys.
 
-        Example:
+        Examples:
             >>> IndexedLimits._text_keys({1: "a", "2": "b"})
             {'1': 'a', '2': 'b'}
         """
@@ -469,7 +470,7 @@ class IndexedLimits(BaseModel):
         Raises:
             LimitsError: If the index is not listed and there is no default.
 
-        Example:
+        Examples:
             >>> lim = IndexedLimits(by_index={1: Limits.at_most(1.0)})
             >>> lim.for_index("1").passing.high
             1.0
@@ -504,7 +505,7 @@ def evaluate(value: float | Quantity, limits: Limits) -> Verdict:
         UnitError: If a quantity is judged against unitless limits, or its unit has a
             different dimension.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import V, mV
         >>> lim = Limits.between(4.75 * V, 5.25 * V)
         >>> evaluate(5000 * mV, lim)

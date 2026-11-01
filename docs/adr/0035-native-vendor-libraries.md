@@ -11,7 +11,7 @@
 > **Who this is for:** an engineer who joined today and has to write a driver for an
 > instrument that only comes with a vendor DLL. You need to know what a driver is
 > ([ADR-0011](0011-drivers-and-duts.md)). C-interop terms (calling convention, prototype,
-> output parameter) are explained below and in the [glossary](../wiki/glossary.md). The
+> output parameter) are explained below and in the [glossary](../learn/architecture/glossary.md). The
 > step-by-step how-to is the guide [Wrap a vendor DLL](../wiki/guides/wrap-a-vendor-dll.md).
 
 ## 1. Summary

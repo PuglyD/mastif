@@ -41,7 +41,7 @@ def assert_satisfies(cls: type, contract: type) -> None:
     Raises:
         AssertionError: With one line per problem.
 
-    Example:
+    Examples:
         >>> from mastif.resources._examples import ExamplePsu
         >>> from mastif.resources.std import PowerSupply, Shell
         >>> assert_satisfies(ExamplePsu, PowerSupply)
@@ -68,7 +68,7 @@ class LifecycleReport:
         safe_state_ran: Whether any safe-state action ran.
         steps: The lifecycle steps run, in order.
 
-    Example:
+    Examples:
         ``report.steps`` is ``["build", "open", "identify", "health", "safe_state", "close"]``
         for a driver with every hook.
     """
@@ -98,7 +98,7 @@ def check_lifecycle(cls: type, config: Mapping[str, Any], **io: object) -> Lifec
     Raises:
         AssertionError: Naming the step that failed and why.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeLineIO
         >>> from mastif.resources._examples import ExamplePsu
         >>> from mastif.resources.transports import Scpi
@@ -116,7 +116,7 @@ def check_lifecycle(cls: type, config: Mapping[str, Any], **io: object) -> Lifec
     def inject(want: type, transport: object, log: object) -> object:
         """Hand out the caller's fakes by parameter type.
 
-        Example:
+        Examples:
             For ``io: Scpi`` this returns the fake passed as ``io=``.
         """
         for param, kind in spec.io_params.items():
@@ -129,7 +129,7 @@ def check_lifecycle(cls: type, config: Mapping[str, Any], **io: object) -> Lifec
     def step(name: str, fn: Any) -> Any:
         """Run one step, recording it and turning any exception into a clear assertion.
 
-        Example:
+        Examples:
             ``step("open", lambda: call_hook(obj, "open"))``
         """
         try:

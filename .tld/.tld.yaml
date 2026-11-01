@@ -1,0 +1,14 @@
+project_name: mastif-oss
+exclude:
+    - .git/
+    - .venv/
+    - venv/
+    - __pycache__/
+    - '**/*.pyc'
+    - .pytest_cache/
+    - .mypy_cache/
+repositories:
+    mastif-oss:
+        url: https://github.com/PuglyD/mastif.git
+        config:
+            mode: upsert

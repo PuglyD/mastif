@@ -78,6 +78,11 @@ mastif.cli → mastif.api → mastif.engine → mastif.station → mastif.resour
   document their parameters under `Args:`.
 - Docstring examples are written as doctests (`>>>`) and run by `uv run pytest`
   (`--doctest-modules`), so they can never go stale.
+- Use the Google-style section heading `Examples:` (plural), even for one example.
+  `Example:` is parsed as prose and renders doctest prompts as Markdown blockquotes.
+- Declare exported constants individually with type annotations and short attribute
+  docstrings. Document public type aliases too; tuple-unpacked globals are not reliably
+  indexed by the API documentation parser.
 
 ## Git workflow
 
@@ -105,6 +110,23 @@ today and knows nothing about it. They should come away understanding *what* exi
 *why* it exists, and *how it connects to the rest of the system*.
 
 **Style.**
+- Follow [`docs/wiki/documentation-style.md`](docs/wiki/documentation-style.md) for
+  reader journeys, runnable examples, API links, and terminal demonstrations.
+- API references use one `docs/reference/<layer>/index.md` file per layer, beginning
+  with a quick purpose/module summary and links to concept pages. List layers as
+  peers in the left navigation, including Kernel; keep `navigation.indexes` disabled.
+- Use generated Python module headings and the collapsible right-hand TOC, with
+  methods and attributes nested under their owning classes. Do not add descriptive
+  module headings or editorial grouping levels. Show public and private members,
+  render each symbol once, and verify TOC ownership as well as links and coverage.
+- Use a technical, friendly tone with plenty of context, written as "we" and "you". Assume
+  engineering knowledge, not familiarity with mastif. Introduce the problem before naming the
+  abstraction that solves it. Learn pages open with an introduction and end with a recap;
+  see the Voice section of the style guide.
+- Link related ADRs where their decisions matter, and explain the relationship.
+  Give diagrams ordinary text links to the concepts and decisions they introduce.
+- Distinguish implemented behaviour from proposed designs. State actual guarantees
+  and failure limits instead of unconditional claims about hardware outcomes.
 - **First principles.** Start from the real-world problem, e.g. "a cable falls out
   mid-run", and derive the design from it. Never start from the code.
 - **Systems thinking.** Always place the thing in the wider system: what calls it, what
@@ -137,7 +159,7 @@ Cross-cutting decisions get their own ADRs too, e.g. layering or the error model
   to its *History* section.
 - Reversing a decision requires a new ADR that supersedes the old one.
 
-**The wiki (`docs/wiki/`).** Keep the wiki in step with the code:
+**The docs (`docs/learn/architecture/` and `docs/wiki/`).** Keep them in step with the code:
 - each layer's page
 - the end-to-end flow pages
 - the glossary

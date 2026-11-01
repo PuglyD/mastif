@@ -39,7 +39,7 @@ class SshShell:
     picks. Each command runs in a fresh shell on the host: ``cd`` or ``export`` in one
     command does not carry over to the next (chain them with ``&&`` instead).
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeSshSession
         >>> session = FakeSshSession({"uname -r": "6.1.0\\n"})
         >>> session.open()
@@ -56,7 +56,7 @@ class SshShell:
             transport: The SSH connection (host, user, credentials, host-key policy).
             timeout: Default seconds to wait for a command to finish.
 
-        Example:
+        Examples:
             ``{transport: {kind: ssh, host: 192.168.1.60, username: root}, timeout: 30}``
         """
 
@@ -66,7 +66,7 @@ class SshShell:
     def __init__(self, cfg: Config, session: SshSession) -> None:
         """Keep the config and the session the station injects (and opens).
 
-        Example:
+        Examples:
             The station calls ``SshShell(cfg, session=SshSession(cfg.transport))``.
         """
         self.cfg = cfg
@@ -89,7 +89,7 @@ class SshShell:
             TransportTimeout: If the command doesn't finish in time.
             TransportError: If the connection fails.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeSshSession
             >>> s = FakeSshSession(); s.open()
             >>> cfg = SshShell.Config.model_validate(

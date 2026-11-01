@@ -38,7 +38,7 @@ class ResourceError(MastifError):
     Catch this when you want to handle any hardware-side failure in one place, for
     example to put the station into a safe state.
 
-    Example:
+    Examples:
         >>> try:
         ...     raise TransportTimeout("no reply from 10.0.0.5:5025 within 2.0 s")
         ... except ResourceError as exc:
@@ -53,7 +53,7 @@ class DriverDefinitionError(ResourceError):
     Raised when the class is decorated, i.e. when the org's module is imported. The
     mistake therefore shows up in the org's own unit tests, not at a test station.
 
-    Example:
+    Examples:
         >>> raise DriverDefinitionError("acme.psu-x: Config must subclass DriverConfig")
         Traceback (most recent call last):
         ...
@@ -64,7 +64,7 @@ class DriverDefinitionError(ResourceError):
 class ContractMismatch(DriverDefinitionError):
     """A driver claims to provide a contract but is missing some of its methods.
 
-    Example:
+    Examples:
         >>> raise ContractMismatch("acme.psu-x: PowerSupply: output: missing")
         Traceback (most recent call last):
         ...
@@ -77,7 +77,7 @@ class DriverNotFound(ResourceError):
 
     Usually a typo in the profile, or the org's SDK package isn't installed.
 
-    Example:
+    Examples:
         >>> raise DriverNotFound("no driver 'acme.psu-y'; known: acme.psu-x")
         Traceback (most recent call last):
         ...
@@ -88,7 +88,7 @@ class DriverNotFound(ResourceError):
 class TransportError(ResourceError):
     """Bytes could not be moved: the connection failed, was refused or dropped.
 
-    Example:
+    Examples:
         >>> raise TransportError("connection to 10.0.0.5:5025 refused")
         Traceback (most recent call last):
         ...
@@ -99,7 +99,7 @@ class TransportError(ResourceError):
 class TransportTimeout(TransportError):
     """No (complete) reply arrived within the allowed time.
 
-    Example:
+    Examples:
         >>> issubclass(TransportTimeout, TransportError)
         True
     """
@@ -111,7 +111,7 @@ class ProtocolError(ResourceError):
     For example, a number was expected and text came back, or a SCPI error queue held an
     entry.
 
-    Example:
+    Examples:
         >>> raise ProtocolError("MEAS:CURR? returned 'OVLD', expected a number")
         Traceback (most recent call last):
         ...
@@ -125,7 +125,7 @@ class IdentityMismatch(ResourceError):
     Raised before any other operation, so a test never drives the wrong instrument or
     measures the wrong unit.
 
-    Example:
+    Examples:
         >>> raise IdentityMismatch("bench_psu: serial is 'B999', expected 'A123'")
         Traceback (most recent call last):
         ...
@@ -136,7 +136,7 @@ class IdentityMismatch(ResourceError):
 class ResourceFault(ResourceError):
     """The device reports a fault, or its health check failed.
 
-    Example:
+    Examples:
         >>> raise ResourceFault("bench_psu: over-temperature protection tripped")
         Traceback (most recent call last):
         ...

@@ -1,7 +1,7 @@
 # Guide: write a DUT type
 
 A **DUT type** describes the product you test: how to reach it (channels), what it can
-do (product methods), and its live state. Concepts: [Resources](../resources.md).
+do (product methods), and its live state. Concepts: [Resources](../../learn/architecture/resources.md).
 Design: ADR-0011, ADR-0019, ADR-0020, ADR-0023.
 
 ## 1. Decide the channels

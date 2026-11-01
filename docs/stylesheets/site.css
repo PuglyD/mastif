@@ -1,0 +1,293 @@
+/* Shared reading and reference styles; Material owns the layout.
+   Colours come from the Vesper theme for Obsidian, MIT licence, Copyright (c) 2025 Omar Rashad:
+   https://github.com/omarrashad/obsidian-vesper
+   Syntax uses a custom Gruvbox-inspired palette with Vesper's peach and mint accents.
+   Light mode uses darker counterparts for readable code on its pale background.
+   Vesper's light accent (#FFB066) is used for fills, with #A65A14 for link text. */
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #101010;
+  --md-default-bg-color--light: #101010b3;
+  --md-default-bg-color--lighter: #1010104d;
+  --md-default-bg-color--lightest: #1010101a;
+  --md-default-fg-color: #ffffff;
+  --md-default-fg-color--light: #a0a0a0;
+  --md-default-fg-color--lighter: #707070;
+  --md-default-fg-color--lightest: #2a2a2a;
+  --md-primary-fg-color: #101010;
+  --md-primary-fg-color--light: #1a1a1a;
+  --md-primary-fg-color--dark: #101010;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #a0a0a0;
+  --md-accent-fg-color: #ffc799;
+  --md-accent-fg-color--transparent: #ffc79920;
+  --md-accent-bg-color: #000000;
+  --md-typeset-color: #ffffff;
+  --md-typeset-a-color: #ffc799;
+  --md-code-bg-color: #1a1a1a;
+  --md-code-fg-color: #e8e3dc;
+  --md-code-hl-keyword-color: #e89b91;
+  --md-code-hl-function-color: #ffc799;
+  --md-code-hl-constant-color: #c5afe8;
+  --md-code-hl-number-color: #c5afe8;
+  --md-code-hl-special-color: #9fc8e5;
+  --md-code-hl-string-color: #99ffe4;
+  --md-code-hl-name-color: #e8e3dc;
+  --md-code-hl-variable-color: #e8e3dc;
+  --md-code-hl-generic-color: #e8e3dc;
+  --md-code-hl-operator-color: #c9bfb3;
+  --md-code-hl-punctuation-color: #b5ada3;
+  --md-code-hl-comment-color: #96928c;
+  --mastif-code-type-color: #e6d18a;
+  --mastif-code-decorator-color: #9fc8e5;
+  --md-footer-bg-color: #101010;
+  --md-footer-bg-color--dark: #0a0a0a;
+  --mastif-accent-fill: #ffc799;
+  --mastif-accent-fill-hover: #e6a974;
+  --mastif-selection: #ffc79950;
+  --mastif-symbol-class: #ffc799;
+  --mastif-symbol-function: #99ffe4;
+  --mastif-symbol-attribute: #a0a0a0;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #ffffff;
+  --md-default-fg-color: #1a1a1a;
+  --md-default-fg-color--light: #5f5f5f;
+  --md-default-fg-color--lighter: #aaaaaa;
+  --md-default-fg-color--lightest: #e6e6e6;
+  --md-primary-fg-color: #ffffff;
+  --md-primary-fg-color--light: #fafafa;
+  --md-primary-fg-color--dark: #ffffff;
+  --md-primary-bg-color: #1a1a1a;
+  --md-primary-bg-color--light: #777777;
+  --md-accent-fg-color: #a65a14;
+  --md-accent-fg-color--transparent: #ffb06620;
+  --md-accent-bg-color: #ffffff;
+  --md-typeset-color: #1a1a1a;
+  --md-typeset-a-color: #a65a14;
+  --md-code-bg-color: #fafafa;
+  --md-code-fg-color: #292522;
+  --md-code-hl-keyword-color: #a23e38;
+  --md-code-hl-function-color: #945116;
+  --md-code-hl-constant-color: #7952a3;
+  --md-code-hl-number-color: #7952a3;
+  --md-code-hl-special-color: #37698f;
+  --md-code-hl-string-color: #006f58;
+  --md-code-hl-name-color: #292522;
+  --md-code-hl-variable-color: #292522;
+  --md-code-hl-generic-color: #292522;
+  --md-code-hl-operator-color: #655b50;
+  --md-code-hl-punctuation-color: #70675d;
+  --md-code-hl-comment-color: #706a63;
+  --mastif-code-type-color: #78600e;
+  --mastif-code-decorator-color: #37698f;
+  --md-footer-bg-color: #1a1a1a;
+  --md-footer-bg-color--dark: #101010;
+  --mastif-accent-fill: #ffb066;
+  --mastif-accent-fill-hover: #e0a568;
+  --mastif-selection: #ffb06650;
+  --mastif-symbol-class: #a65a14;
+  --mastif-symbol-function: #007a66;
+  --mastif-symbol-attribute: #5f5f5f;
+}
+
+/* Material groups classes with functions, decorators with keywords, and keyword
+   constants with ordinary names. Split those Pygments tokens explicitly. These
+   selectors also apply to highlighted inline code and mkdocstrings signatures. */
+.highlight .nc,
+.highlight .ne,
+.highlight .kt,
+.highlight .nb { color: var(--mastif-code-type-color); }
+
+.highlight .nf,
+.highlight .fm { color: var(--md-code-hl-function-color); }
+
+.highlight .nd,
+.highlight .nn { color: var(--mastif-code-decorator-color); }
+
+.highlight .kc,
+.highlight .no { color: var(--md-code-hl-constant-color); }
+
+.highlight .bp { color: var(--md-code-hl-name-color); }
+
+/* Configuration keys are labels rather than language control-flow keywords. */
+.language-yaml.highlight .nt,
+.language-json.highlight .nt,
+.language-toml.highlight .na { color: var(--mastif-code-decorator-color); }
+
+::selection { background-color: var(--mastif-selection); }
+
+.md-search__input { background-color: var(--md-code-bg-color); }
+[data-md-toggle="search"]:checked ~ .md-header .md-search__input { background-color: var(--md-default-bg-color); }
+
+.md-header, .md-tabs {
+  box-shadow: none;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3 {
+  color: var(--md-default-fg-color);
+  font-weight: 600;
+}
+
+.md-typeset .md-button {
+  color: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+}
+
+.md-typeset .md-button--primary,
+.md-typeset .md-button--primary:focus {
+  color: #000000;
+  background-color: var(--mastif-accent-fill);
+  border-color: var(--mastif-accent-fill);
+}
+
+.md-typeset .md-button:hover {
+  color: #000000;
+  background-color: var(--mastif-accent-fill-hover);
+  border-color: var(--mastif-accent-fill-hover);
+}
+
+.md-typeset .mastif-lead {
+  font-size: 1.2em;
+  line-height: 1.65;
+  max-width: 46rem;
+}
+
+.md-typeset h1.mastif-title {
+  /* The banner carries the name; the heading stays for screen readers and the page outline. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.md-typeset .mastif-banner {
+  display: block;
+  width: min(100%, 44rem);
+  margin: 0.5rem auto 1.5rem;
+}
+
+/* The artwork is black ink on transparency; white reads better on the dark theme. */
+[data-md-color-scheme="slate"] .md-typeset .mastif-banner,
+[data-md-color-scheme="slate"] .md-header__button.md-logo img {
+  filter: invert(1);
+}
+
+[data-md-color-scheme="default"] .md-header__button.md-logo img { filter: none; }
+
+.md-header__button.md-logo img { height: 1.7rem; width: auto; }
+
+.md-typeset .mastif-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.md-typeset .mastif-badges img { display: block; height: 1.4rem; width: auto; }
+
+.md-typeset .grid.cards > ul > li {
+  border-radius: 0.5rem;
+}
+
+.md-typeset h2 { margin-top: 2em; }
+.md-typeset h2.doc-heading { margin-top: 1.5em; }
+
+.md-typeset .doc-signature {
+  border-left: 0.15rem solid var(--md-accent-fg-color);
+}
+
+.md-typeset .doc-symbol-class { color: var(--mastif-symbol-class); }
+.md-typeset .doc-symbol-method,
+.md-typeset .doc-symbol-function { color: var(--mastif-symbol-function); }
+.md-typeset .doc-symbol-attribute { color: var(--mastif-symbol-attribute); }
+
+.md-typeset .doc-heading code { overflow-wrap: anywhere; }
+
+/* Progressive enhancement: without JS, the full TOC remains available. */
+.md-sidebar--secondary .toc-branch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.4rem;
+  align-items: start;
+}
+
+.md-sidebar--secondary .toc-branch > .md-nav {
+  grid-column: 1 / -1;
+}
+
+.md-sidebar--secondary .toc-branch > .md-nav[hidden] {
+  display: none;
+}
+
+.toc-toggle {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.15rem;
+  border-radius: 0.2rem;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.toc-toggle::before {
+  content: "";
+  width: 0.3rem;
+  height: 0.3rem;
+  border-right: 0.08rem solid currentColor;
+  border-bottom: 0.08rem solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.toc-toggle[aria-expanded="true"]::before { transform: rotate(45deg); }
+.toc-toggle:hover { color: var(--md-accent-fg-color); }
+.toc-toggle:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 1px;
+}
+
+.md-typeset [data-termynal] {
+  margin: 1rem 0;
+  border-radius: 0.6rem;
+  font-family: var(--md-code-font);
+  font-size: 0.75rem;
+  color: #ffffff;
+  background: #1a1a1a;
+  box-shadow: 0 0.3rem 1rem #0002;
+}
+
+.md-typeset .terminal-play {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--md-accent-fg-color);
+  border-radius: 0.25rem;
+  color: var(--md-accent-fg-color);
+  cursor: pointer;
+}
+
+.terminal-play:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .md-typeset [data-termynal] { padding: 4rem 1rem 1rem; }
+  /* Put long transcript titles below the window dots on narrow screens. */
+  .md-typeset [data-termynal][data-ty-title]::after {
+    top: 1.9rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    text-align: left;
+    font-size: 0.65rem;
+    line-height: 1.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset [data-ty-cursor]::after { animation: none; }
+}

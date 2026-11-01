@@ -46,7 +46,7 @@ from mastif.station.profile import ChannelEntry, ResourceEntry, StationProfile
 def _config_error(where: str, exc: ValidationError) -> StationError:
     """Turn a Pydantic config error into a `StationError` naming the resource and fields.
 
-    Example:
+    Examples:
         ``resource 'bench_psu': invalid config: chanel: Extra inputs are not permitted``
     """
     details = "; ".join(
@@ -58,7 +58,7 @@ def _config_error(where: str, exc: ValidationError) -> StationError:
 class Station:
     """A built station: resources by name, roles, and their lifecycle.
 
-    Example:
+    Examples:
         >>> from mastif.resources._examples import ExamplePsu
         >>> from mastif.resources.std import PowerSupply
         >>> profile = StationProfile.from_yaml('''
@@ -85,7 +85,7 @@ class Station:
     ) -> None:
         """Wrap already-built handles; use `Station.build` rather than calling this.
 
-        Example:
+        Examples:
             ``Station(profile, handles)`` is what `build` returns.
         """
         self.profile = profile
@@ -98,7 +98,7 @@ class Station:
     def name(self) -> str:
         """The station name from the profile.
 
-        Example:
+        Examples:
             ``station.name`` returns ``"bench-01"``.
         """
         return self.profile.station
@@ -134,7 +134,7 @@ class Station:
             StationError: Naming the resource, for unknown drivers, invalid configs,
                 missing, unknown or incompatible DUT channels, and impossible I/O.
 
-        Example:
+        Examples:
             >>> Station.build(StationProfile.from_yaml(
             ...     "station: s\\nresources: {psu: {driver: acme.nope}}"), Registry(builtin=False))
             Traceback (most recent call last):
@@ -161,7 +161,7 @@ class Station:
     ) -> ResourceHandle:
         """Build one resource and, for DUTs, its channels; translate errors to `StationError`.
 
-        Example:
+        Examples:
             ``Station._build_handle("dut", entry, registry, build_io, log)``
         """
         where = f"resource {name!r}"
@@ -209,7 +209,7 @@ class Station:
         Raises:
             StationError: If there is no such resource.
 
-        Example:
+        Examples:
             ``station.resource("bench_psu").identity``
         """
         try:
@@ -234,7 +234,7 @@ class Station:
         Raises:
             RoleError: If the role or its target doesn't exist (yet).
 
-        Example:
+        Examples:
             ``station.role("psu_main").measure_current()``
         """
         target = self.profile.target_of(role)
@@ -265,7 +265,7 @@ class Station:
         Raises:
             RoleError: If the role doesn't exist or can't serve the contract.
 
-        Example:
+        Examples:
             ``psu = station.require("psu_main", PowerSupply)``
         """
         obj = self.role(role)
@@ -277,7 +277,7 @@ class Station:
     def _contract_problem(self, role: str, contract: type, obj: Any) -> str | None:
         """Explain why a role's object can't serve a contract, or return ``None``.
 
-        Example:
+        Examples:
             ``"role 'psu_main' (demo.example-psu) does not provide Shell"``
         """
         from mastif.resources.contracts import satisfies  # noqa: PLC0415
@@ -307,7 +307,7 @@ class Station:
         Returns:
             One message per problem; empty if everything fits.
 
-        Example:
+        Examples:
             >>> from mastif.resources._examples import ExamplePsu
             >>> from mastif.resources.std import Shell
             >>> st = Station.build(StationProfile.from_yaml('''
@@ -337,7 +337,7 @@ class Station:
     def identities(self) -> dict[str, Identity]:
         """Return every identity reported while opening, for the run manifest.
 
-        Example:
+        Examples:
             ``station.identities()["bench_psu"].serial`` returns ``"A123"``.
         """
         return {n: h.identity for n, h in self.handles.items() if h.identity is not None}
@@ -345,7 +345,7 @@ class Station:
     def open(self, expect: Mapping[str, Mapping[str, object]] | None = None) -> None:
         """Open, identify and health-check every resource; see `ResourceManager.open_all`.
 
-        Example:
+        Examples:
             ``station.open(expect={"dut": {"serial": scanned_serial}})``
         """
         self.manager.open_all(expect)
@@ -353,7 +353,7 @@ class Station:
     def safe_state(self) -> dict[str, Exception]:
         """Make every open resource safe; see `ResourceManager.safe_state_all`.
 
-        Example:
+        Examples:
             ``failures = station.safe_state()``
         """
         return self.manager.safe_state_all()
@@ -361,7 +361,7 @@ class Station:
     def close(self) -> None:
         """Close every open resource in reverse order; see `ResourceManager.close_all`.
 
-        Example:
+        Examples:
             ``station.close()``
         """
         self.manager.close_all()
@@ -369,7 +369,7 @@ class Station:
     def __enter__(self) -> Self:
         """Open the station for a ``with`` block.
 
-        Example:
+        Examples:
             ``with Station.build(profile, registry) as st: ...``
         """
         self.open()
@@ -383,7 +383,7 @@ class Station:
     ) -> None:
         """Make everything safe, then close, even when the block raised.
 
-        Example:
+        Examples:
             Runs when the ``with`` block ends.
         """
         try:

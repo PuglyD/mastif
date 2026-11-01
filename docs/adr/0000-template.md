@@ -10,7 +10,7 @@
 
 > **Who this is for:** an engineer who joined today. Assume they know Python and test
 > engineering in general, and know nothing about mastif. Explain every mastif term the
-> first time it appears, and link to the [glossary](../wiki/glossary.md).
+> first time it appears, and link to the [glossary](../learn/architecture/glossary.md).
 
 ## 1. Summary
 

@@ -5,7 +5,7 @@ their test environment. It provides fake transports and conformance helpers, so
 drivers can be tested without hardware, using fakes instead of mocks as `AGENTS.md`
 asks.
 
-Example:
+Examples:
     >>> from mastif_testing import FakeLineIO
     >>> from mastif.resources.transports import Scpi
     >>> Scpi(FakeLineIO({"*IDN?": "ACME,PSU-X,A123,1.4"})).identify().model

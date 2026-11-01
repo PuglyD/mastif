@@ -1,6 +1,6 @@
 # Guide: write a station profile
 
-A station profile is a YAML file describing one bench. Concepts: [Station](../station.md).
+A station profile is a YAML file describing one bench. Concepts: [Station](../../learn/architecture/station.md).
 Design: ADR-0013, ADR-0021, ADR-0023.
 
 ## Anatomy
@@ -81,4 +81,4 @@ This can run in CI. No hardware is touched.
 | `resource 'dut': channel 'console' needs Shell, but ... doesn't provide it` | The wrong driver for that channel |
 | `bench_psu: serial is 'B999', expected 'A123'` | The wrong device on the bench (at open) |
 
-More: [Error map](../errors.md).
+More: [Error map](../../learn/architecture/errors.md).

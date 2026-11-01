@@ -198,7 +198,7 @@ This ADR is the error catalogue. Who should catch what:
 | Infra errors | `packages/mastif/src/mastif/infra/errors.py` |
 | Resource errors | `packages/mastif/src/mastif/resources/errors.py` |
 | Station errors | `packages/mastif/src/mastif/station/errors.py` |
-| Wiki error map | `docs/wiki/errors.md` |
+| Wiki error map | `docs/learn/architecture/errors.md` |
 
 ## History
 

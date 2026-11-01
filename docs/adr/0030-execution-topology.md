@@ -12,8 +12,8 @@
 > eventually: *which process owns the instruments?* It explains the two possible answers,
 > argues both fairly, and lists the rules the engine must follow now so that either
 > answer keeps working. Terms are explained on first use and collected in the
-> [glossary](../wiki/glossary.md). Practical advice behind this ADR is collected in the
-> [field notes](../wiki/field-notes.md).
+> [glossary](../learn/architecture/glossary.md). Practical advice behind this ADR is collected in the
+> [field notes](../learn/architecture/field-notes.md).
 
 ## 1. Summary
 
@@ -427,7 +427,7 @@ modes.
 | State models (`@driver(state=...)`) | `packages/mastif/src/mastif/resources/driver.py` |
 | Engine constraints | `docs/plan.md`, Part B |
 | Runtime | not built; planned package `mastif.runtime` |
-| Wiki | `docs/wiki/architecture.md` (deployment modes), `docs/wiki/field-notes.md` |
+| Wiki | `docs/learn/architecture/index.md` (deployment modes), `docs/learn/architecture/field-notes.md` |
 
 ## History
 

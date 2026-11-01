@@ -57,7 +57,7 @@ def _paramiko_client() -> Any:
     Raises:
         TransportError: If paramiko isn't installed, with the install command.
 
-    Example:
+    Examples:
         ``client = _paramiko_client()`` (needs the ``ssh`` extra).
     """
     try:
@@ -74,14 +74,14 @@ class _RejectUnknownHost:
     known-hosts file. This class is duck-typed to paramiko's ``MissingHostKeyPolicy``,
     so no paramiko import is needed to define it.
 
-    Example:
+    Examples:
         ``client.set_missing_host_key_policy(_RejectUnknownHost(config))``
     """
 
     def __init__(self, config: SshConfig) -> None:
         """Remember the config, for the error message.
 
-        Example:
+        Examples:
             ``_RejectUnknownHost(SshConfig(host="h", username="u"))``
         """
         self.config = config
@@ -92,7 +92,7 @@ class _RejectUnknownHost:
         Raises:
             TransportError: Always.
 
-        Example:
+        Examples:
             Called by paramiko during ``connect`` for an unknown host.
         """
         raise TransportError(
@@ -108,14 +108,14 @@ class _AcceptNewHost:
     The key is added to the client's known hosts and, if the config names a
     ``known_hosts_file``, saved there, so the next connection checks it strictly.
 
-    Example:
+    Examples:
         ``client.set_missing_host_key_policy(_AcceptNewHost(config, log))``
     """
 
     def __init__(self, config: SshConfig, log: logging.Logger) -> None:
         """Remember the config and where to log the new key.
 
-        Example:
+        Examples:
             ``_AcceptNewHost(config, logging.getLogger("mastif.io"))``
         """
         self.config = config
@@ -124,7 +124,7 @@ class _AcceptNewHost:
     def missing_host_key(self, client: Any, hostname: str, key: Any) -> None:
         """Accept and remember the new host key.
 
-        Example:
+        Examples:
             Called by paramiko during ``connect`` for an unknown host.
         """
         client.get_host_keys().add(hostname, key.get_name(), key)
@@ -144,7 +144,7 @@ class SshSession:
     share shell state (``cd`` in one command doesn't affect the next), exactly like
     ``ssh host cmd``.
 
-    Example:
+    Examples:
         Reading a Linux DUT's kernel version (needs a reachable host)::
 
             ssh = SshSession(SshConfig(host="192.168.1.60", username="root"))
@@ -167,7 +167,7 @@ class SshSession:
             client_factory: Creates the SSH client. Defaults to paramiko's
                 ``SSHClient``; tests pass a fake.
 
-        Example:
+        Examples:
             >>> SshSession(SshConfig(host="192.168.1.60", username="root")).name
             'ssh://root@192.168.1.60:22'
         """
@@ -181,7 +181,7 @@ class SshSession:
     def is_open(self) -> bool:
         """Whether the session is connected.
 
-        Example:
+        Examples:
             >>> SshSession(SshConfig(host="h", username="u")).is_open
             False
         """
@@ -194,7 +194,7 @@ class SshSession:
             TransportError: If paramiko is missing, the host is unreachable, its key is
                 unknown (strict) or has changed, or authentication fails.
 
-        Example:
+        Examples:
             Called by the station before the driver's ``open()``.
         """
         if self._client is not None:
@@ -235,7 +235,7 @@ class SshSession:
     def close(self) -> None:
         """Disconnect; safe to call repeatedly.
 
-        Example:
+        Examples:
             Called by the station after the driver's ``close()``.
         """
         if self._client is not None:
@@ -249,7 +249,7 @@ class SshSession:
         Raises:
             TransportError: If not open.
 
-        Example:
+        Examples:
             Guards `run` and `invoke_shell`.
         """
         if self._client is None:
@@ -278,7 +278,7 @@ class SshSession:
                 closed, which usually terminates the remote command.
             TransportError: If the session is closed or the connection fails.
 
-        Example:
+        Examples:
             ``ssh.run("cat /etc/hostname")`` returns a result with ``output='dut-07\\n'``,
             ``exit_code=0`` and ``stderr=''``.
         """
@@ -341,7 +341,7 @@ class SshSession:
         Raises:
             TransportError: If the session is closed or the server refuses a shell.
 
-        Example:
+        Examples:
             Used by `SshStreamTransport`; drivers rarely call it directly.
         """
         client = self._require_client()
@@ -357,7 +357,7 @@ def _describe_connect_error(exc: Exception) -> str:
     paramiko's exception classes are matched by name, so this works without importing
     paramiko (it may not be installed, and tests use fakes).
 
-    Example:
+    Examples:
         >>> class BadHostKeyException(Exception): ...
         >>> _describe_connect_error(BadHostKeyException("x"))[:24]
         'host key has CHANGED (x)'
@@ -382,7 +382,7 @@ class SshStreamTransport(BufferedStream):
     whatever the shell prints (echo, prompts, output) is read back, just like a serial
     console. Ask for ``io: LineIO`` or use ``mastif.line-shell`` on top of it.
 
-    Example:
+    Examples:
         A vendor CLI that is only reachable as an SSH shell (needs a host)::
 
             sh = SshStreamTransport(SshConfig(host="10.0.0.20", username="admin",
@@ -405,7 +405,7 @@ class SshStreamTransport(BufferedStream):
             logger: Where to trace I/O.
             client_factory: Creates the SSH client; tests pass a fake.
 
-        Example:
+        Examples:
             >>> SshStreamTransport(SshConfig(host="10.0.0.20", username="admin")).name
             'ssh://admin@10.0.0.20:22'
         """
@@ -420,7 +420,7 @@ class SshStreamTransport(BufferedStream):
         Raises:
             TransportError: If either step fails.
 
-        Example:
+        Examples:
             Called by `open`.
         """
         self.session.open()
@@ -433,7 +433,7 @@ class SshStreamTransport(BufferedStream):
     def _disconnect(self) -> None:
         """Close the channel and the session.
 
-        Example:
+        Examples:
             Called by `close`.
         """
         try:
@@ -449,7 +449,7 @@ class SshStreamTransport(BufferedStream):
         Raises:
             TransportError: If the channel fails.
 
-        Example:
+        Examples:
             ``self._send(b"uptime\\n")``
         """
         assert self._chan is not None
@@ -464,7 +464,7 @@ class SshStreamTransport(BufferedStream):
         Raises:
             TransportError: If the shell exited or the connection failed.
 
-        Example:
+        Examples:
             Returns console output as it arrives, e.g. ``b"up 3 days\\r\\n$ "``.
         """
         assert self._chan is not None

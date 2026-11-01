@@ -11,7 +11,7 @@
 > **Who this is for:** an engineer who joined today. A *channel* is a named way into a DUT,
 > declared on the DUT class as `console: Shell = channel()` and mapped to a driver in the
 > station profile ([ADR-0011](0011-drivers-and-duts.md)). See the
-> [glossary](../wiki/glossary.md).
+> [glossary](../learn/architecture/glossary.md).
 
 ## 1. Summary
 
@@ -142,7 +142,7 @@ opens the session, before this driver is used (ADR-0033).
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/channels/ssh.py` |
 | Tests | `packages/mastif/tests/resources/test_ssh.py`, plus doctests (using `FakeSshSession`) |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-dut.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/wiki/guides/write-a-dut.md` |
 
 ## History
 

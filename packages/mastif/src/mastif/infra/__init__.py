@@ -9,7 +9,7 @@ variables, git), so it can't live in the pure kernel, but every higher layer may
 - `version`: distribution version plus git information (embedded at build, or live).
 - `bootstrap`: the one call an application makes at start-up.
 
-Example:
+Examples:
     >>> from mastif.infra import create_settings, section
     >>> create_settings(defaults={"station": {"name": "bench-01"}}).station.name
     'bench-01'

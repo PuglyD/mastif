@@ -176,7 +176,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/station/station.py`, `packages/mastif/src/mastif/station/errors.py` |
 | Tests | `packages/mastif/tests/station/test_station.py`, plus doctests |
-| Wiki | `docs/wiki/station.md`, `docs/wiki/life-of-a-station.md` |
+| Wiki | `docs/learn/architecture/station.md`, `docs/learn/architecture/life-of-a-station.md` |
 
 ## History
 

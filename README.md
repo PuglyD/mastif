@@ -1,13 +1,17 @@
 # mastif
 
-A domain-neutral framework for automated test equipment (ATE).
+The org-centric hardware testing framework and platform: a domain-neutral foundation for automated test equipment (ATE).
 
-- **Core**: the test execution engine, the instrument and DUT primitives, results and events.
+- **Core**: instrument and DUT primitives, station lifecycle and results; the test execution engine and events are planned.
 - **API**: a stable Python API, plus an optional network service built on it (planned).
 
 Organisations write their own SDK on top of it (contracts, drivers, DUT types, loop types) and attach their own UI.
 
+The platform is this shared testing foundation. Organisations choose the deployment and shared services around it; mastif doesn't prescribe a server stack or identity system.
+
 Status: early development. See `docs/plan.md` and `docs/adr/`.
+
+[Read the documentation](https://puglyd.github.io/mastif/) — built from `develop`.
 
 ```
 uv sync

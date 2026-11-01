@@ -1,18 +1,53 @@
 site_name: mastif
-site_description: A domain-neutral framework for automated test equipment
+site_description: The org-centric hardware testing framework and platform
+site_url: https://puglyd.github.io/mastif/
+repo_url: https://github.com/PuglyD/mastif
+repo_name: PuglyD/mastif
+watch:
+  - packages/mastif/src
+  - packages/mastif-testing/src
 theme:
   name: material
+  logo: assets/mastif-logo-web.png
+  favicon: assets/mastif-favicon.png
+  font:
+    text: IBM Plex Sans
+    code: JetBrains Mono
   palette:
-    - scheme: default
-      toggle: {icon: material/brightness-7, name: Dark mode}
     - scheme: slate
+      primary: custom
+      accent: custom
       toggle: {icon: material/brightness-4, name: Light mode}
-  features: [navigation.tabs, navigation.sections, navigation.top, content.code.copy, search.highlight]
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle: {icon: material/brightness-7, name: Dark mode}
+  features:
+    - navigation.tabs
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - search.suggest
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
   - def_list
   - tables
   - toc: {permalink: true}
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: [docs]
+      check_paths: true
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.superfences:
       custom_fences:
         # Class "diagram", not "mermaid": Material would render it into a closed shadow
@@ -22,45 +57,146 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 extra_css:
   - stylesheets/diagrams.css
+  - stylesheets/site.css
 extra_javascript:
   - javascripts/diagrams.js
+  - javascripts/terminals.js
+  - javascripts/toc.js
 plugins:
   - search
+  - termynal:
+      title: mastif · simulated example
+      buttons: macos
   - mkdocstrings:
       handlers:
         python:
           paths: [packages/mastif/src, packages/mastif-testing/src]
           options:
             docstring_style: google
+            show_if_no_docstring: true
+            filters: []
             show_source: false
             members_order: source
             show_root_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            docstring_section_style: spacy
+            heading_level: 2
 nav:
-  - Home: index.md
-  - Wiki:
-      - Start here: wiki/start-here.md
-      - Architecture: wiki/architecture.md
-      - Life of a station: wiki/life-of-a-station.md
-      - Layers:
-          - Kernel: wiki/kernel.md
-          - Infra: wiki/infra.md
-          - Resources: wiki/resources.md
-          - Transports: wiki/transports.md
-          - Station: wiki/station.md
-          - Testing kit: wiki/testing-kit.md
-      - Guides:
-          - Write a driver: wiki/guides/write-a-driver.md
-          - Write a DUT type: wiki/guides/write-a-dut.md
-          - Write a station profile: wiki/guides/write-a-station-profile.md
-          - Wrap a vendor DLL: wiki/guides/wrap-a-vendor-dll.md
-          - Test your driver: wiki/guides/test-your-driver.md
-          - Bootstrap an application: wiki/guides/bootstrap-an-application.md
-      - Field notes: wiki/field-notes.md
-      - Error map: wiki/errors.md
-      - Glossary: wiki/glossary.md
+  - Overview:
+      - index.md
+      - Guided walkthrough: wiki/walkthrough.md
+      - Project status: wiki/roadmap.md
       - Licensing: wiki/licensing.md
-      - Working on mastif: wiki/working-on-mastif.md
-      - Roadmap: wiki/roadmap.md
+  - Getting Started:
+      - Intro:
+          - What is mastif?: getting-started/intro/what-is-mastif.md
+          - What mastif wants to solve: getting-started/intro/problem.md
+          - Why mastif?: getting-started/intro/why-mastif.md
+          - Who is this for: getting-started/intro/who.md
+          - How to learn mastif: getting-started/intro/how-to-learn.md
+          - The route through the course: getting-started/intro/route.md
+      - Tutorial — Build your first tests and deploy them:
+          - Installation: getting-started/tutorial/installation.md
+          - Writing tests:
+              - Your first test run: getting-started/tutorial/writing-tests/first-run.md
+              - Writing a reusable test: getting-started/tutorial/writing-tests/reusable-tests.md
+              - Parameters and configuration: getting-started/tutorial/writing-tests/parameters.md
+              - Resources and capabilities: getting-started/tutorial/writing-tests/resources.md
+              - Requesting instruments and resources: getting-started/tutorial/writing-tests/requirements.md
+              - Combining tests into a plan: getting-started/tutorial/writing-tests/plans.md
+              - Repeats, sweeps, and DUT slots: getting-started/tutorial/writing-tests/loops.md
+              - Setup, cleanup, and cancellation: getting-started/tutorial/writing-tests/cleanup.md
+              - Packaging a test project: getting-started/tutorial/writing-tests/packaging.md
+              - Outcomes:
+                  - Measurements and units: getting-started/tutorial/writing-tests/measurements.md
+                  - Limits, checks, and verdicts: getting-started/tutorial/writing-tests/limits.md
+                  - Failed checks and execution errors: getting-started/tutorial/writing-tests/failures.md
+          - First results:
+              - Understanding the results: getting-started/tutorial/first-results/results.md
+              - Progress and saved results: getting-started/tutorial/first-results/progress.md
+          - Build your own hardware integration:
+              - Your first driver: getting-started/tutorial/hardware-integration/first-driver.md
+              - Capability contracts: getting-started/tutorial/hardware-integration/contracts.md
+              - Configuration and injection: getting-started/tutorial/hardware-integration/configuration.md
+              - Device communication: getting-started/tutorial/hardware-integration/communication.md
+              - Identity, health, and safe state: getting-started/tutorial/hardware-integration/identity.md
+              - Modelling a DUT: getting-started/tutorial/hardware-integration/duts.md
+              - Channels and child resources: getting-started/tutorial/hardware-integration/channels.md
+              - Testing with fake I/O: getting-started/tutorial/hardware-integration/fake-io.md
+              - Contract and lifecycle conformance: getting-started/tutorial/hardware-integration/conformance.md
+              - Packaging an organisation SDK: getting-started/tutorial/hardware-integration/packaging.md
+          - Running and deploying on a station PC:
+              - Station profiles and roles: getting-started/tutorial/deploying/profiles.md
+              - Working with simulation: getting-started/tutorial/deploying/simulation.md
+              - Connecting real hardware: getting-started/tutorial/deploying/hardware.md
+              - Opening and closing: getting-started/tutorial/deploying/lifecycle.md
+              - Deploying to a station PC: getting-started/tutorial/deploying/deploy.md
+  - Learn:
+      - Overview: learn/index.md
+      - Framework fundamental concepts:
+          - The system at a glance: learn/fundamentals/index.md
+          - Python types and protocols: learn/fundamentals/types.md
+          - Dependency injection: learn/fundamentals/injection.md
+          - Dimensional correctness: learn/fundamentals/units.md
+          - Concurrency versus parallelism: learn/fundamentals/concurrency.md
+      - System design and architecture:
+          - System design:
+              - Design, architecture, and platforms: learn/system-design/concepts.md
+              - What the system must do: learn/system-design/specification.md
+              - The concept system design: learn/system-design/station-and-server.md
+              - Styles and patterns: learn/system-design/styles-and-patterns.md
+              - Verdicts and dispositions: learn/system-design/dispositions.md
+              - From invocation to result: learn/system-design/run-lifecycle.md
+              - Who owns what?: learn/system-design/ownership.md
+              - Resource lifetimes and access: learn/system-design/resource-lifetimes.md
+              - Concurrency and blocking calls: learn/system-design/concurrency.md
+              - Cancellation and timeouts: learn/system-design/cancellation.md
+              - Failure propagation and recovery: learn/system-design/recovery.md
+              - Direct and persistent modes: learn/system-design/execution-modes.md
+              - Events, state, and clients: learn/system-design/events-state.md
+          - Architecture as built:
+              - System overview: learn/architecture/index.md
+              - Life of a station: learn/architecture/life-of-a-station.md
+              - Concepts:
+                  - Kernel: learn/architecture/kernel.md
+                  - Infra: learn/architecture/infra.md
+                  - Resources: learn/architecture/resources.md
+                  - Transports: learn/architecture/transports.md
+                  - Station: learn/architecture/station.md
+                  - Testing kit: learn/architecture/testing-kit.md
+              - Field notes: learn/architecture/field-notes.md
+              - Error map: learn/architecture/errors.md
+              - Glossary: learn/architecture/glossary.md
+      - What exists today: learn/status.md
+      - Operate a station:
+          - Settings and bootstrap: learn/operations/bootstrap.md
+          - Logging and diagnostics: learn/operations/logging.md
+          - Preparing and validating: learn/operations/preflight.md
+          - Environments and profiles: learn/operations/environments.md
+          - Versions and reproducibility: learn/operations/reproducibility.md
+          - Persistent station service: learn/operations/service.md
+          - Operator interfaces: learn/operations/operator-ui.md
+          - Troubleshooting: learn/operations/troubleshooting.md
+      - How-to recipes:
+          - SCPI over TCP, serial, or VISA: learn/recipes/scpi.md
+          - SSH and consoles: learn/recipes/shell.md
+          - UDP request/reply: learn/recipes/udp.md
+          - Wrap a vendor DLL: learn/recipes/native-library.md
+          - Replace hardware with simulation: learn/recipes/simulation.md
+          - Identity and health failures: learn/recipes/identity-failures.md
+  - Guides:
+      - Start here (direct-use guide): wiki/start-here.md
+      - Your first measurement: wiki/first-measurement.md
+      - Write a driver: wiki/guides/write-a-driver.md
+      - Write a DUT type: wiki/guides/write-a-dut.md
+      - Write a station profile: wiki/guides/write-a-station-profile.md
+      - Wrap a vendor DLL: wiki/guides/wrap-a-vendor-dll.md
+      - Test your driver: wiki/guides/test-your-driver.md
+      - Bootstrap an application: wiki/guides/bootstrap-an-application.md
   - Decisions:
       - Index: adr/index.md
       - Template: adr/0000-template.md
@@ -106,9 +242,12 @@ nav:
           - 0028 Version information: adr/0028-version-information.md
           - 0029 Bootstrap: adr/0029-bootstrap.md
   - API reference:
-      - Kernel: reference/kernel.md
-      - Infra: reference/infra.md
-      - Resources: reference/resources.md
-      - Station: reference/station.md
-      - mastif-testing: reference/testing.md
-  - Plan: plan.md
+      - Kernel: reference/kernel/index.md
+      - Infrastructure: reference/infra/index.md
+      - Resources: reference/resources/index.md
+      - Station: reference/station/index.md
+      - Testing kit: reference/testing/index.md
+  - Contributing:
+      - Working on mastif: wiki/working-on-mastif.md
+      - Documentation style: wiki/documentation-style.md
+      - Implementation plan: plan.md

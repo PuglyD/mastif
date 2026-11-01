@@ -130,7 +130,7 @@ This module raises none itself. The checks that use it raise errors in the
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/identity.py` |
 | Tests | `packages/mastif/tests/resources/test_contracts_and_identity.py`; `packages/mastif/tests/station/test_station.py` |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/station.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/learn/architecture/station.md` |
 
 ## History
 

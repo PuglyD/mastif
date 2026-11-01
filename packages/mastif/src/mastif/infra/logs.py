@@ -62,12 +62,12 @@ from mastif.infra.errors import ConfigError
 from mastif.kernel.results import Table
 from mastif.kernel.verdict import Verdict
 
-TRACE = 5
+TRACE: int = 5
 """Level below DEBUG for raw protocol traffic (every byte to and from instruments)."""
-SUCCESS = 25
+SUCCESS: int = 25
 """Level between INFO and WARNING for positive milestones ("step passed")."""
 
-THEME = Theme(
+THEME: Theme = Theme(
     {
         "logging.level.trace": "bright_black",
         "logging.level.debug": "dark_goldenrod",
@@ -89,7 +89,8 @@ _VERDICT_STYLES = {
     Verdict.ABORTED: "bold magenta",
 }
 
-LOGGING_FILE_NAMES = ("logging.yaml", "logging.yml")
+LOGGING_FILE_NAMES: tuple[str, ...] = ("logging.yaml", "logging.yml")
+"""Configuration filenames considered when resolving application logging settings."""
 
 
 class MastifLogger(logging.Logger):
@@ -98,7 +99,7 @@ class MastifLogger(logging.Logger):
     `configure_logging` installs it as the logger class, so loggers created afterwards
     have these methods. With plain loggers, use ``log.log(TRACE, ...)``.
 
-    Example:
+    Examples:
         >>> log = MastifLogger("demo")
         >>> log.isEnabledFor(SUCCESS) or True
         True
@@ -107,7 +108,7 @@ class MastifLogger(logging.Logger):
     def trace(self, msg: object, *args: object, **kwargs: Any) -> None:
         """Log at TRACE level: raw protocol traffic, the noisiest detail.
 
-        Example:
+        Examples:
             ``log.trace(">> %r", b"*IDN?\\n")``
         """
         if self.isEnabledFor(TRACE):
@@ -116,7 +117,7 @@ class MastifLogger(logging.Logger):
     def success(self, msg: object, *args: object, **kwargs: Any) -> None:
         """Log at SUCCESS level: a positive milestone such as a passed step.
 
-        Example:
+        Examples:
             ``log.success("power-up sequence complete")``
         """
         if self.isEnabledFor(SUCCESS):
@@ -133,7 +134,7 @@ class TabularData:
         rows: Cell values as text.
         row_styles: Optional Rich style per row, e.g. a verdict colour.
 
-    Example:
+    Examples:
         >>> TabularData("t", ("a",), (("1",),)).columns
         ('a',)
     """
@@ -147,7 +148,7 @@ class TabularData:
 def _cell(value: object) -> str:
     """Render one cell as text, with empty text for missing values.
 
-    Example:
+    Examples:
         >>> _cell(None), _cell(1.5)
         ('', '1.5')
     """
@@ -170,7 +171,7 @@ def as_tabular(message: object, title: str | None = None) -> TabularData | None:
     Returns:
         The table contents, or ``None`` if the message isn't tabular.
 
-    Example:
+    Examples:
         >>> from mastif.kernel import Limits, Table
         >>> t = Table(name="sweep", columns=("ch", "p"), rows=((1, 9.5), (2, 12.0)),
         ...           limits={"p": Limits.at_most(10.0)})
@@ -207,7 +208,7 @@ def to_markdown(data: TabularData) -> str:
 
     Pipes inside cells are escaped, so the table structure can't break.
 
-    Example:
+    Examples:
         >>> print(to_markdown(TabularData("t", ("a", "b"), (("1", "x|y"),))))
         **t**
         <BLANKLINE>
@@ -219,7 +220,7 @@ def to_markdown(data: TabularData) -> str:
     def esc(text: str) -> str:
         """Escape pipe characters inside a cell.
 
-        Example:
+        Examples:
             ``esc("a|b")`` returns ``"a\\|b"``.
         """
         return text.replace("|", "\\|")
@@ -237,7 +238,7 @@ def to_markdown(data: TabularData) -> str:
 def to_rich_table(data: TabularData) -> RichTable:
     """Render a table as a Rich table, for the console.
 
-    Example:
+    Examples:
         >>> to_rich_table(TabularData("t", ("a",), (("1",),))).row_count
         1
     """
@@ -253,7 +254,7 @@ def to_rich_table(data: TabularData) -> RichTable:
 def _tabular_of(record: logging.LogRecord) -> TabularData | None:
     """Extract a table from a log record, honouring an ``extra={"title": ...}``.
 
-    Example:
+    Examples:
         Returns ``None`` for ordinary text records.
     """
     return as_tabular(record.msg, getattr(record, "title", None))
@@ -265,7 +266,7 @@ class RichTableHandler(RichHandler):
     A tabular record prints a one-line summary (as a normal log line) followed by the
     table, so the console keeps its timeline.
 
-    Example:
+    Examples:
         In a logging YAML::
 
             handlers:
@@ -277,7 +278,7 @@ class RichTableHandler(RichHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create the handler with mastif's colour theme, unless a console is given.
 
-        Example:
+        Examples:
             ``RichTableHandler(level=logging.INFO)``
         """
         kwargs.setdefault("console", Console(theme=THEME, stderr=True))
@@ -286,7 +287,7 @@ class RichTableHandler(RichHandler):
     def emit(self, record: logging.LogRecord) -> None:
         """Print the record; tables become a summary line plus a Rich table.
 
-        Example:
+        Examples:
             Called by ``logging`` for each record that reaches this handler.
         """
         data = _tabular_of(record)
@@ -308,7 +309,7 @@ class TableAwareFormatter(logging.Formatter):
     It formats a *copy* of the record, so other handlers (such as the console) still
     see the original table object.
 
-    Example:
+    Examples:
         In a logging YAML::
 
             formatters:
@@ -320,7 +321,7 @@ class TableAwareFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Format the record; tables become markdown on the lines after the prefix.
 
-        Example:
+        Examples:
             ``2026-10-25 10:00:00 | INFO | acme | sweep`` followed by a markdown table.
         """
         data = _tabular_of(record)
@@ -337,7 +338,7 @@ class Loggers:
     A convenience for scripts and notebooks. It's equivalent to
     ``logging.getLogger(name)`` and holds no state.
 
-    Example:
+    Examples:
         >>> Loggers()["acme.tests"].name
         'acme.tests'
         >>> Loggers().traffic.name
@@ -347,7 +348,7 @@ class Loggers:
     def __getattr__(self, name: str) -> logging.Logger:
         """Return the logger with this name.
 
-        Example:
+        Examples:
             ``Loggers().station.info("ready")``
         """
         if name.startswith("_"):
@@ -357,7 +358,7 @@ class Loggers:
     def __getitem__(self, name: str) -> logging.Logger:
         """Return the logger with this (possibly dotted) name.
 
-        Example:
+        Examples:
             ``Loggers()["mastif.io"]``
         """
         return logging.getLogger(name)
@@ -370,7 +371,7 @@ def default_logging_config() -> dict[str, Any]:
     DEBUG and above, rotated at 10 MB with 5 backups, tables as markdown. The
     ``mastif.io`` logger (instrument byte traffic) goes to the file only.
 
-    Example:
+    Examples:
         >>> cfg = default_logging_config()
         >>> io_logger = cfg.get("loggers").get("mastif.io")
         >>> sorted(cfg.get("handlers")), io_logger.get("propagate")
@@ -401,7 +402,7 @@ def resolve_logging_config(
     Raises:
         ConfigError: If a ``logging.yaml`` exists but can't be parsed.
 
-    Example:
+    Examples:
         >>> from mastif.infra.config import create_settings
         >>> s = create_settings(defaults={"logging": {"version": 1, "root": {"level": "WARNING"}}})
         >>> resolve_logging_config(s).get("root")
@@ -427,7 +428,7 @@ def _load_yaml(path: Path) -> dict[str, Any]:
     Raises:
         ConfigError: If the file can't be read or isn't a mapping.
 
-    Example:
+    Examples:
         ``_load_yaml(Path("config/logging.yaml"))``
     """
     try:
@@ -444,7 +445,7 @@ def _place_log_files(config: dict[str, Any], log_dir: Path) -> None:
 
     The directory is created if needed, so a fresh station can log on its first run.
 
-    Example:
+    Examples:
         ``filename: mastif.log`` with ``log_dir=/data/logs`` gives ``/data/logs/mastif.log``.
     """
     for handler in (config.get("handlers") or {}).values():
@@ -486,7 +487,7 @@ def configure_logging(
         ConfigError: If the file can't be read or the configuration is invalid (for
             example an unknown handler class).
 
-    Example:
+    Examples:
         >>> configure_logging({"version": 1, "disable_existing_loggers": False,
         ...                    "root": {"level": "INFO"}}, rich_tracebacks=False)
         >>> logging.getLevelName(SUCCESS)

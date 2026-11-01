@@ -5,7 +5,7 @@ the type they want (`StreamTransport`, `LineIO`, `Scpi`, `DatagramChannel`,
 `SshSession`, `NativeLibrary`), and the station builds it from the ``transport:``
 block of the station profile (see `build_io`).
 
-Example:
+Examples:
     >>> from mastif.resources.transports import Scpi, TcpConfig, build_io
     >>> isinstance(build_io(Scpi, TcpConfig(host="10.0.0.5", port=5025)), Scpi)
     True

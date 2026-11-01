@@ -30,7 +30,7 @@ class Verdict(StrEnum):
 
     Values are lowercase strings, so they read naturally in JSON and YAML.
 
-    Example:
+    Examples:
         >>> Verdict("fail") is Verdict.FAIL
         True
         >>> str(Verdict.WARN)
@@ -71,7 +71,7 @@ def aggregate(verdicts: Iterable[Verdict]) -> Verdict:
     Returns:
         The parent verdict; SKIPPED when there are no children (nothing was judged).
 
-    Example:
+    Examples:
         >>> aggregate([Verdict.PASS, Verdict.WARN, Verdict.PASS])
         <Verdict.WARN: 'warn'>
         >>> aggregate([Verdict.PASS, Verdict.SKIPPED])

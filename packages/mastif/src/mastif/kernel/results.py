@@ -33,6 +33,7 @@ from mastif.kernel.units import Quantity
 from mastif.kernel.verdict import Verdict, aggregate
 
 type Cell = float | int | str | bool | None
+"""Scalar table-cell value; `None` represents an empty cell."""
 
 
 def _drop_verdicts(data: Any, *keys: str) -> Any:
@@ -49,7 +50,7 @@ def _drop_verdicts(data: Any, *keys: str) -> Any:
     Returns:
         The input without those keys (non-dict input is returned unchanged).
 
-    Example:
+    Examples:
         >>> _drop_verdicts({"name": "v", "verdict": "pass"}, "verdict")
         {'name': 'v'}
     """
@@ -71,7 +72,7 @@ class Measurement(BaseModel):
         unit: The unit, or ``None`` for unitless values.
         limits: Acceptance limits, or ``None`` to record without judging.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import mA
         >>> m = Measurement("standby_current", 180 * mA, Limits.at_most(250 * mA))
         >>> m.value, m.unit, m.verdict
@@ -111,7 +112,7 @@ class Measurement(BaseModel):
             UnitError: If the value's unit can't be compared with the limits. This is
                 raised at construction, not when a report is generated.
 
-        Example:
+        Examples:
             >>> Measurement("ratio", 0.98).verdict
             <Verdict.PASS: 'pass'>
             >>> from mastif.kernel.units import dB
@@ -131,7 +132,7 @@ class Measurement(BaseModel):
         Returns:
             Normalised input.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V
             >>> Measurement._normalise({"name": "v", "value": 5 * V, "verdict": "fail"})
             {'name': 'v', 'value': 5.0, 'unit': 'V'}
@@ -155,7 +156,7 @@ class Measurement(BaseModel):
         Raises:
             UnitError: If the value and limits can't be compared.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V, mA
             >>> Measurement("v", 1 * V, Limits.at_most(250 * mA))
             Traceback (most recent call last):
@@ -170,7 +171,7 @@ class Measurement(BaseModel):
     def verdict(self) -> Verdict:
         """PASS, WARN or FAIL from the limits; PASS when there are no limits.
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import V
             >>> Measurement("v", 6 * V, Limits.at_most(5 * V)).verdict
             <Verdict.FAIL: 'fail'>
@@ -184,7 +185,7 @@ class Measurement(BaseModel):
     def quantity(self) -> Quantity:
         """The value as a `Quantity`, for further arithmetic (dimensionless if unitless).
 
-        Example:
+        Examples:
             >>> from mastif.kernel.units import mV
             >>> Measurement("v", 500 * mV).quantity.to("V")
             Quantity(value=0.5, unit='V')
@@ -205,7 +206,7 @@ class Check(BaseModel):
         passed: Whether the condition held.
         detail: Human-readable explanation, most useful on failure.
 
-    Example:
+    Examples:
         >>> c = Check(name="firmware_version", passed=False, detail="expected 2.1, got 2.0")
         >>> c.verdict
         <Verdict.FAIL: 'fail'>
@@ -229,7 +230,7 @@ class Check(BaseModel):
         Returns:
             Normalised input.
 
-        Example:
+        Examples:
             >>> Check.model_validate({"name": "c", "passed": False, "verdict": "pass"}).verdict
             <Verdict.FAIL: 'fail'>
         """
@@ -240,7 +241,7 @@ class Check(BaseModel):
     def verdict(self) -> Verdict:
         """PASS if the condition held, otherwise FAIL.
 
-        Example:
+        Examples:
             >>> Check(name="link_up", passed=True).verdict
             <Verdict.PASS: 'pass'>
         """
@@ -271,7 +272,7 @@ class Table(BaseModel):
         units: Unit per column (bare cell numbers are in this unit).
         limits: Limits per judged column.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import dBm
         >>> t = Table(
         ...     name="output_power",
@@ -305,7 +306,7 @@ class Table(BaseModel):
         Returns:
             Normalised input.
 
-        Example:
+        Examples:
             >>> Table._normalise({"name": "t", "verdict": "pass", "row_verdicts": []})
             {'name': 't'}
         """
@@ -326,7 +327,7 @@ class Table(BaseModel):
                 `IndexedLimits` are used without an index column.
             UnitError: If a column's unit can't be compared with its limits.
 
-        Example:
+        Examples:
             >>> Table(name="t", columns=("a", "b"), rows=((1,),))
             Traceback (most recent call last):
             ...
@@ -361,7 +362,7 @@ class Table(BaseModel):
         Raises:
             LimitsError: If the column has `IndexedLimits` and the table has no index.
 
-        Example:
+        Examples:
             >>> t = Table(name="t", columns=("x",), rows=(), limits={"x": Limits.at_most(1.0)})
             >>> t._judge((0.5,), "x"), t._judge((None,), "x")
             (<Verdict.PASS: 'pass'>, <Verdict.FAIL: 'fail'>)
@@ -383,7 +384,7 @@ class Table(BaseModel):
     def cell_verdicts(self) -> tuple[dict[str, Verdict], ...]:
         """For each row, the verdict of every judged column, so a UI can colour cells.
 
-        Example:
+        Examples:
             >>> lim = {"x": Limits.at_most(1.0)}
             >>> Table(name="t", columns=("x",), rows=((2.0,),), limits=lim).cell_verdicts
             ({'x': <Verdict.FAIL: 'fail'>},)
@@ -395,7 +396,7 @@ class Table(BaseModel):
     def row_verdicts(self) -> tuple[Verdict, ...]:
         """Verdict per row: the worst judged cell, or PASS when no column is judged.
 
-        Example:
+        Examples:
             >>> Table(name="t", columns=("note",), rows=(("ok",),)).row_verdicts
             (<Verdict.PASS: 'pass'>,)
         """
@@ -408,7 +409,7 @@ class Table(BaseModel):
     def verdict(self) -> Verdict:
         """Verdict for the whole table: the worst row, or PASS for an empty table.
 
-        Example:
+        Examples:
             >>> Table(name="t", columns=("x",), rows=()).verdict
             <Verdict.PASS: 'pass'>
         """
@@ -426,7 +427,7 @@ class Table(BaseModel):
         Raises:
             ValueError: If the column doesn't exist.
 
-        Example:
+        Examples:
             >>> Table(name="t", columns=("ch", "p"), rows=((1, 9.5), (2, 9.9))).column("p")
             [9.5, 9.9]
         """
@@ -435,3 +436,4 @@ class Table(BaseModel):
 
 
 type Result = Annotated[Measurement | Check | Table, Field(discriminator="kind")]
+"""Result union discriminated by `kind` when validating measurements, checks, or tables."""

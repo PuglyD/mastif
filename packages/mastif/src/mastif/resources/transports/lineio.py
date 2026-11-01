@@ -27,7 +27,7 @@ from mastif.resources.transports.stream import StreamTransport
 class LineIO(Protocol):
     """Send and receive lines of text.
 
-    Example:
+    Examples:
         A driver for a simple ASCII instrument::
 
             def __init__(self, cfg: Config, io: LineIO):
@@ -61,7 +61,7 @@ class LineIO(Protocol):
 class StreamLineIO:
     """`LineIO` over any `StreamTransport` (TCP, serial, or a fake stream).
 
-    Example:
+    Examples:
         Over a serial loopback, a query reads back its own echo::
 
             io = StreamLineIO(SerialTransport(SerialConfig(port="loop://")), LineSettings())
@@ -76,7 +76,7 @@ class StreamLineIO:
             stream: The byte stream to talk over.
             settings: Terminators, encoding and default timeout.
 
-        Example:
+        Examples:
             ``StreamLineIO(TcpTransport(cfg), cfg)``, because `TcpConfig` is also a
             `LineSettings`.
         """
@@ -86,7 +86,7 @@ class StreamLineIO:
     def open(self) -> None:
         """Open the underlying stream.
 
-        Example:
+        Examples:
             Called by the station before the driver's own ``open()``.
         """
         self.stream.open()
@@ -94,7 +94,7 @@ class StreamLineIO:
     def close(self) -> None:
         """Close the underlying stream.
 
-        Example:
+        Examples:
             Called by the station after the driver's own ``close()``.
         """
         self.stream.close()
@@ -108,7 +108,7 @@ class StreamLineIO:
         Raises:
             TransportError: If sending fails, or the text can't be encoded.
 
-        Example:
+        Examples:
             ``io.write_line("OUTP ON")`` sends ``b"OUTP ON\\n"`` with default settings.
         """
         s = self.settings
@@ -131,7 +131,7 @@ class StreamLineIO:
             TransportTimeout: If no complete line arrives in time.
             TransportError: If the bytes can't be decoded.
 
-        Example:
+        Examples:
             ``io.read_line()`` returns ``"5.0021"`` for the bytes ``b"5.0021\\n"``.
         """
         s = self.settings
@@ -153,7 +153,7 @@ class StreamLineIO:
         Returns:
             The reply line.
 
-        Example:
+        Examples:
             ``io.query("MEAS:VOLT?")`` returns ``"5.0021"``.
         """
         self.write_line(line)
@@ -165,7 +165,7 @@ class VisaLineIO:
 
     VISA handles message framing itself, so this class only maps settings and errors.
 
-    Example:
+    Examples:
         Talking to a USB-TMC instrument (needs hardware and a VISA backend)::
 
             io = VisaLineIO(VisaConfig(resource="USB0::0x1234::0x5678::A123::INSTR"))
@@ -187,7 +187,7 @@ class VisaLineIO:
             resource_manager: A pyvisa ``ResourceManager``-like object. Pass a fake in
                 tests; by default one is created on `open`.
 
-        Example:
+        Examples:
             >>> VisaLineIO(VisaConfig(resource="GPIB0::5::INSTR")).config.resource
             'GPIB0::5::INSTR'
         """
@@ -202,7 +202,7 @@ class VisaLineIO:
         Raises:
             TransportError: If pyvisa is missing or the resource can't be opened.
 
-        Example:
+        Examples:
             Called by the station before the driver's ``open()``.
         """
         if self._res is not None:
@@ -227,7 +227,7 @@ class VisaLineIO:
     def close(self) -> None:
         """Close the VISA resource; safe to call repeatedly.
 
-        Example:
+        Examples:
             Called by the station after the driver's ``close()``.
         """
         if self._res is not None:
@@ -242,7 +242,7 @@ class VisaLineIO:
         text avoids importing pyvisa's error codes, so this module works without
         pyvisa installed.
 
-        Example:
+        Examples:
             ``self._call("query", "*IDN?")``
         """
         if self._res is None:
@@ -257,7 +257,7 @@ class VisaLineIO:
     def write_line(self, line: str) -> None:
         """Send one line.
 
-        Example:
+        Examples:
             ``io.write_line("OUTP ON")``
         """
         self.log.debug("%s >> %r", self.config.resource, line)
@@ -269,7 +269,7 @@ class VisaLineIO:
         Args:
             timeout: Ignored for VISA: the resource's configured timeout applies.
 
-        Example:
+        Examples:
             ``io.read_line()`` returns ``"5.0021"``.
         """
         reply = self._call("read")
@@ -279,7 +279,7 @@ class VisaLineIO:
     def query(self, line: str, timeout: float | None = None) -> str:
         """Send one line and read the reply.
 
-        Example:
+        Examples:
             ``io.query("*IDN?")`` returns ``"ACME,PSU-X,A123,1.4"``.
         """
         self.log.debug("%s >> %r", self.config.resource, line)

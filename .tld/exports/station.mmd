@@ -1,0 +1,11 @@
+flowchart LR
+  n_mastif_station___all__["__all__ · station"]
+  n_mastif_station_errors["mastif.station.errors"]
+  n_mastif_station_manager["mastif.station.manager"]
+  n_mastif_station_profile["mastif.station.profile"]
+  n_mastif_station_station["mastif.station.station"]
+  n_mastif_station_manager -->|imports ResourceEntry| n_mastif_station_profile
+  n_mastif_station_profile -->|imports StationError| n_mastif_station_errors
+  n_mastif_station_station -->|imports RoleError, StationError| n_mastif_station_errors
+  n_mastif_station_station -->|imports Listener, ResourceHandle, ResourceManager| n_mastif_station_manager
+  n_mastif_station_station -->|imports ChannelEntry, ResourceEntry, StationProfile| n_mastif_station_profile

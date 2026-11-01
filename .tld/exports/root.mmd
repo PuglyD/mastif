@@ -1,0 +1,22 @@
+flowchart LR
+  n_application["Application / test script"]
+  n_hardware["Instruments &amp; DUTs"]
+  n_infra["mastif.infra"]
+  n_kernel["mastif.kernel"]
+  n_org_sdk["Organisation SDK / plugins"]
+  n_planned["Planned execution platform"]
+  n_resources["mastif.resources"]
+  n_station["mastif.station"]
+  n_testing["mastif_testing"]
+  n_application -->|bootstraps services| n_infra
+  n_application -->|evaluates &amp; records results| n_kernel
+  n_application -->|builds / opens / requires| n_station
+  n_infra -->|formats result data| n_kernel
+  n_planned -->|future orchestration| n_station
+  n_resources -->|device I/O| n_hardware
+  n_resources -->|accepts injected Settings| n_infra
+  n_resources -->|uses quantities &amp; typed errors| n_kernel
+  n_resources -->|discovers installed drivers| n_org_sdk
+  n_station -->|receives Settings| n_infra
+  n_station -->|constructs &amp; manages drivers| n_resources
+  n_testing -->|exercises contracts &amp; lifecycle| n_resources

@@ -40,7 +40,7 @@ class LineSettings(BaseModel):
         encoding: Text encoding of the line content.
         timeout: Seconds to wait for a reply before raising `TransportTimeout`.
 
-    Example:
+    Examples:
         >>> LineSettings().read_termination == "\\n"
         True
     """
@@ -62,7 +62,7 @@ class TcpConfig(LineSettings):
         port: TCP port (5025 is the usual raw-SCPI port).
         connect_timeout: Seconds to wait for the connection itself.
 
-    Example:
+    Examples:
         >>> TcpConfig(host="10.0.0.5", port=5025).kind
         'tcp'
     """
@@ -87,7 +87,7 @@ class SerialConfig(LineSettings):
         parity: ``"N"``, ``"E"``, ``"O"``, ``"M"`` or ``"S"``.
         stopbits: 1, 1.5 or 2.
 
-    Example:
+    Examples:
         >>> SerialConfig(port="COM3", baudrate=115200).parity
         'N'
     """
@@ -113,7 +113,7 @@ class SerialConfig(LineSettings):
         Raises:
             ValueError: If not 1, 1.5 or 2 (reported as a validation error).
 
-        Example:
+        Examples:
             >>> SerialConfig(port="COM3", stopbits=1.5).stopbits
             1.5
         """
@@ -133,7 +133,7 @@ class UdpConfig(BaseModel):
         local_port: Local port to bind; ``0`` lets the OS choose. Set it when the DUT
             replies to a fixed port.
 
-    Example:
+    Examples:
         >>> UdpConfig(host="192.168.1.50", port=9000).local_port
         0
     """
@@ -157,7 +157,7 @@ class VisaConfig(LineSettings):
         resource: The VISA resource string.
         backend: pyvisa backend selector, e.g. ``"@py"``; empty for the system default.
 
-    Example:
+    Examples:
         >>> VisaConfig(resource="TCPIP0::10.0.0.5::INSTR").backend
         ''
     """
@@ -191,7 +191,7 @@ class TelnetConfig(LineSettings):
             everything before it, so greetings never reach the driver as a reply.
             ``None`` means nothing is waited for.
 
-    Example:
+    Examples:
         >>> cfg = TelnetConfig(host="10.0.0.9", login_prompt="login: ", username="admin")
         >>> cfg.port, cfg.write_termination
         (23, '\\r\\n')
@@ -225,7 +225,7 @@ class TelnetConfig(LineSettings):
             ValueError: If only one of ``login_prompt`` and ``username`` is set, or a
                 password is given without them (reported as a validation error).
 
-        Example:
+        Examples:
             >>> TelnetConfig(host="h", login_prompt="login: ", username="u").username
             'u'
         """
@@ -263,7 +263,7 @@ class SshConfig(LineSettings):
             (``~/.ssh/known_hosts``). With ``accept_new``, new keys are saved here.
         connect_timeout: Seconds to wait for the connection and the SSH handshake.
 
-    Example:
+    Examples:
         >>> cfg = SshConfig(host="192.168.1.60", username="root")
         >>> cfg.port, cfg.known_hosts
         (22, 'strict')
@@ -306,7 +306,7 @@ class NativeConfig(BaseModel):
             are not thread-safe or keep per-thread state; leave this on unless the
             vendor documents otherwise.
 
-    Example:
+    Examples:
         >>> cfg = NativeConfig(library="acmedio", search_paths=["C:/Program Files/Acme/bin"])
         >>> cfg.calling_convention, cfg.thread_confined
         ('cdecl', True)

@@ -127,7 +127,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif-testing/src/mastif_testing/conformance.py` |
 | Tests | `packages/mastif-testing/tests/test_conformance.py`, plus doctests |
-| Wiki | `docs/wiki/testing-kit.md`, `docs/wiki/guides/test-your-driver.md` |
+| Wiki | `docs/learn/architecture/testing-kit.md`, `docs/wiki/guides/test-your-driver.md` |
 
 ## History
 

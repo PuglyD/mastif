@@ -157,7 +157,7 @@ inside the constructor, so the task's line is in the traceback.
 |---|---|
 | Implementation | `packages/mastif/src/mastif/kernel/results.py` |
 | Tests | `packages/mastif/tests/kernel/test_results_and_ids.py`, plus doctests |
-| Wiki | `docs/wiki/kernel.md` |
+| Wiki | `docs/learn/architecture/kernel.md` |
 
 ## History
 

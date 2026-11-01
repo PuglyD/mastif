@@ -15,7 +15,10 @@
 
 ## Next: the test execution engine
 
-These steps are planned in detail in [the plan](../plan.md), Part B.
+The [Learn course](../getting-started/intro/route.md) describes the intended author experience in full,
+based on the class-based design below and on the [implementation plan](../plan.md), Part B.
+Its `Task` examples, CLI output, and plan files are design previews: they show how the
+engine should work, and they are not implemented yet.
 
 1. **Author API.**
    - `Task` classes with `should_run`, `setup`, `run`, `on_fail` and `teardown` hooks.

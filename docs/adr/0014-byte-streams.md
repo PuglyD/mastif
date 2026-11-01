@@ -154,7 +154,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/transports/stream.py` |
 | Tests | `packages/mastif/tests/resources/test_transports.py` (real localhost TCP, serial `loop://`) |
-| Wiki | `docs/wiki/transports.md` |
+| Wiki | `docs/learn/architecture/transports.md` |
 
 ## History
 

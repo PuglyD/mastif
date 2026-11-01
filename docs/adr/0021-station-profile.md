@@ -154,7 +154,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/station/profile.py` |
 | Tests | `packages/mastif/tests/station/test_station.py`, plus doctests |
-| Wiki | `docs/wiki/station.md`, `docs/wiki/guides/write-a-station-profile.md` |
+| Wiki | `docs/learn/architecture/station.md`, `docs/wiki/guides/write-a-station-profile.md` |
 
 ## History
 

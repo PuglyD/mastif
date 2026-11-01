@@ -48,7 +48,7 @@ class Runtime:
         version: Version and git information of the application's distribution, or
             ``None`` if no distribution was named.
 
-    Example:
+    Examples:
         ``runtime.settings.station.name``, ``runtime.version.summary()``
     """
 
@@ -94,7 +94,7 @@ def bootstrap(
         ConfigError: If settings or logging configuration can't be loaded.
         VersionError: If ``distribution`` isn't installed.
 
-    Example:
+    Examples:
         >>> rt = bootstrap(defaults={"station": {"name": "bench-01"},
         ...                          "logging": {"version": 1, "disable_existing_loggers": False}},
         ...                rich_tracebacks=False)

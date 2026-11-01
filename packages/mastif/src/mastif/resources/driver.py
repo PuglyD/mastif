@@ -54,12 +54,16 @@ from mastif.resources.transports.config import TransportConfig
 from mastif.resources.transports.factory import IO_TYPES, build_io
 
 T = TypeVar("T", bound=type)
+"""Class type variable preserving the type returned by driver and DUT decorators."""
 
 type Kind = Literal["instrument", "dut"]
+"""Resource category recorded in a driver specification."""
 type IoFactory = Callable[[type, TransportConfig, logging.Logger | None], object]
+"""Factory receiving the requested I/O type, transport configuration, and optional logger."""
 
 _ID_PATTERN = re.compile(r"^[a-z0-9_]+(\.[a-z0-9_-]+)+$")
-LIFECYCLE_HOOKS = ("open", "identify", "health", "safe_state", "close")
+LIFECYCLE_HOOKS: tuple[str, ...] = ("open", "identify", "health", "safe_state", "close")
+"""Hook names validated for no-argument calls; this tuple is not an execution schedule."""
 
 
 class DriverConfig(BaseModel):
@@ -69,7 +73,7 @@ class DriverConfig(BaseModel):
     typo in a profile fails clearly when the station is built. If the driver asks for
     injected I/O, declare a ``transport`` field typed with one of the transport configs.
 
-    Example:
+    Examples:
         >>> from mastif.resources.transports import TcpConfig
         >>> class Config(DriverConfig):
         ...     transport: TcpConfig
@@ -85,7 +89,7 @@ class DriverConfig(BaseModel):
 class NoConfig(DriverConfig):
     """The config of a driver that declares none: accepts only an empty mapping.
 
-    Example:
+    Examples:
         >>> NoConfig.model_validate({})
         NoConfig()
     """
@@ -100,7 +104,7 @@ class ChannelSpec:
         contract: The contract the channel's driver must satisfy.
         optional: If True, the profile may leave the channel out; the attribute is then ``None``.
 
-    Example:
+    Examples:
         >>> from mastif.resources.std import Shell
         >>> ChannelSpec("console", Shell).optional
         False
@@ -118,7 +122,7 @@ class _ChannelMarker:
     precedence. Reading the attribute before that happens raises a clear error instead
     of returning the placeholder.
 
-    Example:
+    Examples:
         ``console: Shell = channel()`` puts a marker on the class until the station attaches
         a real channel.
     """
@@ -126,7 +130,7 @@ class _ChannelMarker:
     def __init__(self, optional: bool) -> None:
         """Remember whether the channel is optional.
 
-        Example:
+        Examples:
             ``_ChannelMarker(optional=False)``
         """
         self.optional = optional
@@ -135,7 +139,7 @@ class _ChannelMarker:
     def __set_name__(self, owner: type, name: str) -> None:
         """Learn the attribute name the marker was assigned to.
 
-        Example:
+        Examples:
             For ``console: Shell = channel()`` the name is ``"console"``.
         """
         self.name = name
@@ -146,7 +150,7 @@ class _ChannelMarker:
         Raises:
             ResourceError: If the channel hasn't been attached by the station.
 
-        Example:
+        Examples:
             ``WidgetBoard.console`` returns the marker; ``board.console`` before attachment raises.
         """
         if instance is None:
@@ -167,7 +171,7 @@ def channel(*, optional: bool = False) -> Any:
     Returns:
         A placeholder the station replaces with the real channel object per instance.
 
-    Example:
+    Examples:
         >>> from mastif.resources.std import Shell
         >>> @dut("demo.board")
         ... class Board:
@@ -196,7 +200,7 @@ class DriverSpec:
         channels: Declared channels, by name.
         state_model: Pydantic model for the resource's live state, if declared.
 
-    Example:
+    Examples:
         >>> from mastif.resources.std import PowerSupply
         >>> from mastif.resources._examples import ExamplePsu
         >>> spec_of(ExamplePsu).io_params
@@ -228,7 +232,7 @@ class DriverSpec:
         Returns:
             True if the driver can serve it.
 
-        Example:
+        Examples:
             >>> from mastif.resources.std import PowerSupply, Shell
             >>> from mastif.resources._examples import ExamplePsu
             >>> spec_of(ExamplePsu).provides_contract(PowerSupply)
@@ -250,7 +254,7 @@ def _hints(fn: Callable[..., Any], cls: type) -> dict[str, Any]:
     Raises:
         DriverDefinitionError: If an annotation can't be resolved.
 
-    Example:
+    Examples:
         ``_hints(PsuX.__init__, PsuX)`` returns ``{"cfg": PsuX.Config, "io": Scpi, ...}``.
     """
     try:
@@ -263,7 +267,7 @@ def _hints(fn: Callable[..., Any], cls: type) -> dict[str, Any]:
 class _InitPlan:
     """Which ``__init__`` parameters receive which injected values.
 
-    Example:
+    Examples:
         ``def __init__(self, cfg: Config, io: Scpi)`` gives
         ``_InitPlan(config_param="cfg", io_params={"io": Scpi})``.
     """
@@ -293,7 +297,7 @@ def _inspect_init(driver_id: str, cls: type, config_model: type[DriverConfig]) -
         DriverDefinitionError: For parameters mastif can't supply, or I/O without a
             ``transport`` config field.
 
-    Example:
+    Examples:
         ``def __init__(self, cfg: Config, io: Scpi, settings: Settings)`` gives
         ``config_param="cfg"``, ``io_params={"io": Scpi}``, ``settings_param="settings"``.
     """
@@ -334,7 +338,7 @@ def _collect_channels(driver_id: str, cls: type) -> dict[str, ChannelSpec]:
     Raises:
         DriverDefinitionError: If a channel has no annotation.
 
-    Example:
+    Examples:
         ``console: Shell = channel()`` gives ``{"console": ChannelSpec("console", Shell)}``.
     """
     markers = {
@@ -363,14 +367,14 @@ def _decorate(
 ) -> Callable[[T], T]:
     """Build the class decorator shared by `driver` and `dut`.
 
-    Example:
+    Examples:
         ``_decorate("acme.psu-x", "instrument", (PowerSupply,), None)(PsuX)``
     """
 
     def decorate(cls: T) -> T:
         """Validate the class and attach its `DriverSpec`; the class itself is unchanged.
 
-        Example:
+        Examples:
             Runs once, when ``@driver(...)`` is applied at import time.
         """
         if not _ID_PATTERN.match(driver_id):
@@ -428,7 +432,7 @@ def driver(
     Raises:
         DriverDefinitionError: Or its subclass `ContractMismatch`, if anything is wrong.
 
-    Example:
+    Examples:
         >>> from mastif.resources.std import Relay
         >>> @driver("acme.relays", provides=[Relay])
         ... class AcmeRelays:
@@ -462,7 +466,7 @@ def dut(
     Returns:
         A class decorator.
 
-    Example:
+    Examples:
         >>> from pydantic import BaseModel
         >>> from mastif.resources.std import Shell
         >>> class BoardState(BaseModel):
@@ -489,7 +493,7 @@ def spec_of(cls: type) -> DriverSpec:
     Raises:
         DriverDefinitionError: If the class was not decorated.
 
-    Example:
+    Examples:
         >>> from mastif.resources._examples import ExamplePsu
         >>> spec_of(ExamplePsu).id
         'demo.example-psu'
@@ -507,7 +511,7 @@ def spec_of(cls: type) -> DriverSpec:
 def is_driver(obj: object) -> bool:
     """Tell whether an object is a class decorated with ``@driver`` or ``@dut``.
 
-    Example:
+    Examples:
         >>> from mastif.resources._examples import ExamplePsu
         >>> is_driver(ExamplePsu), is_driver(int)
         (True, False)
@@ -529,7 +533,7 @@ class BuiltResource:
         config: The validated config.
         io: Injected I/O objects, in parameter order.
 
-    Example:
+    Examples:
         ``build_resource(spec_of(PsuX), {...}, name="bench_psu").instance`` is a ``PsuX``.
     """
 
@@ -572,7 +576,7 @@ def build_resource(
         DriverDefinitionError: If the requested I/O can't be built from the transport.
         ResourceError: If the driver asks for settings and none were given.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeLineIO
         >>> from mastif.resources._examples import ExamplePsu
         >>> from mastif.resources.transports import Scpi
@@ -621,7 +625,7 @@ def call_hook(instance: object, hook: str) -> Any:
     Returns:
         The hook's return value, or ``None`` if the driver doesn't define it.
 
-    Example:
+    Examples:
         >>> class D:
         ...     def health(self): return "fine"
         >>> call_hook(D(), "health"), call_hook(D(), "open")
@@ -634,7 +638,7 @@ def call_hook(instance: object, hook: str) -> Any:
 def has_hook(instance: object, hook: str) -> bool:
     """Tell whether a driver defines an optional lifecycle hook.
 
-    Example:
+    Examples:
         >>> class D:
         ...     def identify(self): ...
         >>> has_hook(D(), "identify"), has_hook(D(), "health")
@@ -656,7 +660,7 @@ def make_safe(built: BuiltResource) -> bool:
     Returns:
         True if any safe-state action ran, False if the resource has none.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeLineIO
         >>> from mastif.resources._examples import ExamplePsu
         >>> from mastif.resources.transports import Scpi

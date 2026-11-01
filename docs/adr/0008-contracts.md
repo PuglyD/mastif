@@ -162,7 +162,7 @@ or satisfies it structurally (ADR-0011, ADR-0023).
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/contracts.py` |
 | Tests | `packages/mastif/tests/resources/test_contracts_and_identity.py`, plus doctests |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-driver.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/wiki/guides/write-a-driver.md` |
 
 ## History
 

@@ -123,7 +123,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/transports/factory.py` |
 | Tests | `packages/mastif/tests/resources/test_transports.py`, `test_telnet.py`, `test_ssh.py` (parametrised combination tests) |
-| Wiki | `docs/wiki/transports.md` |
+| Wiki | `docs/learn/architecture/transports.md` |
 
 ## History
 

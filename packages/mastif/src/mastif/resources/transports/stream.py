@@ -29,7 +29,7 @@ from mastif.resources.transports.config import SerialConfig, TcpConfig
 class StreamTransport(Protocol):
     """A bidirectional byte stream with timeouts.
 
-    Example:
+    Examples:
         A binary-protocol driver asking for a raw stream::
 
             @driver("acme.counter", provides=[Counter])
@@ -78,7 +78,7 @@ class BufferedStream:
     class adds buffering, terminator and length framing, deadline handling and I/O
     tracing, so every stream behaves the same.
 
-    Example:
+    Examples:
         A minimal in-memory stream (how a test fake could be built)::
 
             class Canned(BufferedStream):
@@ -103,7 +103,7 @@ class BufferedStream:
             logger: Where to trace I/O; defaults to the ``mastif.io`` logger.
             encoding: Encoding for text passed to `write` and `read_until`.
 
-        Example:
+        Examples:
             Subclasses call ``super().__init__(f"{host}:{port}", config.timeout, logger)``.
         """
         self.name = name
@@ -117,7 +117,7 @@ class BufferedStream:
     def is_open(self) -> bool:
         """Whether the stream is currently open.
 
-        Example:
+        Examples:
             ``stream.is_open`` is False until ``stream.open()`` succeeds.
         """
         return self._open
@@ -128,7 +128,7 @@ class BufferedStream:
         Raises:
             TransportError: If the connection cannot be established.
 
-        Example:
+        Examples:
             ``stream.open()`` is called by the station before the driver's ``open()``.
         """
         if self._open:
@@ -141,7 +141,7 @@ class BufferedStream:
     def close(self) -> None:
         """Close the connection; safe to call repeatedly.
 
-        Example:
+        Examples:
             ``stream.close()`` is called by the station after the driver's ``close()``.
         """
         if not self._open:
@@ -167,7 +167,7 @@ class BufferedStream:
             TransportError: If the stream is closed, the send fails, or the text can't
                 be encoded.
 
-        Example:
+        Examples:
             ``stream.write(b"\\x01\\x10")`` or ``stream.write("*IDN?\\n")``
         """
         self._require_open()
@@ -192,7 +192,7 @@ class BufferedStream:
             TransportTimeout: If no terminator arrives in time.
             TransportError: If the stream is closed or fails.
 
-        Example:
+        Examples:
             ``stream.read_until(b"\\n")`` returns ``b"ACME,PSU-X,A123,1.4"``.
         """
         self._require_open()
@@ -219,7 +219,7 @@ class BufferedStream:
             TransportTimeout: If fewer than ``size`` bytes arrive in time.
             TransportError: If the stream is closed or fails.
 
-        Example:
+        Examples:
             ``header = stream.read_exactly(4)``
         """
         self._require_open()
@@ -237,7 +237,7 @@ class BufferedStream:
         Raises:
             TransportError: If the text can't be encoded.
 
-        Example:
+        Examples:
             ``self._to_bytes("OK")`` returns ``b"OK"`` with ASCII encoding.
         """
         if isinstance(data, bytes):
@@ -250,7 +250,7 @@ class BufferedStream:
     def _deadline(self, timeout: float | None) -> float:
         """Turn a relative timeout into an absolute monotonic deadline.
 
-        Example:
+        Examples:
             ``self._deadline(None)`` uses the configured default timeout.
         """
         return time.monotonic() + (self.timeout if timeout is None else timeout)
@@ -265,7 +265,7 @@ class BufferedStream:
         Raises:
             TransportTimeout: If the deadline passes first.
 
-        Example:
+        Examples:
             Called in a loop by `read_until` until the terminator is buffered.
         """
         remaining = deadline - time.monotonic()
@@ -279,7 +279,7 @@ class BufferedStream:
     def _require_open(self) -> None:
         """Raise unless the stream is open.
 
-        Example:
+        Examples:
             Guards every read and write, so using a closed stream fails with a clear message.
         """
         if not self._open:
@@ -288,7 +288,7 @@ class BufferedStream:
     def _connect(self) -> None:
         """Open the raw connection (subclass hook).
 
-        Example:
+        Examples:
             TCP creates and connects a socket here.
         """
         raise NotImplementedError
@@ -296,7 +296,7 @@ class BufferedStream:
     def _disconnect(self) -> None:
         """Close the raw connection (subclass hook).
 
-        Example:
+        Examples:
             TCP closes its socket here.
         """
         raise NotImplementedError
@@ -304,7 +304,7 @@ class BufferedStream:
     def _send(self, data: bytes) -> None:
         """Send raw bytes (subclass hook).
 
-        Example:
+        Examples:
             TCP calls ``socket.sendall(data)`` here.
         """
         raise NotImplementedError
@@ -312,7 +312,7 @@ class BufferedStream:
     def _receive(self, timeout: float) -> bytes:
         """Receive at least one byte, or return ``b""`` on timeout (subclass hook).
 
-        Example:
+        Examples:
             TCP calls ``socket.recv(4096)`` with ``timeout`` set on the socket.
         """
         raise NotImplementedError
@@ -321,7 +321,7 @@ class BufferedStream:
 class TcpTransport(BufferedStream):
     """A TCP client connection.
 
-    Example:
+    Examples:
         Talking to a raw-SCPI LAN instrument (needs hardware)::
 
             tcp = TcpTransport(TcpConfig(host="10.0.0.5", port=5025))
@@ -338,7 +338,7 @@ class TcpTransport(BufferedStream):
             config: Host, port and timeouts.
             logger: Where to trace I/O.
 
-        Example:
+        Examples:
             >>> TcpTransport(TcpConfig(host="127.0.0.1", port=5025)).name
             '127.0.0.1:5025'
         """
@@ -349,7 +349,7 @@ class TcpTransport(BufferedStream):
     def _connect(self) -> None:
         """Connect the socket, translating OS errors into `TransportError`.
 
-        Example:
+        Examples:
             A refused connection raises ``TransportError("127.0.0.1:1: cannot connect: ...")``.
         """
         try:
@@ -362,7 +362,7 @@ class TcpTransport(BufferedStream):
     def _disconnect(self) -> None:
         """Close the socket.
 
-        Example:
+        Examples:
             Called by `close`; afterwards the transport can be opened again.
         """
         if self._sock is not None:
@@ -372,7 +372,7 @@ class TcpTransport(BufferedStream):
     def _send(self, data: bytes) -> None:
         """Send all bytes, translating OS errors.
 
-        Example:
+        Examples:
             A dropped connection raises ``TransportError("...: send failed: ...")``.
         """
         assert self._sock is not None
@@ -387,7 +387,7 @@ class TcpTransport(BufferedStream):
         Raises:
             TransportError: If the peer closed the connection or the read failed.
 
-        Example:
+        Examples:
             Returns whatever the instrument sent so far, e.g. ``b"ACME,PSU"``.
         """
         assert self._sock is not None
@@ -406,7 +406,7 @@ class TcpTransport(BufferedStream):
 class SerialTransport(BufferedStream):
     """A serial port through pyserial (install the ``serial`` extra).
 
-    Example:
+    Examples:
         A loopback port echoes what is written (no hardware needed)::
 
             port = SerialTransport(SerialConfig(port="loop://"))
@@ -422,7 +422,7 @@ class SerialTransport(BufferedStream):
             config: Port name or URL, line settings and timeouts.
             logger: Where to trace I/O.
 
-        Example:
+        Examples:
             >>> SerialTransport(SerialConfig(port="COM3")).name
             'COM3'
         """
@@ -436,7 +436,7 @@ class SerialTransport(BufferedStream):
         Raises:
             TransportError: If pyserial is not installed or the port can't be opened.
 
-        Example:
+        Examples:
             A missing port raises ``TransportError("COM9: cannot open: ...")``.
         """
         try:
@@ -458,7 +458,7 @@ class SerialTransport(BufferedStream):
     def _disconnect(self) -> None:
         """Close the port.
 
-        Example:
+        Examples:
             Called by `close`.
         """
         if self._port is not None:
@@ -468,7 +468,7 @@ class SerialTransport(BufferedStream):
     def _send(self, data: bytes) -> None:
         """Write all bytes to the port.
 
-        Example:
+        Examples:
             ``self._send(b"version\\r\\n")``
         """
         assert self._port is not None
@@ -481,7 +481,7 @@ class SerialTransport(BufferedStream):
     def _receive(self, timeout: float) -> bytes:
         """Read what is waiting (at least one byte), or ``b""`` on timeout.
 
-        Example:
+        Examples:
             Returns console output as it arrives, e.g. ``b"2.1\\r\\n# "``.
         """
         assert self._port is not None

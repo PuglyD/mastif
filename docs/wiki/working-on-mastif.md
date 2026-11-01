@@ -15,8 +15,8 @@ A change is done when **all** of the following are true:
 4. **An ADR** exists for every new module, with all sections of the
    [template](../adr/0000-template.md) filled in. Changed modules get their ADR updated,
    plus a *History* line.
-5. **The wiki** is updated: the layer page, the flows, the [glossary](glossary.md) for
-   new terms, the [error map](errors.md) for new exceptions, and a guide for new
+5. **The wiki** is updated: the layer page, the flows, the [glossary](../learn/architecture/glossary.md) for
+   new terms, the [error map](../learn/architecture/errors.md) for new exceptions, and a guide for new
    extension points.
 6. **Every check passes:**
 

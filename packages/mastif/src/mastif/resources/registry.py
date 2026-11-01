@@ -30,13 +30,14 @@ from types import ModuleType
 from mastif.resources.driver import DriverSpec, is_driver, spec_of
 from mastif.resources.errors import DriverDefinitionError, DriverNotFound
 
-ENTRY_POINT_GROUP = "mastif.drivers"
+ENTRY_POINT_GROUP: str = "mastif.drivers"
+"""Python entry-point group inspected by `Registry.discover` for installed drivers."""
 
 
 def _classes_in(obj: object) -> list[type]:
     """Return the decorated driver classes in a module, iterable, or single class.
 
-    Example:
+    Examples:
         ``_classes_in(acme_sdk.drivers)`` returns every ``@driver`` class defined there.
     """
     if isinstance(obj, type) and is_driver(obj):
@@ -51,7 +52,7 @@ def _classes_in(obj: object) -> list[type]:
 class Registry:
     """A lookup table from driver id to `DriverSpec`.
 
-    Example:
+    Examples:
         >>> from mastif.resources._examples import ExamplePsu
         >>> reg = Registry([ExamplePsu])
         >>> reg.get("demo.example-psu").cls is ExamplePsu
@@ -70,7 +71,7 @@ class Registry:
         Raises:
             DriverDefinitionError: If two different classes share an id.
 
-        Example:
+        Examples:
             >>> Registry(builtin=False).ids()
             []
         """
@@ -99,7 +100,7 @@ class Registry:
             DriverDefinitionError: If an advertised module fails to import, or two
                 drivers share an id.
 
-        Example:
+        Examples:
             >>> "mastif.udp" in Registry.discover()
             True
         """
@@ -126,7 +127,7 @@ class Registry:
         Raises:
             DriverDefinitionError: On a conflicting id.
 
-        Example:
+        Examples:
             >>> from mastif.resources._examples import ExamplePsu
             >>> reg = Registry(builtin=False)
             >>> reg.add(ExamplePsu, ExamplePsu)
@@ -157,7 +158,7 @@ class Registry:
         Raises:
             DriverNotFound: Listing the known ids, which helps spot a typo.
 
-        Example:
+        Examples:
             >>> Registry(builtin=False).get("acme.nope")
             Traceback (most recent call last):
             ...
@@ -172,7 +173,7 @@ class Registry:
     def ids(self) -> list[str]:
         """Return all known driver ids, sorted.
 
-        Example:
+        Examples:
             >>> Registry().ids()
             ['mastif.line-shell', 'mastif.ssh-shell', 'mastif.udp']
         """
@@ -181,7 +182,7 @@ class Registry:
     def __contains__(self, driver_id: object) -> bool:
         """Tell whether a driver id is known.
 
-        Example:
+        Examples:
             >>> "mastif.udp" in Registry()
             True
         """

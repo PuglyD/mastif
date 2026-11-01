@@ -1,0 +1,8 @@
+flowchart LR
+  n_future_api["Python API / service — planned"]
+  n_future_cli["CLI — planned"]
+  n_future_engine["Test execution engine — planned"]
+  n_future_runtime["Persistent station runtime — planned"]
+  n_future_api -->|planned facade| n_future_engine
+  n_future_cli -->|planned dependency| n_future_api
+  n_future_engine -->|later proxy-based mode| n_future_runtime

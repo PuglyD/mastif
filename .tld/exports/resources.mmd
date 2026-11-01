@@ -1,0 +1,23 @@
+flowchart LR
+  n_builtin_channels["mastif.resources.channels"]
+  n_contracts["mastif.resources.contracts"]
+  n_driver_registry["mastif.resources.registry"]
+  n_driver_spec["mastif.resources.driver"]
+  n_identity["mastif.resources.identity"]
+  n_mastif_resources___all__["__all__ · resources"]
+  n_mastif_resources__examples["mastif.resources._examples"]
+  n_mastif_resources_std["mastif.resources.std"]
+  n_resource_errors["mastif.resources.errors"]
+  n_transports["mastif.resources.transports"]
+  n_builtin_channels -->|implements Shell / MessageChannel| n_contracts
+  n_builtin_channels -->|requests injected communication| n_transports
+  n_contracts -->|imports ContractMismatch| n_resource_errors
+  n_driver_registry -->|includes built-ins| n_builtin_channels
+  n_driver_registry -->|indexes specifications| n_driver_spec
+  n_driver_registry -->|missing / duplicate ID| n_resource_errors
+  n_driver_spec -->|validates provides| n_contracts
+  n_driver_spec -->|imports DriverDefinitionError, ResourceError| n_resource_errors
+  n_mastif_resources__examples -->|imports DriverConfig, driver| n_driver_spec
+  n_mastif_resources__examples -->|imports PowerSupply| n_mastif_resources_std
+  n_mastif_resources_std -->|imports contract| n_contracts
+  n_transports -->|reports transport / protocol failures| n_resource_errors

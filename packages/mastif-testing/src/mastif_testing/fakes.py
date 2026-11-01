@@ -31,7 +31,9 @@ from mastif.resources.transports.native import NativeFunction, StatusCheck
 from mastif.resources.transports.stream import BufferedStream
 
 type Reply = str | list[str]
+"""A fixed line reply or a sequence of replies for a fake line-I/O command."""
 type NativeBehaviour = Callable[..., Any] | int | list[int]
+"""Scripted native function behaviour: a callback, fixed status, or sequence of statuses."""
 
 
 class FakeLineIO:
@@ -47,7 +49,7 @@ class FakeLineIO:
         opened: How many times `open` was called.
         closed: How many times `close` was called.
 
-    Example:
+    Examples:
         >>> io = FakeLineIO({"*IDN?": "ACME,PSU-X,A123,1.4", "MEAS:CURR?": ["0.10", "0.18"]})
         >>> io.query("MEAS:CURR?"), io.query("MEAS:CURR?"), io.query("MEAS:CURR?")
         ('0.10', '0.18', '0.18')
@@ -62,7 +64,7 @@ class FakeLineIO:
         Args:
             replies: Command line to reply, or to a list of successive replies.
 
-        Example:
+        Examples:
             ``FakeLineIO({"*IDN?": "ACME,PSU-X,A123,1.4"})``
         """
         self._script = {
@@ -76,7 +78,7 @@ class FakeLineIO:
     def open(self) -> None:
         """Count the open call.
 
-        Example:
+        Examples:
             >>> io = FakeLineIO(); io.open(); io.opened
             1
         """
@@ -85,7 +87,7 @@ class FakeLineIO:
     def close(self) -> None:
         """Count the close call.
 
-        Example:
+        Examples:
             >>> io = FakeLineIO(); io.close(); io.closed
             1
         """
@@ -94,7 +96,7 @@ class FakeLineIO:
     def feed(self, line: str) -> None:
         """Queue an unsolicited line, e.g. an asynchronous event from the device.
 
-        Example:
+        Examples:
             >>> io = FakeLineIO(); io.feed("ALARM 3"); io.read_line()
             'ALARM 3'
         """
@@ -103,7 +105,7 @@ class FakeLineIO:
     def write_line(self, line: str) -> None:
         """Record the line and queue its scripted reply, if any.
 
-        Example:
+        Examples:
             >>> io = FakeLineIO({"PING": "PONG"}); io.write_line("PING"); io.read_line()
             'PONG'
         """
@@ -118,7 +120,7 @@ class FakeLineIO:
         Raises:
             TransportTimeout: If nothing is queued, as with a silent device.
 
-        Example:
+        Examples:
             >>> FakeLineIO().read_line()
             Traceback (most recent call last):
             ...
@@ -131,7 +133,7 @@ class FakeLineIO:
     def query(self, line: str, timeout: float | None = None) -> str:
         """Write a line and return the next queued reply.
 
-        Example:
+        Examples:
             >>> FakeLineIO({"*OPC?": "1"}).query("*OPC?")
             '1'
         """
@@ -148,7 +150,7 @@ class FakeStream(BufferedStream):
     Attributes:
         sent: All bytes written, concatenated.
 
-    Example:
+    Examples:
         >>> s = FakeStream()
         >>> s.open()
         >>> s.feed(b"\\x00\\x00\\x01\\x00rest")
@@ -165,7 +167,7 @@ class FakeStream(BufferedStream):
         Args:
             timeout: Default read timeout; short, because nothing will ever arrive late.
 
-        Example:
+        Examples:
             ``FakeStream()``
         """
         super().__init__("fake-stream", timeout)
@@ -175,7 +177,7 @@ class FakeStream(BufferedStream):
     def feed(self, data: bytes) -> None:
         """Make bytes available to read.
 
-        Example:
+        Examples:
             ``stream.feed(b"OK\\n")``
         """
         self._incoming.append(data)
@@ -183,21 +185,21 @@ class FakeStream(BufferedStream):
     def _connect(self) -> None:
         """Nothing to connect.
 
-        Example:
+        Examples:
             Called by `open`.
         """
 
     def _disconnect(self) -> None:
         """Nothing to disconnect.
 
-        Example:
+        Examples:
             Called by `close`.
         """
 
     def _send(self, data: bytes) -> None:
         """Record sent bytes.
 
-        Example:
+        Examples:
             ``stream.write(b"x")`` appends ``b"x"`` to `sent`.
         """
         self.sent += data
@@ -205,7 +207,7 @@ class FakeStream(BufferedStream):
     def _receive(self, timeout: float) -> bytes:
         """Hand out the next fed chunk, or ``b""`` (a timeout) if none.
 
-        Example:
+        Examples:
             Returns ``b"OK\\n"`` after ``feed(b"OK\\n")``.
         """
         return self._incoming.popleft() if self._incoming else b""
@@ -231,7 +233,7 @@ class FakeSshSession:
         opened: How many times `open` was called.
         closed: How many times `close` was called.
 
-    Example:
+    Examples:
         >>> ssh = FakeSshSession({"uname -r": "6.1.0\\n",
         ...                       "false": ShellResult(command="", output="", exit_code=1)})
         >>> ssh.open()
@@ -247,7 +249,7 @@ class FakeSshSession:
         Args:
             commands: Command line to its output, result or exception.
 
-        Example:
+        Examples:
             ``FakeSshSession({"cat /etc/hostname": "dut-07\\n"})``
         """
         self._script = dict(commands or {})
@@ -261,7 +263,7 @@ class FakeSshSession:
     def is_open(self) -> bool:
         """Whether `open` was called more recently than `close`.
 
-        Example:
+        Examples:
             >>> FakeSshSession().is_open
             False
         """
@@ -270,7 +272,7 @@ class FakeSshSession:
     def open(self) -> None:
         """Mark the session open and count the call.
 
-        Example:
+        Examples:
             >>> s = FakeSshSession(); s.open(); s.is_open, s.opened
             (True, 1)
         """
@@ -280,7 +282,7 @@ class FakeSshSession:
     def close(self) -> None:
         """Mark the session closed and count the call.
 
-        Example:
+        Examples:
             >>> s = FakeSshSession(); s.open(); s.close(); s.is_open, s.closed
             (False, 1)
         """
@@ -293,7 +295,7 @@ class FakeSshSession:
         Raises:
             TransportError: If the session is not open, or the script says so.
 
-        Example:
+        Examples:
             >>> FakeSshSession().run("ls")
             Traceback (most recent call last):
             ...
@@ -326,7 +328,7 @@ def set_out(ref: Any, value: Any) -> None:
         ref: The argument: ``ctypes.byref(x)`` or ``ctypes.pointer(x)``.
         value: The value to store in ``x``.
 
-    Example:
+    Examples:
         >>> import ctypes
         >>> count = ctypes.c_int()
         >>> set_out(ctypes.byref(count), 7)
@@ -359,7 +361,7 @@ class FakeNativeLibrary:
         opened: How many times `open` was called.
         closed: How many times `close` was called.
 
-    Example:
+    Examples:
         >>> import ctypes
         >>> lib = FakeNativeLibrary({"ACME_Count": 4, "ACME_Reset": [-3, 0]})
         >>> lib.open()
@@ -383,7 +385,7 @@ class FakeNativeLibrary:
         Args:
             functions: Symbol name to behaviour.
 
-        Example:
+        Examples:
             ``FakeNativeLibrary({"ACME_Open": open_fn, "ACME_Close": 0})``
         """
         self._behaviour: dict[str, Any] = {
@@ -400,7 +402,7 @@ class FakeNativeLibrary:
     def is_open(self) -> bool:
         """Whether `open` was called more recently than `close`.
 
-        Example:
+        Examples:
             >>> FakeNativeLibrary().is_open
             False
         """
@@ -409,7 +411,7 @@ class FakeNativeLibrary:
     def open(self) -> None:
         """Mark the library loaded and count the call.
 
-        Example:
+        Examples:
             >>> lib = FakeNativeLibrary(); lib.open(); lib.opened
             1
         """
@@ -419,7 +421,7 @@ class FakeNativeLibrary:
     def close(self) -> None:
         """Mark the library unloaded and count the call.
 
-        Example:
+        Examples:
             >>> lib = FakeNativeLibrary(); lib.open(); lib.close(); lib.is_open
             False
         """
@@ -439,7 +441,7 @@ class FakeNativeLibrary:
             DriverDefinitionError: If ``argtypes`` is missing or not a list.
             TransportError: If the fake has no behaviour for ``name``.
 
-        Example:
+        Examples:
             >>> FakeNativeLibrary().function("ACME_Missing", None, [])
             Traceback (most recent call last):
             ...
@@ -459,7 +461,7 @@ class FakeNativeLibrary:
             DriverDefinitionError: If the function wasn't declared.
             ProtocolError: If the declaration's status check fails.
 
-        Example:
+        Examples:
             >>> lib = FakeNativeLibrary({"ACME_Count": 1}); lib.open()
             >>> lib.call("ACME_Count")
             Traceback (most recent call last):
@@ -494,7 +496,7 @@ class FakeDatagramPeer:
     Attributes:
         received: Every payload received, in order.
 
-    Example:
+    Examples:
         >>> import socket
         >>> with FakeDatagramPeer(lambda msg: msg.upper()) as peer:
         ...     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -513,7 +515,7 @@ class FakeDatagramPeer:
         Args:
             responder: Maps a received payload to a reply payload, or ``None``.
 
-        Example:
+        Examples:
             ``FakeDatagramPeer(lambda m: b"ACK")``
         """
         self.responder = responder
@@ -530,7 +532,7 @@ class FakeDatagramPeer:
     def port(self) -> int:
         """The localhost port the peer listens on; point the channel's config at it.
 
-        Example:
+        Examples:
             ``UdpConfig(host="127.0.0.1", port=peer.port)``
         """
         return self._sock.getsockname()[1]
@@ -543,7 +545,7 @@ class FakeDatagramPeer:
         Raises:
             TransportError: If nobody has sent anything to the peer yet.
 
-        Example:
+        Examples:
             ``peer.push(b"STATUS OK")``
         """
         if self._last_sender is None:
@@ -553,7 +555,7 @@ class FakeDatagramPeer:
     def close(self) -> None:
         """Stop answering and release the port.
 
-        Example:
+        Examples:
             Called automatically when the ``with`` block ends.
         """
         self._running = False
@@ -563,7 +565,7 @@ class FakeDatagramPeer:
     def __enter__(self) -> Self:
         """Return the running peer.
 
-        Example:
+        Examples:
             ``with FakeDatagramPeer() as peer: ...``
         """
         return self
@@ -576,7 +578,7 @@ class FakeDatagramPeer:
     ) -> None:
         """Close the peer.
 
-        Example:
+        Examples:
             Runs when the ``with`` block ends, even after an exception.
         """
         self.close()
@@ -584,7 +586,7 @@ class FakeDatagramPeer:
     def _serve(self) -> None:
         """Receive datagrams and answer each one via the responder.
 
-        Example:
+        Examples:
             Runs on the ``fake-udp-peer`` thread.
         """
         while self._running:

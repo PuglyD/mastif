@@ -182,7 +182,7 @@ at construction, at the line that made the mistake (ADR-0006).
 |---|---|
 | Implementation | `packages/mastif/src/mastif/kernel/units.py` |
 | Tests | `packages/mastif/tests/kernel/test_units.py`, plus module doctests |
-| Wiki | `docs/wiki/kernel.md` |
+| Wiki | `docs/learn/architecture/kernel.md` |
 
 ## History
 

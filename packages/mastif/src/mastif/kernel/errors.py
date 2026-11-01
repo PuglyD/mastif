@@ -25,7 +25,7 @@ class MastifError(Exception):
     Catch this at a boundary (CLI, service, org tooling) to handle all mastif failures
     in one place.
 
-    Example:
+    Examples:
         >>> try:
         ...     raise UnitError("cannot convert 'V' to 'A'")
         ... except MastifError as exc:
@@ -40,7 +40,7 @@ class UnitError(MastifError):
     This almost always means a mistake in test or driver code, such as comparing volts
     with amps or adding two dBm levels, so mastif fails loudly instead of guessing.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.units import V, A
         >>> (1 * V).to("A")
         Traceback (most recent call last):
@@ -55,7 +55,7 @@ class LimitsError(MastifError):
     Raised when the limits are built, so specification mistakes surface before any
     hardware is touched.
 
-    Example:
+    Examples:
         >>> from mastif.kernel.limits import Range
         >>> Range()
         Traceback (most recent call last):

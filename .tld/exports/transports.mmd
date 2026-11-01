@@ -1,0 +1,29 @@
+flowchart LR
+  n_datagrams["mastif.resources.transports.datagram"]
+  n_io_factory["mastif.resources.transports.factory"]
+  n_lines["mastif.resources.transports.lineio"]
+  n_mastif_resources_transports___all__["__all__ · transports"]
+  n_mastif_resources_transports_telnet["mastif.resources.transports.telnet"]
+  n_native["mastif.resources.transports.native"]
+  n_scpi["mastif.resources.transports.scpi"]
+  n_ssh["mastif.resources.transports.ssh"]
+  n_streams["mastif.resources.transports.stream"]
+  n_transport_config["mastif.resources.transports.config"]
+  n_datagrams -->|imports UdpConfig| n_transport_config
+  n_io_factory -->|builds UDP channel| n_datagrams
+  n_io_factory -->|builds line I/O| n_lines
+  n_io_factory -->|imports TelnetTransport| n_mastif_resources_transports_telnet
+  n_io_factory -->|builds native-library wrapper| n_native
+  n_io_factory -->|wraps LineIO with Scpi| n_scpi
+  n_io_factory -->|builds command session| n_ssh
+  n_io_factory -->|builds byte streams| n_streams
+  n_io_factory -->|selects by config type| n_transport_config
+  n_lines -->|frames stream bytes| n_streams
+  n_lines -->|imports LineSettings, VisaConfig| n_transport_config
+  n_mastif_resources_transports_telnet -->|imports BufferedStream| n_streams
+  n_mastif_resources_transports_telnet -->|imports TelnetConfig| n_transport_config
+  n_native -->|imports NativeConfig| n_transport_config
+  n_scpi -->|writes / queries lines| n_lines
+  n_ssh -->|imports BufferedStream| n_streams
+  n_ssh -->|imports SshConfig| n_transport_config
+  n_streams -->|imports SerialConfig, TcpConfig| n_transport_config

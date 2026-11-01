@@ -23,10 +23,14 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 
 type RunId = str
+"""String identifying a run, normally produced by `new_run_id`."""
 type SlotId = str
+"""String identifying a DUT position on a fixture."""
 type LoopValue = str | int | float | bool
+"""Scalar value stored for one loop coordinate in a `Position`."""
 
 DEFAULT_SLOT: SlotId = "0"
+"""Conventional slot identifier for applications using a single DUT position."""
 
 
 def new_run_id(now: datetime | None = None) -> RunId:
@@ -42,7 +46,7 @@ def new_run_id(now: datetime | None = None) -> RunId:
     Returns:
         The run id.
 
-    Example:
+    Examples:
         >>> rid = new_run_id(datetime(2026, 10, 20, 10, 15, tzinfo=UTC))
         >>> rid.startswith("20261020T101500Z-"), len(rid)
         (True, 23)
@@ -64,7 +68,7 @@ class Position(BaseModel):
         loops: ``(loop name, value)`` pairs, outermost loop first. Empty for tasks that
             run outside any loop (the root).
 
-    Example:
+    Examples:
         >>> p = Position.of(profile="std", channel=2)
         >>> p.key
         'profile=std/channel=2'
@@ -86,7 +90,7 @@ class Position(BaseModel):
         Returns:
             The position.
 
-        Example:
+        Examples:
             >>> Position.of(temperature=25, channel=1).names
             ('temperature', 'channel')
         """
@@ -106,7 +110,7 @@ class Position(BaseModel):
         Raises:
             KeyError: If the loop is not part of this position.
 
-        Example:
+        Examples:
             >>> Position.of(channel=3).get("channel")
             3
         """
@@ -118,7 +122,7 @@ class Position(BaseModel):
     def as_dict(self) -> dict[str, Any]:
         """Return the loop values as a dict (outermost first), for display or templating.
 
-        Example:
+        Examples:
             >>> Position.of(profile="std", channel=1).as_dict()
             {'profile': 'std', 'channel': 1}
         """
@@ -128,7 +132,7 @@ class Position(BaseModel):
     def names(self) -> tuple[str, ...]:
         """Loop names, outermost first.
 
-        Example:
+        Examples:
             >>> Position.of(a=1, b=2).names
             ('a', 'b')
         """
@@ -138,7 +142,7 @@ class Position(BaseModel):
     def key(self) -> str:
         """A stable text form, used in item ids, logs and file names; empty for the root.
 
-        Example:
+        Examples:
             >>> Position.of(profile="std", channel=1).key
             'profile=std/channel=1'
             >>> Position().key
@@ -149,7 +153,7 @@ class Position(BaseModel):
     def __str__(self) -> str:
         """Render for humans: the key, or ``"<root>"`` outside any loop.
 
-        Example:
+        Examples:
             >>> str(Position())
             '<root>'
         """

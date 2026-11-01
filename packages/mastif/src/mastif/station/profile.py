@@ -54,7 +54,7 @@ class ChannelEntry(BaseModel):
         driver: Id of a driver providing the channel's contract, e.g. ``mastif.udp``.
         config: That driver's config.
 
-    Example:
+    Examples:
         >>> ChannelEntry(driver="mastif.udp", config={"transport": {"kind": "udp",
         ...     "host": "192.168.1.50", "port": 9000}}).driver
         'mastif.udp'
@@ -79,7 +79,7 @@ class ResourceEntry(BaseModel):
             multi-DUT stations).
         slot: The DUT slot this resource belongs to, for multi-DUT stations (reserved).
 
-    Example:
+    Examples:
         >>> ResourceEntry(driver="acme.psu-x", expect={"serial": "A123"}).expect
         {'serial': 'A123'}
     """
@@ -106,7 +106,7 @@ class StationProfile(BaseModel):
             name always works as a role too.
         sim: Replacement entries used when building in simulation mode.
 
-    Example:
+    Examples:
         >>> p = StationProfile.from_yaml('''
         ... station: bench-01
         ... resources:
@@ -141,7 +141,7 @@ class StationProfile(BaseModel):
         Raises:
             StationError: Naming every inconsistency found.
 
-        Example:
+        Examples:
             >>> StationProfile(station="s", resources={}, roles={"psu": "missing"})
             Traceback (most recent call last):
             ...
@@ -176,7 +176,7 @@ class StationProfile(BaseModel):
         Raises:
             StationError: If the YAML is malformed or doesn't match the profile format.
 
-        Example:
+        Examples:
             >>> StationProfile.from_yaml("station: s\\nresources: {}").station
             's'
             >>> StationProfile.from_yaml("station: s")
@@ -210,7 +210,7 @@ class StationProfile(BaseModel):
         Raises:
             StationError: If the file can't be read or is invalid.
 
-        Example:
+        Examples:
             ``StationProfile.load("stations/bench-01.yaml")``
         """
         p = Path(path)
@@ -229,7 +229,7 @@ class StationProfile(BaseModel):
         Returns:
             Resource name to entry, in profile order.
 
-        Example:
+        Examples:
             >>> p = StationProfile(station="s",
             ...     resources={"a": ResourceEntry(driver="x.real")},
             ...     sim={"a": ResourceEntry(driver="x.sim")})
@@ -249,7 +249,7 @@ class StationProfile(BaseModel):
         Returns:
             The target name.
 
-        Example:
+        Examples:
             >>> p = StationProfile(station="s", resources={"psu": ResourceEntry(driver="x.y")},
             ...     roles={"psu_main": "psu"})
             >>> p.target_of("psu_main"), p.target_of("psu")

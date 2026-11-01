@@ -190,7 +190,7 @@ sequenceDiagram
 | Implementation | `packages/mastif/src/mastif/infra/config.py` |
 | Tests | `packages/mastif/tests/infra/test_config.py`, plus doctests |
 | Injection | `packages/mastif/src/mastif/resources/driver.py` (`settings_param`), `packages/mastif/src/mastif/station/station.py` |
-| Wiki | `docs/wiki/infra.md`, `docs/wiki/guides/bootstrap-an-application.md` |
+| Wiki | `docs/learn/architecture/infra.md`, `docs/wiki/guides/bootstrap-an-application.md` |
 
 ## History
 

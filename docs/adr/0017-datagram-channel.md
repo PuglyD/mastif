@@ -159,7 +159,7 @@ listener can't break the channel.
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/transports/datagram.py` |
 | Tests | `packages/mastif/tests/resources/test_transports.py` (real UDP with `FakeDatagramPeer`) |
-| Wiki | `docs/wiki/transports.md` |
+| Wiki | `docs/learn/architecture/transports.md` |
 
 ## History
 

@@ -167,7 +167,7 @@ For a table cell judged with `IndexedLimits`, the cell first picks its limits wi
 |---|---|
 | Implementation | `packages/mastif/src/mastif/kernel/limits.py` |
 | Tests | `packages/mastif/tests/kernel/test_limits_and_verdicts.py`, plus doctests |
-| Wiki | `docs/wiki/kernel.md` |
+| Wiki | `docs/learn/architecture/kernel.md` |
 
 ## History
 

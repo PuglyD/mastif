@@ -36,7 +36,7 @@ from mastif.resources.contracts import contract
 class PowerSupply(Protocol):
     """A programmable DC supply channel. Safe state: output off.
 
-    Example:
+    Examples:
         A test powering a board and checking its idle current::
 
             psu: PowerSupply = requires("psu_main")
@@ -73,7 +73,7 @@ class PowerSupply(Protocol):
 class SignalSource(Protocol):
     """A signal generator output (RF or otherwise). Safe state: output off.
 
-    Example:
+    Examples:
         Driving a receiver input with a test tone::
 
             src: SignalSource = requires("rf_source")
@@ -98,7 +98,7 @@ class SignalSource(Protocol):
 class PowerMeter(Protocol):
     """Something that measures power, e.g. an RF power sensor or a spectrum analyser marker.
 
-    Example:
+    Examples:
         Checking a transmitter's output power::
 
             meter: PowerMeter = requires("tx_meter")
@@ -116,7 +116,7 @@ class Switch(Protocol):
     Port names come from the station profile, so tests say ``route("source", "dut_in")``
     and never mention switch positions.
 
-    Example:
+    Examples:
         Connecting a source to the DUT input::
 
             sw: Switch = requires("rf_matrix")
@@ -136,7 +136,7 @@ class Switch(Protocol):
 class Relay(Protocol):
     """A bank of relays addressed by channel name or number. Safe state: all open.
 
-    Example:
+    Examples:
         Connecting a load::
 
             relays: Relay = requires("load_relays")
@@ -159,7 +159,7 @@ class Relay(Protocol):
 class DigitalIO(Protocol):
     """Digital lines that can be driven and read, e.g. DUT straps or fixture sensors.
 
-    Example:
+    Examples:
         Waiting for the fixture lid sensor::
 
             dio: DigitalIO = requires("fixture_io")
@@ -179,7 +179,7 @@ class DigitalIO(Protocol):
 class Axis(Protocol):
     """One motion axis (linear or rotary). Safe state: stop.
 
-    Example:
+    Examples:
         Rotating a turntable to 45 degrees::
 
             table: Axis = requires("turntable")
@@ -214,7 +214,7 @@ class ShellResult(BaseModel):
         stderr: The command's error output, when the shell keeps it separate (SSH exec
             does; a console mixes it into ``output`` and leaves this empty).
 
-    Example:
+    Examples:
         >>> ShellResult(command="uname -r", output="6.1.0", exit_code=0).ok
         True
     """
@@ -230,7 +230,7 @@ class ShellResult(BaseModel):
     def ok(self) -> bool:
         """True unless the shell reported a non-zero exit code.
 
-        Example:
+        Examples:
             >>> ShellResult(command="false", output="", exit_code=1).ok
             False
         """
@@ -243,7 +243,7 @@ class Shell(Protocol):
     It may run over a serial console, Telnet or SSH. The test doesn't care which; the
     station profile decides.
 
-    Example:
+    Examples:
         Reading the DUT's firmware version::
 
             board: WidgetBoard = requires("dut")
@@ -266,7 +266,7 @@ class MessageChannel(Protocol):
       (`request`)
     - listening to unsolicited messages such as status broadcasts (`subscribe`)
 
-    Example:
+    Examples:
         Asking the DUT for its temperature::
 
             reply = self.board.ctrl.request(b"TEMP?", match=lambda m: m.startswith(b"TEMP "))

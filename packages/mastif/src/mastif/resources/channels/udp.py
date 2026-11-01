@@ -18,7 +18,7 @@ from mastif.resources.transports.datagram import DatagramChannel
 class UdpMessageChannel:
     """Message-based DUT communication over UDP.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeDatagramPeer
         >>> from mastif.resources.transports import UdpConfig
         >>> with FakeDatagramPeer(lambda m: b"ok:" + m) as peer:
@@ -34,7 +34,7 @@ class UdpMessageChannel:
     class Config(DriverConfig):
         """Where the DUT's UDP endpoint is.
 
-        Example:
+        Examples:
             ``{transport: {kind: udp, host: 192.168.1.50, port: 9000}}``
         """
 
@@ -43,7 +43,7 @@ class UdpMessageChannel:
     def __init__(self, cfg: Config, io: DatagramChannel) -> None:
         """Keep the datagram channel the station injects (and opens).
 
-        Example:
+        Examples:
             The station calls ``UdpMessageChannel(cfg, io=DatagramChannel(cfg.transport))``.
         """
         self.io = io
@@ -51,7 +51,7 @@ class UdpMessageChannel:
     def send(self, message: bytes) -> None:
         """Send one datagram; see `DatagramChannel.send`.
 
-        Example:
+        Examples:
             ``board.ctrl.send(b"LED ON")``
         """
         self.io.send(message)
@@ -65,7 +65,7 @@ class UdpMessageChannel:
     ) -> bytes:
         """Send and wait for the matching reply; see `DatagramChannel.request`.
 
-        Example:
+        Examples:
             ``board.ctrl.request(b"TEMP?", match=lambda m: m.startswith(b"TEMP "))``
         """
         return self.io.request(message, match, timeout, retries)
@@ -73,7 +73,7 @@ class UdpMessageChannel:
     def subscribe(self, handler: Callable[[bytes], None]) -> Callable[[], None]:
         """Receive every incoming datagram; see `DatagramChannel.subscribe`.
 
-        Example:
+        Examples:
             ``stop = board.ctrl.subscribe(events.append)``
         """
         return self.io.subscribe(handler)

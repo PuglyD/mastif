@@ -1,7 +1,7 @@
 # Guide: write a driver
 
 You'll write an instrument driver for a fictional SCPI bench supply, the "ACME PSU-X",
-register it, and use it from a station. Concepts: [Resources](../resources.md). Design:
+register it, and use it from a station. Concepts: [Resources](../../learn/architecture/resources.md). Design:
 ADR-0008, ADR-0011, ADR-0012, ADR-0016.
 
 ## 1. Pick or define the contract

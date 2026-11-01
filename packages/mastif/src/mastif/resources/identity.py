@@ -19,6 +19,7 @@ from collections.abc import Mapping
 from pydantic import BaseModel, ConfigDict, Field
 
 type Reading = float | int | str | bool
+"""Scalar diagnostic value stored in a resource's `Health.readings` mapping."""
 
 
 class Identity(BaseModel):
@@ -34,7 +35,7 @@ class Identity(BaseModel):
         revision: Firmware or hardware revision.
         extra: Any other identifying facts, as text.
 
-    Example:
+    Examples:
         >>> idn = Identity(vendor="ACME", model="PSU-X", serial="A123", revision="1.4")
         >>> idn.mismatches({"serial": "A123"})
         {}
@@ -60,7 +61,7 @@ class Identity(BaseModel):
         Returns:
             The value, or ``None`` if the resource did not report it.
 
-        Example:
+        Examples:
             >>> Identity(serial="A123", extra={"part_number": "900-0042"}).get("part_number")
             '900-0042'
         """
@@ -83,7 +84,7 @@ class Identity(BaseModel):
         Returns:
             ``{field: (expected, actual)}`` for every mismatch; empty if all match.
 
-        Example:
+        Examples:
             >>> Identity(serial="B999").mismatches({"serial": "A123", "model": "PSU-X"})
             {'serial': ('A123', 'B999'), 'model': ('PSU-X', None)}
         """
@@ -107,7 +108,7 @@ class Health(BaseModel):
         detail: Explanation, mainly when not ok.
         readings: Diagnostic readings, e.g. ``{"temperature_c": 41.5}``.
 
-    Example:
+    Examples:
         >>> Health(ok=False, detail="over-temperature", readings={"temperature_c": 82.0}).ok
         False
         >>> Health.good().ok
@@ -130,7 +131,7 @@ class Health(BaseModel):
         Returns:
             A `Health` with ``ok=True``.
 
-        Example:
+        Examples:
             >>> Health.good(temperature_c=35.0).readings
             {'temperature_c': 35.0}
         """

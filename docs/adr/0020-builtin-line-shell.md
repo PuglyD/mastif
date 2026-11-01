@@ -141,7 +141,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/channels/shell.py` |
 | Tests | `packages/mastif/tests/resources/test_drivers.py`, `test_telnet.py`, `test_ssh.py` (real Telnet and SSH servers), plus doctests (using `FakeStream`) |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-dut.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/wiki/guides/write-a-dut.md` |
 
 ## History
 

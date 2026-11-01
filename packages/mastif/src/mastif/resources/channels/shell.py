@@ -31,7 +31,7 @@ from mastif.resources.transports.stream import StreamTransport
 class LineShell:
     """A prompt-based command shell over a byte stream.
 
-    Example:
+    Examples:
         >>> from mastif_testing import FakeStream
         >>> stream = FakeStream()
         >>> stream.open()
@@ -61,7 +61,7 @@ class LineShell:
                 line would otherwise be mistaken for the first command's output.
             timeout: Default seconds to wait for a command to finish.
 
-        Example:
+        Examples:
             ``{transport: {kind: serial, port: COM3, baudrate: 115200}, prompt: "# "}``
         """
 
@@ -76,7 +76,7 @@ class LineShell:
     def __init__(self, cfg: Config, io: StreamTransport) -> None:
         """Keep the config and the stream the station injects (and opens).
 
-        Example:
+        Examples:
             The station calls ``LineShell(cfg, io=SerialTransport(cfg.transport))``.
         """
         self.cfg = cfg
@@ -88,7 +88,7 @@ class LineShell:
         Raises:
             TransportTimeout: If no prompt appears, e.g. wrong baud rate or DUT not booted.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeStream
             >>> s = FakeStream(); s.open()
             >>> cfg = LineShell.Config.model_validate(
@@ -111,7 +111,7 @@ class LineShell:
     def _run(self, command: str, timeout: float) -> str:
         """Send one command and return its output, without the echo and the prompt.
 
-        Example:
+        Examples:
             ``self._run("uname -r", 5.0)`` returns ``"6.1.0"``.
         """
         t = self.cfg.transport
@@ -136,7 +136,7 @@ class LineShell:
             TransportTimeout: If the prompt does not come back in time.
             ProtocolError: If the exit-code command prints something that isn't a number.
 
-        Example:
+        Examples:
             >>> from mastif_testing import FakeStream
             >>> s = FakeStream(); s.open()
             >>> cfg = LineShell.Config.model_validate({"transport": {"kind": "tcp", "host": "h",

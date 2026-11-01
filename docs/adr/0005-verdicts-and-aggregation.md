@@ -136,7 +136,7 @@ None. `aggregate` accepts any iterable of `Verdict`. A non-`Verdict` element rai
 |---|---|
 | Implementation | `packages/mastif/src/mastif/kernel/verdict.py` |
 | Tests | `packages/mastif/tests/kernel/test_limits_and_verdicts.py` |
-| Wiki | `docs/wiki/kernel.md` |
+| Wiki | `docs/learn/architecture/kernel.md` |
 
 ## History
 

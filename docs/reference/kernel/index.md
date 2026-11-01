@@ -1,15 +1,26 @@
 # Kernel
 
-Generated from docstrings. For the concepts, see [Kernel](../../wiki/kernel.md).
+The kernel gives the rest of mastif a shared vocabulary for values, acceptance
+criteria, and outcomes. Its operations are pure: they do not communicate with hardware.
 
-The kernel provides the pure data and evaluation vocabulary used by the other layers.
-Choose a module from the left navigation or the table below.
+- [`units`](#mastif.kernel.units) keeps units attached to values;
+  [`limits`](#mastif.kernel.limits) evaluates readings against acceptance criteria.
+- [`verdict`](#mastif.kernel.verdict) combines outcomes;
+  [`results`](#mastif.kernel.results) records measurements, checks, and tables.
+- [`ids`](#mastif.kernel.ids) identifies runs and plan positions;
+  [`errors`](#mastif.kernel.errors) defines the shared error hierarchy.
 
-| Module | Responsibility |
-|---|---|
-| [Units and quantities](units.md) | Keep physical units attached to values |
-| [Limits and evaluation](limits.md) | Express acceptance criteria and evaluate readings |
-| [Verdicts and aggregation](verdict.md) | Combine outcomes consistently |
-| [Results](results.md) | Record measurements, checks, and tables |
-| [Identifiers and positions](ids.md) | Identify runs and locations in a plan |
-| [Errors](errors.md) | Common framework errors and kernel-specific failures |
+Expand modules and classes in the right-hand TOC to browse public and private members.
+For explanations and design decisions, see [Kernel concepts](../../learn/architecture/kernel.md).
+
+::: mastif.kernel.units
+
+::: mastif.kernel.limits
+
+::: mastif.kernel.verdict
+
+::: mastif.kernel.results
+
+::: mastif.kernel.ids
+
+::: mastif.kernel.errors

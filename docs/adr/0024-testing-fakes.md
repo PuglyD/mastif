@@ -153,7 +153,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif-testing/src/mastif_testing/fakes.py` |
 | Tests | used across `packages/mastif/tests/resources/*`, plus doctests |
-| Wiki | `docs/wiki/testing-kit.md`, `docs/wiki/guides/test-your-driver.md` |
+| Wiki | `docs/learn/architecture/testing-kit.md`, `docs/wiki/guides/test-your-driver.md` |
 
 ## History
 

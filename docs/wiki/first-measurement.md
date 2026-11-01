@@ -85,9 +85,9 @@ the same result model evaluates it.
 
 | Learn more | Why it matters |
 |---|---|
-| [Kernel concepts](kernel.md) | Understand limits, checks, tables, and aggregation |
+| [Kernel concepts](../learn/architecture/kernel.md) | Understand limits, checks, tables, and aggregation |
 | [Measurement reference][mastif.kernel.results.Measurement] | Inspect constructor parameters and result fields |
 | [Result design](../adr/0006-results.md) | Understand why verdicts are derived from evidence |
-| [Resource concepts](resources.md) | Replace simulated input with an instrument capability |
+| [Resource concepts](../learn/architecture/resources.md) | Replace simulated input with an instrument capability |
 
-**Next:** [Understand resources](resources.md), or [return to the guided tour](walkthrough.md).
+**Next:** [Understand resources](../learn/architecture/resources.md), or [return to the guided tour](walkthrough.md).

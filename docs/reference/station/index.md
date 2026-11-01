@@ -1,12 +1,20 @@
 # Station
 
-Generated from docstrings. For the concepts, see [Station](../../wiki/station.md).
+The station layer turns a configuration profile into a working bench. It connects
+resource names and requested capabilities to driver instances and coordinates their lifecycle.
 
-The station layer composes one bench from a profile and coordinates its resources.
+- [`profile`](#mastif.station.profile) describes resources, role mappings, and simulation settings.
+- [`station`](#mastif.station.station) composes the bench and resolves requested capabilities.
+- [`manager`](#mastif.station.manager) coordinates opening, verification, safe-state attempts,
+  and closing; [`errors`](#mastif.station.errors) describes composition and resolution failures.
 
-| Module | Responsibility |
-|---|---|
-| [Profiles](profile.md) | Describe resources, role mappings, and simulation configuration |
-| [Composition and role resolution](station.md) | Build the station and resolve requested capabilities |
-| [Resource lifecycle](manager.md) | Coordinate opening, verification, safe-state actions, and closing |
-| [Errors](errors.md) | Report station composition and role-resolution failures |
+Expand modules and classes in the right-hand TOC to browse public and private members.
+For explanations and design decisions, see [Station concepts](../../learn/architecture/station.md).
+
+::: mastif.station.profile
+
+::: mastif.station.station
+
+::: mastif.station.manager
+
+::: mastif.station.errors

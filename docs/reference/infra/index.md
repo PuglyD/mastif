@@ -1,13 +1,23 @@
 # Infrastructure
 
-Generated from docstrings. For the concepts, see [Infra](../../wiki/infra.md).
+Infrastructure sets up application-wide services explicitly, so each application
+can control its settings and diagnostics and pass them to the components that need them.
 
-Infrastructure provides explicit application setup and diagnostic services.
+- [`config`](#mastif.infra.config) loads settings;
+  [`logs`](#mastif.infra.logs) configures logging and diagnostic output.
+- [`version`](#mastif.infra.version) reports software versions;
+  [`bootstrap`](#mastif.infra.bootstrap) assembles application services.
+- [`errors`](#mastif.infra.errors) describes configuration and infrastructure failures.
 
-| Module | Responsibility |
-|---|---|
-| [Settings](config.md) | Load and validate application settings |
-| [Logging](logs.md) | Configure logging and diagnostic output |
-| [Version information](version.md) | Describe installed software versions |
-| [Application bootstrap](bootstrap.md) | Assemble application-wide services explicitly |
-| [Errors](errors.md) | Report configuration and infrastructure failures |
+Expand modules and classes in the right-hand TOC to browse public and private members.
+For explanations and design decisions, see [Infrastructure concepts](../../learn/architecture/infra.md).
+
+::: mastif.infra.config
+
+::: mastif.infra.logs
+
+::: mastif.infra.version
+
+::: mastif.infra.bootstrap
+
+::: mastif.infra.errors

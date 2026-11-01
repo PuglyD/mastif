@@ -88,7 +88,7 @@ Identical to `DatagramChannel`, because it is pure delegation.
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/channels/udp.py` |
 | Tests | `packages/mastif/tests/resources/test_drivers.py`, plus doctests |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-dut.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/wiki/guides/write-a-dut.md` |
 
 ## History
 

@@ -11,7 +11,7 @@
 > **Who this is for:** an engineer who joined today. You should know what a byte stream
 > ([ADR-0014](0014-byte-streams.md)) and I/O injection ([ADR-0018](0018-io-injection.md))
 > are. SSH concepts are explained as they appear; terms are in the
-> [glossary](../wiki/glossary.md).
+> [glossary](../learn/architecture/glossary.md).
 
 ## 1. Summary
 
@@ -237,7 +237,7 @@ the next `run`.
 | Config | `packages/mastif/src/mastif/resources/transports/config.py` (`SshConfig`) |
 | Tests | `packages/mastif/tests/resources/test_ssh.py` (fake client, plus a real in-process server) |
 | Fake for SDK authors | `packages/mastif-testing/src/mastif_testing/fakes.py` (`FakeSshSession`) |
-| Wiki | `docs/wiki/transports.md` |
+| Wiki | `docs/learn/architecture/transports.md` |
 
 ## History
 

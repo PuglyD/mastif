@@ -158,7 +158,7 @@ git is normal on stations.
 | Implementation | `packages/mastif/src/mastif/infra/version.py` |
 | Build hook | `packages/mastif/hatch_build.py`, enabled by `[tool.hatch.build.hooks.custom]` in `packages/mastif/pyproject.toml` |
 | Tests | `packages/mastif/tests/infra/test_version_and_bootstrap.py`, plus doctests |
-| Wiki | `docs/wiki/infra.md` |
+| Wiki | `docs/learn/architecture/infra.md` |
 
 ## History
 

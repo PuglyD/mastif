@@ -135,7 +135,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/kernel/ids.py` |
 | Tests | `packages/mastif/tests/kernel/test_results_and_ids.py`, plus doctests |
-| Wiki | `docs/wiki/kernel.md` |
+| Wiki | `docs/learn/architecture/kernel.md` |
 
 ## History
 

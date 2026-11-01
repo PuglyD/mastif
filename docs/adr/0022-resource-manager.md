@@ -8,8 +8,8 @@
 | **Layer** | station |
 | **Related** | [ADR-0010](0010-identity-and-health.md) supplies verification reports; [ADR-0011](0011-drivers-and-duts.md) defines hooks and `make_safe`; [ADR-0023](0023-station-composition-root.md) composes and owns the manager; [ADR-0002](0002-error-model.md) defines the error hierarchy |
 
-**Reading path:** start with [Resources](../wiki/resources.md) for the concepts, then
-[Life of a station](../wiki/life-of-a-station.md) for the end-to-end flow. This record
+**Reading path:** start with [Resources](../learn/architecture/resources.md) for the concepts, then
+[Life of a station](../learn/architecture/life-of-a-station.md) for the end-to-end flow. This record
 specifies the current lifecycle algorithm and its limits; engine integration is planned.
 
 ## 1. Summary
@@ -202,9 +202,9 @@ sequenceDiagram
 
 | What | Where |
 |---|---|
-| Implementation / API | [`mastif.station.manager`](../reference/station/manager.md) |
+| Implementation / API | [`mastif.station.manager`](../reference/station/index.md#mastif.station.manager) |
 | Tests | `packages/mastif/tests/station/test_station.py` (ordering, rollback, identity, health, safe state, events) |
-| Wiki | [Station](../wiki/station.md), [Life of a station](../wiki/life-of-a-station.md), [Resources](../wiki/resources.md) |
+| Wiki | [Station](../learn/architecture/station.md), [Life of a station](../learn/architecture/life-of-a-station.md), [Resources](../learn/architecture/resources.md) |
 
 ## History
 

@@ -220,7 +220,7 @@ single root, `MastifError`. See ADR-0002.
 |---|---|
 | Layer contract | `pyproject.toml`, `[tool.importlinter]` |
 | Rules for contributors | `AGENTS.md`, *Layering* |
-| Wiki overview | `docs/wiki/architecture.md` |
+| Wiki overview | `docs/learn/architecture/index.md` |
 
 ## History
 

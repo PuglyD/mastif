@@ -221,7 +221,7 @@ Hooks may raise anything. The station handles hook errors (ADR-0022).
 | Implementation | `packages/mastif/src/mastif/resources/driver.py` |
 | Doc example driver | `packages/mastif/src/mastif/resources/_examples.py` |
 | Tests | `packages/mastif/tests/resources/test_drivers.py`, plus doctests |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-driver.md`, `docs/wiki/guides/write-a-dut.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/wiki/guides/write-a-driver.md`, `docs/wiki/guides/write-a-dut.md` |
 
 ## History
 

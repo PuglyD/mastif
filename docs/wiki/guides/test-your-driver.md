@@ -1,6 +1,6 @@
 # Guide: test your driver without hardware
 
-Concepts: [Testing kit](../testing-kit.md). Design: ADR-0024, ADR-0025.
+Concepts: [Testing kit](../../learn/architecture/testing-kit.md). Design: ADR-0024, ADR-0025.
 
 ## Install
 

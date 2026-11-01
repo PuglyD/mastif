@@ -1,7 +1,7 @@
 # Guide: bootstrap an application
 
 How a mastif-based application starts: settings, logging and version, then the
-station. Concepts: [Infra](../infra.md). Design: ADR-0026–0029.
+station. Concepts: [Infra](../../learn/architecture/infra.md). Design: ADR-0026–0029.
 
 ## 1. Lay out the station's folders
 

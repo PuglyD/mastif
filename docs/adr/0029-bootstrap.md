@@ -131,7 +131,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/infra/bootstrap.py` |
 | Tests | `packages/mastif/tests/infra/test_version_and_bootstrap.py`, plus doctests |
-| Wiki | `docs/wiki/infra.md`, `docs/wiki/guides/bootstrap-an-application.md` |
+| Wiki | `docs/learn/architecture/infra.md`, `docs/wiki/guides/bootstrap-an-application.md` |
 
 ## History
 

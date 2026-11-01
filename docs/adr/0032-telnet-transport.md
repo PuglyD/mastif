@@ -10,7 +10,7 @@
 
 > **Who this is for:** an engineer who joined today. You need to know what a byte
 > stream is in mastif ([ADR-0014](0014-byte-streams.md)); everything Telnet-specific is
-> explained here. Terms are in the [glossary](../wiki/glossary.md).
+> explained here. Terms are in the [glossary](../learn/architecture/glossary.md).
 
 ## 1. Summary
 
@@ -220,7 +220,7 @@ the last bytes received; the connection is closed. A server hanging up mid-run r
 | Implementation | `packages/mastif/src/mastif/resources/transports/telnet.py` |
 | Config | `packages/mastif/src/mastif/resources/transports/config.py` (`TelnetConfig`) |
 | Tests | `packages/mastif/tests/resources/test_telnet.py` (a real localhost Telnet server) |
-| Wiki | `docs/wiki/transports.md` |
+| Wiki | `docs/learn/architecture/transports.md` |
 
 ## History
 

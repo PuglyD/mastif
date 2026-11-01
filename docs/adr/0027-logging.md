@@ -183,7 +183,7 @@ and never raises into application code.
 | Implementation | `packages/mastif/src/mastif/infra/logs.py` |
 | Bundled config | `packages/mastif/src/mastif/infra/default_logging.yaml` |
 | Tests | `packages/mastif/tests/infra/test_logs.py`, plus doctests |
-| Wiki | `docs/wiki/infra.md`, `docs/wiki/guides/bootstrap-an-application.md` |
+| Wiki | `docs/learn/architecture/infra.md`, `docs/wiki/guides/bootstrap-an-application.md` |
 
 ## History
 

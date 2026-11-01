@@ -116,7 +116,7 @@ YAML → StationProfile (raw dict) → DriverConfig.model_validate → Transport
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/transports/config.py` |
 | Tests | `packages/mastif/tests/resources/test_transports.py` |
-| Wiki | `docs/wiki/transports.md`, `docs/wiki/guides/write-a-station-profile.md` |
+| Wiki | `docs/learn/architecture/transports.md`, `docs/wiki/guides/write-a-station-profile.md` |
 
 ## History
 

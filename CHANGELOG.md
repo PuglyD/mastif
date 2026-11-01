@@ -70,16 +70,38 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 ### Documentation
 
+- Prepared a workflow that builds the docs strictly and deploys to GitHub Pages from
+  `develop`; publication remains on hold.
+- Reorganised the docs into Getting Started (intro and a tutorial ending in deployment) and
+  Learn (concepts, system design, architecture as built, project status, operation, recipes).
+- Rebuilt the homepage around a runnable quick start and the org-centric framing, with
+  technology badges. Adopted the Vesper palette (dark by default), IBM Plex Sans and JetBrains Mono.
+- Moved the Architecture section into Learn under `docs/learn/architecture/`, and gathered the
+  overview and execution/runtime chapters into System design under `docs/learn/system-design/`.
+  Learn covers fundamentals, system design, architecture as built, status and operations;
+  the practical tutorial lives in Getting Started.
+- Added generic framework requirements, the high-level concept system design and its
+  diagram, architectural styles and patterns, and the distinction between evidence and
+  application decisions to System design. Rewrote the architecture pages to match the
+  course. Kept the separate platform-stack and station-deployment designs in a local
+  archive, outside the publishable documentation history.
+- Rewrote the complete Learn course from first principles, with the class-based `Task` design: 58 pages covering the tutorial,
+  hardware integration, execution/runtime, station operation, recipes, and background.
+  Added three runnable hardware-free examples and clearly labelled proposed author APIs,
+  plan formats, CLI transcripts, and runtime behaviour for review.
 - Added an editable tlDiagram architecture map with source-linked Python elements,
   evidenced relationships, responsibility-based drill-downs, and explicitly planned work.
   Every implemented layer expands to modules, classes, functions, members, and types,
   with connectors generated from the source AST and hand-written wording kept in `.tld/curated.yaml`.
+- Added quick orientation summaries to every layer reference and documented the
+  agreed single-page, collapsible Python-hierarchy layout in contributor instructions.
 - Exposed private classes, functions, methods, and attributes in module reference pages.
 - Enabled undocumented public members in the API reference, made unit constants
   individually discoverable, and documented public globals and aliases across both
   packages. Added reference coverage for health readings and the built-in driver tuple.
-- Split API reference modules into dedicated pages under collapsible layer categories;
-  added nested Transport and Channel navigation, with overview pages and ADR links.
+- Consolidated API references into one page per layer, with explicit peer links for
+  every layer and a collapsible right-hand TOC using Python module, class, and member
+  names. Removed editorial grouping headings and retained public/private symbol coverage.
 - Standardised API reference source folders: every section now has its own `index.md`,
   with updated navigation and links and unchanged published section URLs.
 - Collapsible nested sections in the right-hand table of contents, with accessible

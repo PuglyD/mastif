@@ -137,7 +137,7 @@ None are defined here. Implementations raise transport, protocol or fault errors
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/std.py` |
 | Tests | `packages/mastif/tests/resources/test_contracts_and_identity.py` |
-| Wiki | `docs/wiki/resources.md` |
+| Wiki | `docs/learn/architecture/resources.md` |
 
 ## History
 

@@ -1,10 +1,16 @@
 # Testing kit
 
-Generated from docstrings. For the concepts, see [Testing kit](../../wiki/testing-kit.md).
+The `mastif_testing` package helps exercise driver integrations without physical
+hardware, using controlled responses and repeatable checks.
 
-The `mastif_testing` package helps test integrations without physical hardware.
+- [`fakes`](#mastif_testing.fakes) provides scripted I/O substitutes and records
+  interactions so tests can assert what a driver sent or received.
+- [`conformance`](#mastif_testing.conformance) checks capability contracts and
+  driver lifecycle behaviour.
 
-| Module | Responsibility |
-|---|---|
-| [Fakes](fakes.md) | Supply controlled I/O and device responses |
-| [Conformance checks](conformance.md) | Check contracts and driver lifecycle behaviour |
+Expand modules and classes in the right-hand TOC to browse public and private members.
+For explanations and design decisions, see [Testing kit concepts](../../learn/architecture/testing-kit.md).
+
+::: mastif_testing.fakes
+
+::: mastif_testing.conformance

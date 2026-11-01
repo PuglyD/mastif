@@ -1,5 +1,10 @@
 # Start here
 
+!!! tip "Looking for the complete learning journey?"
+    [Learn mastif](../getting-started/intro/route.md) is the full course, covering tests, stations,
+    hardware integration, and the runtime design. This page is a compact orientation to the
+    building blocks you can use directly today.
+
 You know Python and want to understand how mastif helps build a test system.
 You do not need prior experience with automated test equipment or access to a bench.
 
@@ -22,10 +27,10 @@ execution on top of them.
 
 | Your goal | Start with | Then read |
 |---|---|---|
-| See the framework as a whole | [Guided walkthrough](walkthrough.md) | [System architecture](architecture.md) |
-| Run a small example | [Your first measurement](first-measurement.md) | [Kernel concepts](kernel.md) |
-| Integrate an instrument | [Resource concepts](resources.md) | [Write a driver](guides/write-a-driver.md) |
-| Connect a bench | [Station concepts](station.md) | [Write a station profile](guides/write-a-station-profile.md) |
+| See the framework as a whole | [Guided walkthrough](walkthrough.md) | [System architecture](../learn/architecture/index.md) |
+| Run a small example | [Your first measurement](first-measurement.md) | [Kernel concepts](../learn/architecture/kernel.md) |
+| Integrate an instrument | [Resource concepts](../learn/architecture/resources.md) | [Write a driver](guides/write-a-driver.md) |
+| Connect a bench | [Station concepts](../learn/architecture/station.md) | [Write a station profile](guides/write-a-station-profile.md) |
 
 ## A few terms you will encounter
 
@@ -36,7 +41,7 @@ execution on top of them.
 - **Role:** the name a test uses to request a capability, such as `psu_main`.
 - **Profile:** configuration describing the resources and role mappings on a bench.
 
-The [glossary](glossary.md) is the reference for the wider vocabulary.
+The [glossary](../learn/architecture/glossary.md) is the reference for the wider vocabulary.
 
 ## What to expect from the examples
 

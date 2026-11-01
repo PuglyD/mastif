@@ -127,7 +127,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/registry.py`, `packages/mastif/src/mastif/resources/channels/__init__.py` |
 | Tests | `packages/mastif/tests/resources/test_drivers.py` |
-| Wiki | `docs/wiki/resources.md`, `docs/wiki/guides/write-a-driver.md` |
+| Wiki | `docs/learn/architecture/resources.md`, `docs/wiki/guides/write-a-driver.md` |
 
 ## History
 

@@ -12,7 +12,7 @@
 > about software licences. It explains the licence families from scratch, then why
 > mastif chose the one it did, and what that means for you when you add a dependency
 > or build an org SDK. Terms are explained on first use and collected in the
-> [glossary](../wiki/glossary.md). **This ADR is an engineering record, not legal
+> [glossary](../learn/architecture/glossary.md). **This ADR is an engineering record, not legal
 > advice.** A lawyer must confirm the commercial terms before any licence is sold.
 
 ## 1. Summary

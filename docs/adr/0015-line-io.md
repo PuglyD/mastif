@@ -133,7 +133,7 @@ sequenceDiagram
 |---|---|
 | Implementation | `packages/mastif/src/mastif/resources/transports/lineio.py` |
 | Tests | `packages/mastif/tests/resources/test_transports.py` |
-| Wiki | `docs/wiki/transports.md` |
+| Wiki | `docs/learn/architecture/transports.md` |
 
 ## History
 

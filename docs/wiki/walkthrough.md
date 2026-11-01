@@ -14,7 +14,7 @@ mastif's kernel brings the reading, unit, and acceptance limit together in a res
 The verdict is calculated from those inputs.
 
 **Try it:** [Your first measurement](first-measurement.md) includes runnable code and
-a terminal demonstration. Then read [Kernel](kernel.md) for checks and tables.
+a terminal demonstration. Then read [Kernel](../learn/architecture/kernel.md) for checks and tables.
 
 ## 2. Separate a capability from a device model
 
@@ -22,8 +22,8 @@ A test needs to measure current. It should not need to know whether the instrume
 uses TCP, a serial port, or a vendor library. A **contract** describes the capability;
 a **driver** implements it; a **transport** carries the device's commands.
 
-**Explore:** [Resources](resources.md) explains these boundaries using a power supply.
-The [identity and health reference](../reference/resources/identity.md) shows how
+**Explore:** [Resources](../learn/architecture/resources.md) explains these boundaries using a power supply.
+The [identity and health reference](../reference/resources/index.md#mastif.resources.identity) shows how
 drivers report what is connected and whether it is ready.
 
 ## 3. Assemble one bench
@@ -45,7 +45,7 @@ Diagram reading: the profile and registry are inputs to composition; the resourc
 manager coordinates the resulting objects. These arrows describe responsibility,
 not Python imports.
 
-**Explore:** [Station](station.md) · [Station composition decision](../adr/0023-station-composition-root.md)
+**Explore:** [Station](../learn/architecture/station.md) · [Station composition decision](../adr/0023-station-composition-root.md)
 · [Resource lifecycle decision](../adr/0022-resource-manager.md).
 
 ## 4. Follow the failure path too
@@ -59,7 +59,7 @@ exceptions. Hardware outcomes depend on device behaviour and the available shutd
 actions. [ADR-0022](../adr/0022-resource-manager.md) documents the exact ordering and
 limitations rather than promising that software can always make hardware safe.
 
-**Explore:** [Error map](errors.md) for the distinction between a failed measurement
+**Explore:** [Error map](../learn/architecture/errors.md) for the distinction between a failed measurement
 and a failure to obtain a measurement.
 
 ## 5. Place execution in the wider system
@@ -71,8 +71,8 @@ and a failure to obtain a measurement.
 The intended execution layer sits above station composition. Organisation-specific
 tests and interfaces use the framework without putting product knowledge into its core.
 
-**Explore:** [System architecture](architecture.md) for the boundaries;
-[Life of a station](life-of-a-station.md) for an end-to-end flow with planned steps
+**Explore:** [System architecture](../learn/architecture/index.md) for the boundaries;
+[Life of a station](../learn/architecture/life-of-a-station.md) for an end-to-end flow with planned steps
 explicitly marked; [Roadmap](roadmap.md) for status.
 
 ## Continue from the tour

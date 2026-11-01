@@ -1,5 +1,6 @@
 site_name: mastif
-site_description: A domain-neutral framework for automated test equipment
+site_description: The org-centric hardware testing framework and platform
+site_url: https://puglyd.github.io/mastif/
 repo_url: https://github.com/PuglyD/mastif
 repo_name: PuglyD/mastif
 watch:
@@ -7,15 +8,22 @@ watch:
   - packages/mastif-testing/src
 theme:
   name: material
-  font: false
+  logo: assets/mastif-logo-web.png
+  favicon: assets/mastif-favicon.png
+  font:
+    text: IBM Plex Sans
+    code: JetBrains Mono
   palette:
-    - scheme: default
-      toggle: {icon: material/brightness-7, name: Dark mode}
     - scheme: slate
+      primary: custom
+      accent: custom
       toggle: {icon: material/brightness-4, name: Light mode}
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle: {icon: material/brightness-7, name: Dark mode}
   features:
     - navigation.tabs
-    - navigation.indexes
     - navigation.path
     - navigation.top
     - navigation.footer
@@ -83,29 +91,112 @@ nav:
       - Guided walkthrough: wiki/walkthrough.md
       - Project status: wiki/roadmap.md
       - Licensing: wiki/licensing.md
+  - Getting Started:
+      - Intro:
+          - What is mastif?: getting-started/intro/what-is-mastif.md
+          - What mastif wants to solve: getting-started/intro/problem.md
+          - Why mastif?: getting-started/intro/why-mastif.md
+          - Who is this for: getting-started/intro/who.md
+          - How to learn mastif: getting-started/intro/how-to-learn.md
+          - The route through the course: getting-started/intro/route.md
+      - Tutorial — Build your first tests and deploy them:
+          - Installation: getting-started/tutorial/installation.md
+          - Writing tests:
+              - Your first test run: getting-started/tutorial/writing-tests/first-run.md
+              - Writing a reusable test: getting-started/tutorial/writing-tests/reusable-tests.md
+              - Parameters and configuration: getting-started/tutorial/writing-tests/parameters.md
+              - Resources and capabilities: getting-started/tutorial/writing-tests/resources.md
+              - Requesting instruments and resources: getting-started/tutorial/writing-tests/requirements.md
+              - Combining tests into a plan: getting-started/tutorial/writing-tests/plans.md
+              - Repeats, sweeps, and DUT slots: getting-started/tutorial/writing-tests/loops.md
+              - Setup, cleanup, and cancellation: getting-started/tutorial/writing-tests/cleanup.md
+              - Packaging a test project: getting-started/tutorial/writing-tests/packaging.md
+              - Outcomes:
+                  - Measurements and units: getting-started/tutorial/writing-tests/measurements.md
+                  - Limits, checks, and verdicts: getting-started/tutorial/writing-tests/limits.md
+                  - Failed checks and execution errors: getting-started/tutorial/writing-tests/failures.md
+          - First results:
+              - Understanding the results: getting-started/tutorial/first-results/results.md
+              - Progress and saved results: getting-started/tutorial/first-results/progress.md
+          - Build your own hardware integration:
+              - Your first driver: getting-started/tutorial/hardware-integration/first-driver.md
+              - Capability contracts: getting-started/tutorial/hardware-integration/contracts.md
+              - Configuration and injection: getting-started/tutorial/hardware-integration/configuration.md
+              - Device communication: getting-started/tutorial/hardware-integration/communication.md
+              - Identity, health, and safe state: getting-started/tutorial/hardware-integration/identity.md
+              - Modelling a DUT: getting-started/tutorial/hardware-integration/duts.md
+              - Channels and child resources: getting-started/tutorial/hardware-integration/channels.md
+              - Testing with fake I/O: getting-started/tutorial/hardware-integration/fake-io.md
+              - Contract and lifecycle conformance: getting-started/tutorial/hardware-integration/conformance.md
+              - Packaging an organisation SDK: getting-started/tutorial/hardware-integration/packaging.md
+          - Running and deploying on a station PC:
+              - Station profiles and roles: getting-started/tutorial/deploying/profiles.md
+              - Working with simulation: getting-started/tutorial/deploying/simulation.md
+              - Connecting real hardware: getting-started/tutorial/deploying/hardware.md
+              - Opening and closing: getting-started/tutorial/deploying/lifecycle.md
+              - Deploying to a station PC: getting-started/tutorial/deploying/deploy.md
   - Learn:
-      - Start here: wiki/start-here.md
+      - Overview: learn/index.md
+      - Framework fundamental concepts:
+          - The system at a glance: learn/fundamentals/index.md
+          - Python types and protocols: learn/fundamentals/types.md
+          - Dependency injection: learn/fundamentals/injection.md
+          - Dimensional correctness: learn/fundamentals/units.md
+          - Concurrency versus parallelism: learn/fundamentals/concurrency.md
+      - System design and architecture:
+          - System design:
+              - Design, architecture, and platforms: learn/system-design/concepts.md
+              - What the system must do: learn/system-design/specification.md
+              - The concept system design: learn/system-design/station-and-server.md
+              - Styles and patterns: learn/system-design/styles-and-patterns.md
+              - Verdicts and dispositions: learn/system-design/dispositions.md
+              - From invocation to result: learn/system-design/run-lifecycle.md
+              - Who owns what?: learn/system-design/ownership.md
+              - Resource lifetimes and access: learn/system-design/resource-lifetimes.md
+              - Concurrency and blocking calls: learn/system-design/concurrency.md
+              - Cancellation and timeouts: learn/system-design/cancellation.md
+              - Failure propagation and recovery: learn/system-design/recovery.md
+              - Direct and persistent modes: learn/system-design/execution-modes.md
+              - Events, state, and clients: learn/system-design/events-state.md
+          - Architecture as built:
+              - System overview: learn/architecture/index.md
+              - Life of a station: learn/architecture/life-of-a-station.md
+              - Concepts:
+                  - Kernel: learn/architecture/kernel.md
+                  - Infra: learn/architecture/infra.md
+                  - Resources: learn/architecture/resources.md
+                  - Transports: learn/architecture/transports.md
+                  - Station: learn/architecture/station.md
+                  - Testing kit: learn/architecture/testing-kit.md
+              - Field notes: learn/architecture/field-notes.md
+              - Error map: learn/architecture/errors.md
+              - Glossary: learn/architecture/glossary.md
+      - What exists today: learn/status.md
+      - Operate a station:
+          - Settings and bootstrap: learn/operations/bootstrap.md
+          - Logging and diagnostics: learn/operations/logging.md
+          - Preparing and validating: learn/operations/preflight.md
+          - Environments and profiles: learn/operations/environments.md
+          - Versions and reproducibility: learn/operations/reproducibility.md
+          - Persistent station service: learn/operations/service.md
+          - Operator interfaces: learn/operations/operator-ui.md
+          - Troubleshooting: learn/operations/troubleshooting.md
+      - How-to recipes:
+          - SCPI over TCP, serial, or VISA: learn/recipes/scpi.md
+          - SSH and consoles: learn/recipes/shell.md
+          - UDP request/reply: learn/recipes/udp.md
+          - Wrap a vendor DLL: learn/recipes/native-library.md
+          - Replace hardware with simulation: learn/recipes/simulation.md
+          - Identity and health failures: learn/recipes/identity-failures.md
+  - Guides:
+      - Start here (direct-use guide): wiki/start-here.md
       - Your first measurement: wiki/first-measurement.md
       - Write a driver: wiki/guides/write-a-driver.md
-  - Guides:
       - Write a DUT type: wiki/guides/write-a-dut.md
       - Write a station profile: wiki/guides/write-a-station-profile.md
       - Wrap a vendor DLL: wiki/guides/wrap-a-vendor-dll.md
       - Test your driver: wiki/guides/test-your-driver.md
       - Bootstrap an application: wiki/guides/bootstrap-an-application.md
-  - Architecture:
-      - System overview: wiki/architecture.md
-      - Life of a station: wiki/life-of-a-station.md
-      - Concepts:
-          - Kernel: wiki/kernel.md
-          - Infra: wiki/infra.md
-          - Resources: wiki/resources.md
-          - Transports: wiki/transports.md
-          - Station: wiki/station.md
-          - Testing kit: wiki/testing-kit.md
-      - Field notes: wiki/field-notes.md
-      - Error map: wiki/errors.md
-      - Glossary: wiki/glossary.md
   - Decisions:
       - Index: adr/index.md
       - Template: adr/0000-template.md
@@ -151,55 +242,11 @@ nav:
           - 0028 Version information: adr/0028-version-information.md
           - 0029 Bootstrap: adr/0029-bootstrap.md
   - API reference:
-      - Kernel:
-          - reference/kernel/index.md
-          - Units and quantities: reference/kernel/units.md
-          - Limits and evaluation: reference/kernel/limits.md
-          - Verdicts and aggregation: reference/kernel/verdict.md
-          - Results: reference/kernel/results.md
-          - Identifiers and positions: reference/kernel/ids.md
-          - Errors: reference/kernel/errors.md
-      - Infrastructure:
-          - reference/infra/index.md
-          - Settings: reference/infra/config.md
-          - Logging: reference/infra/logs.md
-          - Version information: reference/infra/version.md
-          - Application bootstrap: reference/infra/bootstrap.md
-          - Errors: reference/infra/errors.md
-      - Resources:
-          - reference/resources/index.md
-          - Contracts: reference/resources/contracts.md
-          - Standard capabilities: reference/resources/std.md
-          - Drivers and DUTs: reference/resources/driver.md
-          - Identity and health: reference/resources/identity.md
-          - Driver registry: reference/resources/registry.md
-          - Transports:
-              - reference/resources/transports/index.md
-              - Configuration: reference/resources/transports/config.md
-              - Byte streams: reference/resources/transports/stream.md
-              - Line I/O: reference/resources/transports/lineio.md
-              - SCPI: reference/resources/transports/scpi.md
-              - Datagrams: reference/resources/transports/datagram.md
-              - Telnet: reference/resources/transports/telnet.md
-              - SSH: reference/resources/transports/ssh.md
-              - Native libraries: reference/resources/transports/native.md
-              - I/O factory: reference/resources/transports/factory.md
-          - Channels:
-              - reference/resources/channels/index.md
-              - UDP messages: reference/resources/channels/udp.md
-              - Line shell: reference/resources/channels/shell.md
-              - SSH shell: reference/resources/channels/ssh.md
-          - Errors: reference/resources/errors.md
-      - Station:
-          - reference/station/index.md
-          - Profiles: reference/station/profile.md
-          - Composition and role resolution: reference/station/station.md
-          - Resource lifecycle: reference/station/manager.md
-          - Errors: reference/station/errors.md
-      - Testing kit:
-          - reference/testing/index.md
-          - Fakes: reference/testing/fakes.md
-          - Conformance checks: reference/testing/conformance.md
+      - Kernel: reference/kernel/index.md
+      - Infrastructure: reference/infra/index.md
+      - Resources: reference/resources/index.md
+      - Station: reference/station/index.md
+      - Testing kit: reference/testing/index.md
   - Contributing:
       - Working on mastif: wiki/working-on-mastif.md
       - Documentation style: wiki/documentation-style.md

@@ -24,7 +24,7 @@ elements:
       and a Station explicitly, calls capabilities by role, and records kernel results. This is not an implemented mastif
       CLI or engine.
     technology: Python
-    file_path: docs/wiki/life-of-a-station.md
+    file_path: docs/learn/architecture/life-of-a-station.md
     tags:
     - external
     - current
@@ -39,7 +39,7 @@ elements:
     kind: external
     description: External bench devices reached over TCP, serial, VISA, UDP, Telnet, SSH, or a locally installed vendor library.
       This box represents the system boundary, not code shipped in mastif.
-    file_path: docs/wiki/transports.md
+    file_path: docs/learn/architecture/transports.md
     tags:
     - external
     - hardware

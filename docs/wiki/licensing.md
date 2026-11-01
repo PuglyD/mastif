@@ -2,7 +2,7 @@
 
 mastif is licensed under the **GNU Affero General Public License, version 3 or later**
 (`AGPL-3.0-or-later`). The author also sells a **commercial licence** for use without
-the AGPL's obligations. Offering both is called [dual licensing](glossary.md). The full
+the AGPL's obligations. Offering both is called [dual licensing](../learn/architecture/glossary.md). The full
 reasoning is in [ADR-0031](../adr/0031-licensing-and-dependency-policy.md). This page is
 the short version. It is not legal advice.
 
@@ -33,7 +33,7 @@ internal test station counts as commercial use. See ADR-0031, section 2.4.
 
 External contributions are **not accepted** at the moment. Selling a commercial licence
 requires the author to own all of the code. If contributions open later, they will need
-a [CLA](glossary.md) (Contributor Licence Agreement).
+a [CLA](../learn/architecture/glossary.md) (Contributor Licence Agreement).
 
 ## Dependencies
 

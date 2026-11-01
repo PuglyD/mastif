@@ -12,7 +12,7 @@ You need Python 3.12 or newer, Git, and [uv](https://docs.astral.sh/uv/).
 For this development version, work from the source checkout:
 
 ```console
-git clone https://github.com/PuglyD/mastif.git
+git clone --branch develop https://github.com/PuglyD/mastif.git
 cd mastif
 uv sync --group docs
 ```

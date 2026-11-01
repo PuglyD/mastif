@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 from collections import defaultdict
+from contextlib import suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -89,20 +90,39 @@ SYMBOL_REFS = {
     "mastif_testing.conformance.check_lifecycle": "lifecycle-tests",
 }
 
-RELATIONSHIPS = {"inherits": "inherits", "overrides": "inherits", "imports": "dependency",
-                 "re-exports": "dependency", "calls": "calls"}
+RELATIONSHIPS = {
+    "inherits": "inherits",
+    "overrides": "inherits",
+    "imports": "dependency",
+    "re-exports": "dependency",
+    "calls": "calls",
+}
 GRID_X, GRID_Y, MAX_ROWS = 460, 190, 10
 
 
 def short(text: str, limit: int) -> str:
+    """Collapse whitespace and bound a diagram label's length.
+
+    Examples:
+        >>> short("one   two", 6)
+        'one t…'
+    """
     text = " ".join(text.split())
     return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
 def first_line(node: ast.AST) -> str:
-    doc = ast.get_docstring(node) if isinstance(
-        node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
-    ) else None
+    """Extract the opening docstring line for a diagram description.
+
+    Examples:
+        >>> first_line(ast.parse("'A module summary.'"))
+        'A module summary.'
+    """
+    doc = (
+        ast.get_docstring(node)
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))
+        else None
+    )
     return doc.strip().splitlines()[0] if doc else ""
 
 
@@ -113,10 +133,8 @@ def annotation_names(node: ast.AST | None) -> list[str]:
     names: list[str] = []
     for child in ast.walk(node):
         if isinstance(child, ast.Constant) and isinstance(child.value, str):
-            try:
+            with suppress(SyntaxError):
                 names += annotation_names(ast.parse(child.value, mode="eval").body)
-            except SyntaxError:
-                pass
         elif isinstance(child, ast.Name):
             names.append(child.id)
         elif isinstance(child, ast.Attribute):
@@ -127,6 +145,12 @@ def annotation_names(node: ast.AST | None) -> list[str]:
 
 
 def dotted_name(node: ast.AST) -> str | None:
+    """Read a static attribute chain without evaluating the expression.
+
+    Examples:
+        >>> dotted_name(ast.parse("module.Class", mode="eval").body)
+        'module.Class'
+    """
     parts: list[str] = []
     while isinstance(node, ast.Attribute):
         parts.append(node.attr)
@@ -138,6 +162,12 @@ def dotted_name(node: ast.AST) -> str | None:
 
 
 def signature(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
+    """Render a callable's signature for its diagram description.
+
+    Examples:
+        >>> signature(ast.parse("def read() -> int: ...").body[0])
+        'read() -> int'
+    """
     args = ast.unparse(node.args)
     returns = f" -> {ast.unparse(node.returns)}" if node.returns else ""
     prefix = "async " if isinstance(node, ast.AsyncFunctionDef) else ""
@@ -161,6 +191,8 @@ def top_level_statements(body: list[ast.stmt]):
 
 @dataclass
 class Member:
+    """Keep a Python symbol's source evidence and diagram ownership together."""
+
     qualname: str
     kind: str
     name: str
@@ -172,11 +204,13 @@ class Member:
     ref: str = ""
     home: str = ""
     tags: list[str] = field(default_factory=list)
-    members: dict[str, "Member"] = field(default_factory=dict)
+    members: dict[str, Member] = field(default_factory=dict)
 
 
 @dataclass
 class Module:
+    """Hold a parsed module and the imports and symbols used to resolve edges."""
+
     dotted: str
     path: Path
     tree: ast.Module
@@ -192,6 +226,12 @@ used_refs: set[str] = set(MODULE_REFS.values())
 
 
 def make_ref(qualname: str, kind: str) -> str:
+    """Allocate a lowercase diagram reference, preserving curated symbol refs.
+
+    Examples:
+        >>> make_ref("demo.Example", "class")
+        'demo.example'
+    """
     if qualname in SYMBOL_REFS:
         used_refs.add(SYMBOL_REFS[qualname])
         return SYMBOL_REFS[qualname]
@@ -204,11 +244,24 @@ def make_ref(qualname: str, kind: str) -> str:
 
 
 def private_tag(name: str) -> list[str]:
+    """Mark private symbols without hiding Python's special methods.
+
+    Examples:
+        >>> private_tag("_helper"), private_tag("__init__")
+        (['private'], [])
+    """
     is_dunder = name.startswith("__") and name.endswith("__")
     return ["private"] if name.startswith("_") and not is_dunder else []
 
 
 def load_modules() -> None:
+    """Populate the module index by parsing the configured source roots.
+
+    Examples:
+        From the repository root, before resolving symbols:
+
+        >>> load_modules()  # doctest: +SKIP
+    """
     for src, relative, layer in ROOTS:
         for path in sorted((src / relative).rglob("*.py")):
             parts = path.relative_to(src).with_suffix("").parts
@@ -222,6 +275,14 @@ def load_modules() -> None:
 
 
 def read_imports(module: Module) -> None:
+    """Index absolute imports for later static name resolution.
+
+    Examples:
+        >>> module = Module("demo", Path("demo.py"), ast.parse("import ast"), False)
+        >>> read_imports(module)
+        >>> module.imports
+        {'ast': 'ast'}
+    """
     for node in ast.walk(module.tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
@@ -232,16 +293,30 @@ def read_imports(module: Module) -> None:
 
 
 def is_type_alias(stmt: ast.stmt) -> bool:
+    """Recognise explicit aliases and union assignments in the source model.
+
+    Examples:
+        >>> is_type_alias(ast.parse("type Reading = int | float").body[0])
+        True
+    """
     if isinstance(stmt, ast.TypeAlias):
         return True
     if isinstance(stmt, ast.AnnAssign):
         return "TypeAlias" in annotation_names(stmt.annotation)
-    return isinstance(stmt, ast.Assign) and isinstance(stmt.value, ast.BinOp) and isinstance(
-        stmt.value.op, ast.BitOr
+    return (
+        isinstance(stmt, ast.Assign)
+        and isinstance(stmt.value, ast.BinOp)
+        and isinstance(stmt.value.op, ast.BitOr)
     )
 
 
 def statement_targets(stmt: ast.stmt) -> list[str]:
+    """List names defined by assignments or type aliases for symbol discovery.
+
+    Examples:
+        >>> statement_targets(ast.parse("count: int = 1").body[0])
+        ['count']
+    """
     if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
         return [stmt.target.id]
     if isinstance(stmt, ast.Assign):
@@ -257,10 +332,24 @@ def statement_targets(stmt: ast.stmt) -> list[str]:
 
 
 def typed_name(name: str, annotation: ast.AST | None) -> str:
+    """Add a source annotation to a diagram label within its length budget.
+
+    Examples:
+        >>> typed_name("count", ast.parse("int", mode="eval").body)
+        'count: int'
+    """
     return short(f"{name}: {ast.unparse(annotation)}" if annotation else name, 70)
 
 
 def read_class(module: Module, cls: ast.ClassDef) -> Member:
+    """Collect a class and its declared or instance-assigned diagram members.
+
+    Examples:
+        >>> tree = ast.parse("class Sample: value: int")
+        >>> module = Module("demo", Path("demo.py"), tree, False)
+        >>> sorted(read_class(module, tree.body[0]).members)
+        ['value']
+    """
     qualname = f"{module.dotted}.{cls.name}"
     path = module.path.as_posix()
     bases = ", ".join(ast.unparse(base) for base in cls.bases)
@@ -273,18 +362,35 @@ def read_class(module: Module, cls: ast.ClassDef) -> Member:
     summary = first_line(cls)
     header = f"class {cls.name}({bases})" if bases else f"class {cls.name}"
     member = Member(
-        qualname, "class", cls.name, f"{header}. {summary}".strip(),
-        f"{path}#{cls.name}", cls.lineno, cls, tags=tags, home=module.dotted,
+        qualname,
+        "class",
+        cls.name,
+        f"{header}. {summary}".strip(),
+        f"{path}#{cls.name}",
+        cls.lineno,
+        cls,
+        tags=tags,
+        home=module.dotted,
     )
     member.ref = make_ref(qualname, "class")
 
-    def add(name: str, kind: str, label: str, description: str, line: int, node=None, annotation=None):
+    def add(
+        name: str, kind: str, label: str, description: str, line: int, node=None, annotation=None
+    ):
         if name in member.members:
             return
         full = f"{qualname}.{name}"
         child = Member(
-            full, kind, label, description, f"{path}#{cls.name}.{name}", line, node,
-            annotation, tags=private_tag(name), home=module.dotted,
+            full,
+            kind,
+            label,
+            description,
+            f"{path}#{cls.name}.{name}",
+            line,
+            node,
+            annotation,
+            tags=private_tag(name),
+            home=module.dotted,
         )
         child.ref = make_ref(full, kind)
         member.members[name] = child
@@ -294,18 +400,41 @@ def read_class(module: Module, cls: ast.ClassDef) -> Member:
             decos = [ast.unparse(d) for d in stmt.decorator_list]
             if any(d.endswith("overload") for d in decos):
                 continue
-            is_property = any(d in ("property", "cached_property") or d.endswith(".setter") for d in decos)
+            is_property = any(
+                d in ("property", "cached_property") or d.endswith(".setter") for d in decos
+            )
             kind = "property" if is_property else "method"
             returns = f" -> {ast.unparse(stmt.returns)}" if stmt.returns else ""
             label = short(f"{stmt.name}{returns}" if is_property else f"{stmt.name}(){returns}", 70)
-            add(stmt.name, kind, label, f"{signature(stmt)}. {first_line(stmt)}".strip(), stmt.lineno, stmt)
+            add(
+                stmt.name,
+                kind,
+                label,
+                f"{signature(stmt)}. {first_line(stmt)}".strip(),
+                stmt.lineno,
+                stmt,
+            )
         elif isinstance(stmt, ast.ClassDef):
-            add(stmt.name, "class", stmt.name, f"Nested class. {first_line(stmt)}".strip(), stmt.lineno, stmt)
+            add(
+                stmt.name,
+                "class",
+                stmt.name,
+                f"Nested class. {first_line(stmt)}".strip(),
+                stmt.lineno,
+                stmt,
+            )
         else:
             annotation = stmt.annotation if isinstance(stmt, ast.AnnAssign) else None
             for name in statement_targets(stmt):
-                add(name, "attribute", typed_name(name, annotation), f"Class attribute of {cls.name}.",
-                    stmt.lineno, stmt, annotation)
+                add(
+                    name,
+                    "attribute",
+                    typed_name(name, annotation),
+                    f"Class attribute of {cls.name}.",
+                    stmt.lineno,
+                    stmt,
+                    annotation,
+                )
     # Instance attributes assigned through self; an unannotated one takes its type from
     # the parameter or constructor call that supplies it.
     for function in ast.walk(cls):
@@ -313,13 +442,18 @@ def read_class(module: Module, cls: ast.ClassDef) -> Member:
             continue
         parameters = {a.arg: a.annotation for a in [*function.args.args, *function.args.kwonlyargs]}
         for stmt in ast.walk(function):
+            if not isinstance(stmt, (ast.Assign, ast.AnnAssign)):
+                continue
             target, declared, value = None, None, getattr(stmt, "value", None)
             if isinstance(stmt, ast.AnnAssign):
                 target, declared = stmt.target, stmt.annotation
             elif isinstance(stmt, ast.Assign) and len(stmt.targets) == 1:
                 target = stmt.targets[0]
-            if not (isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name)
-                    and target.value.id == "self"):
+            if not (
+                isinstance(target, ast.Attribute)
+                and isinstance(target.value, ast.Name)
+                and target.value.id == "self"
+            ):
                 continue
             inferred = declared
             if inferred is None and isinstance(value, ast.Name):
@@ -329,12 +463,27 @@ def read_class(module: Module, cls: ast.ClassDef) -> Member:
             shown = declared
             if shown is None and isinstance(value, ast.Name):
                 shown = parameters.get(value.id)
-            add(target.attr, "attribute", typed_name(target.attr, shown),
-                f"Instance attribute of {cls.name}.", stmt.lineno, stmt, inferred)
+            add(
+                target.attr,
+                "attribute",
+                typed_name(target.attr, shown),
+                f"Instance attribute of {cls.name}.",
+                stmt.lineno,
+                stmt,
+                inferred,
+            )
     return member
 
 
 def read_symbols(module: Module) -> None:
+    """Index module-level symbols and their nested class members.
+
+    Examples:
+        >>> module = Module("demo", Path("demo.py"), ast.parse("COUNT = 1"), False)
+        >>> read_symbols(module)
+        >>> list(module.symbols)
+        ['COUNT']
+    """
     path = module.path.as_posix()
     for stmt in top_level_statements(module.tree.body):
         if isinstance(stmt, ast.ClassDef):
@@ -345,9 +494,15 @@ def read_symbols(module: Module) -> None:
             full = f"{module.dotted}.{stmt.name}"
             returns = f" -> {ast.unparse(stmt.returns)}" if stmt.returns else ""
             symbol = Member(
-                full, "function", short(f"{stmt.name}(){returns}", 70),
-                f"{signature(stmt)}. {first_line(stmt)}".strip(), f"{path}#{stmt.name}", stmt.lineno,
-                stmt, tags=private_tag(stmt.name), home=module.dotted,
+                full,
+                "function",
+                short(f"{stmt.name}(){returns}", 70),
+                f"{signature(stmt)}. {first_line(stmt)}".strip(),
+                f"{path}#{stmt.name}",
+                stmt.lineno,
+                stmt,
+                tags=private_tag(stmt.name),
+                home=module.dotted,
             )
             symbol.ref = make_ref(full, "function")
             module.symbols[stmt.name] = symbol
@@ -360,8 +515,15 @@ def read_symbols(module: Module) -> None:
                 kind = "type-alias" if is_type_alias(stmt) else "global"
                 word = "Type alias" if kind == "type-alias" else "Module global"
                 symbol = Member(
-                    full, kind, typed_name(name, annotation), f"{word} in {module.dotted}.",
-                    f"{path}#{name}", stmt.lineno, stmt, annotation, tags=private_tag(name),
+                    full,
+                    kind,
+                    typed_name(name, annotation),
+                    f"{word} in {module.dotted}.",
+                    f"{path}#{name}",
+                    stmt.lineno,
+                    stmt,
+                    annotation,
+                    tags=private_tag(name),
                     home=module.dotted,
                 )
                 symbol.ref = make_ref(full, kind)
@@ -389,6 +551,13 @@ def locate(qualified: str, depth: int = 0) -> Member | Module | str | None:
 
 
 def resolve(module: Module, name: str) -> Member | Module | str | None:
+    """Resolve a name through a module's definitions and imported aliases.
+
+    Examples:
+        >>> module = Module("demo", Path("demo.py"), ast.parse(""), False)
+        >>> resolve(module, "unknown") is None
+        True
+    """
     head, _, rest = name.partition(".")
     if head in module.symbols:
         qualified = module.symbols[head].qualname
@@ -420,6 +589,8 @@ def member_of(cls: Member, name: str, seen: set[str] | None = None) -> Member | 
 
 @dataclass
 class Edge:
+    """Accumulate distinct relationship verbs and their supporting source lines."""
+
     verbs: list[str] = field(default_factory=list)
     lines: list[int] = field(default_factory=list)
 
@@ -429,6 +600,13 @@ source_of: dict[tuple[str, str, str], str] = {}
 
 
 def connect(view: str, source: str, target: str, verb: str, line: int, path: Path) -> None:
+    """Merge source-backed evidence into a connector, ignoring self-edges.
+
+    Examples:
+        >>> connect("demo", "a", "b", "calls", 1, Path("demo.py"))
+        >>> edges[("demo", "a", "b")].verbs
+        ['calls']
+    """
     if source == target:
         return
     edge = edges[(view, source, target)]
@@ -440,10 +618,23 @@ def connect(view: str, source: str, target: str, verb: str, line: int, path: Pat
 
 
 def ref_of(found: Member | Module | str) -> str:
+    """Normalise a resolved symbol or external reference into a connector ref.
+
+    Examples:
+        >>> ref_of("external-api")
+        'external-api'
+    """
     return found if isinstance(found, str) else found.ref
 
 
 def class_type_of(module: Module, annotation: ast.AST | None) -> Member | None:
+    """Find a known class in an annotation for conservative type inference.
+
+    Examples:
+        >>> module = Module("demo", Path("demo.py"), ast.parse(""), False)
+        >>> class_type_of(module, None) is None
+        True
+    """
     for name in annotation_names(annotation):
         found = resolve(module, name)
         if isinstance(found, Member) and found.kind == "class":
@@ -463,7 +654,9 @@ def type_of(member: Member | None) -> Member | None:
     return class_type_of(modules[member.home], annotation)
 
 
-def infer(expr: ast.AST, module: Module, local: dict[str, Member], owner: Member | None) -> Member | None:
+def infer(
+    expr: ast.AST, module: Module, local: dict[str, Member], owner: Member | None
+) -> Member | None:
     """Best-effort static class of an expression; None when it cannot be shown."""
     if isinstance(expr, ast.Name):
         if expr.id == "self" and owner:
@@ -488,7 +681,9 @@ def infer(expr: ast.AST, module: Module, local: dict[str, Member], owner: Member
     return None
 
 
-def local_variables(node: ast.AST, module: Module, local: dict[str, Member], owner: Member | None) -> set[str]:
+def local_variables(
+    node: ast.AST, module: Module, local: dict[str, Member], owner: Member | None
+) -> set[str]:
     """Fill ``local`` with inferred variable classes and return every locally bound name."""
     bound: set[str] = set(local)
     for _ in range(2):  # a second pass catches variables built from earlier variables
@@ -523,6 +718,7 @@ def local_variables(node: ast.AST, module: Module, local: dict[str, Member], own
 def scan_callable(module: Module, view: str, member: Member, owner: Member | None) -> None:
     """Record what a function or method's signature and body demonstrably reach."""
     node = member.node
+    assert isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
     path = module.path
     source = member.ref
 
@@ -533,8 +729,12 @@ def scan_callable(module: Module, view: str, member: Member, owner: Member | Non
 
     local: dict[str, Member] = {}
     parameter_names = {"self", "cls"}
-    for arg in [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs,
-                *filter(None, [node.args.vararg, node.args.kwarg])]:
+    for arg in [
+        *node.args.posonlyargs,
+        *node.args.args,
+        *node.args.kwonlyargs,
+        *filter(None, [node.args.vararg, node.args.kwarg]),
+    ]:
         parameter_names.add(arg.arg)
         for name in annotation_names(arg.annotation):
             link(name, f"parameter {arg.arg}", arg.lineno)
@@ -554,10 +754,19 @@ def scan_callable(module: Module, view: str, member: Member, owner: Member | Non
         if tree is not None:
             handled.update(id(sub_node) for sub_node in ast.walk(tree))
 
-    for field_node in [*node.args.defaults, *node.args.kw_defaults, *node.decorator_list, node.returns]:
+    for field_node in [
+        *node.args.defaults,
+        *node.args.kw_defaults,
+        *node.decorator_list,
+        node.returns,
+    ]:
         skip(field_node)
-    for arg in [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs,
-                *filter(None, [node.args.vararg, node.args.kwarg])]:
+    for arg in [
+        *node.args.posonlyargs,
+        *node.args.args,
+        *node.args.kwonlyargs,
+        *filter(None, [node.args.vararg, node.args.kwarg]),
+    ]:
         skip(arg.annotation)
 
     for child in ast.walk(node):
@@ -565,8 +774,14 @@ def scan_callable(module: Module, view: str, member: Member, owner: Member | Non
             func = child.func
             handled.add(id(func))
             line = child.lineno
-            if (isinstance(func, ast.Attribute) and isinstance(func.value, ast.Call)
-                    and isinstance(func.value.func, ast.Name) and func.value.func.id == "super" and owner):
+            if (
+                isinstance(func, ast.Attribute)
+                and isinstance(func.value, ast.Call)
+                and isinstance(func.value.func, ast.Name)
+                and func.value.func.id == "super"
+                and owner
+            ):
+                assert isinstance(owner.node, ast.ClassDef)
                 for base in owner.node.bases:
                     for base_name in annotation_names(base):
                         found = resolve(module, base_name)
@@ -629,7 +844,8 @@ def lift_cross_class_edges() -> None:
     """
     owner_class = {
         child.ref: (symbol.ref, child.qualname.rpartition(".")[2])
-        for module in modules.values() for symbol in module.symbols.values()
+        for module in modules.values()
+        for symbol in module.symbols.values()
         for child in symbol.members.values()
     }
     for key in list(edges):
@@ -663,32 +879,49 @@ def rollup(module: Module) -> None:
     for symbol in module.symbols.values():
         if not symbol.members:
             continue
-        for (view, source, target), edge in list(edges.items()):
+        for (view, _source, target), edge in list(edges.items()):
             if view != symbol.ref:
                 continue
             outer = top_of.get(target, target)
             if outer == symbol.ref:
                 continue
             for verb in edge.verbs:
-                connect(module.ref, symbol.ref, outer, verb.split(" ")[0], edge.lines[0], module.path)
+                connect(
+                    module.ref, symbol.ref, outer, verb.split(" ")[0], edge.lines[0], module.path
+                )
 
 
 def scan_module(module: Module) -> None:
+    """Record inheritance, annotations and callable dependencies for a module.
+
+    Examples:
+        An empty module contributes no relationships:
+
+        >>> scan_module(Module("demo", Path("demo.py"), ast.parse(""), False))
+    """
     path = module.path
     for symbol in module.symbols.values():
         if symbol.kind == "class":
+            assert isinstance(symbol.node, ast.ClassDef)
             for base in symbol.node.bases:
                 for name in annotation_names(base):
                     found = resolve(module, name)
                     if found is not None:
-                        connect(module.ref, symbol.ref, ref_of(found), "inherits", symbol.line, path)
+                        connect(
+                            module.ref, symbol.ref, ref_of(found), "inherits", symbol.line, path
+                        )
             for decorator in symbol.node.decorator_list:
                 for name in annotation_names(decorator):
                     found = resolve(module, name)
                     if found is not None:
-                        connect(module.ref, symbol.ref, ref_of(found), "decorated by", symbol.line, path)
+                        connect(
+                            module.ref, symbol.ref, ref_of(found), "decorated by", symbol.line, path
+                        )
             for child in symbol.members.values():
-                if child.kind in ("method", "property") and child.qualname.rpartition(".")[2] != "__init__":
+                if (
+                    child.kind in ("method", "property")
+                    and child.qualname.rpartition(".")[2] != "__init__"
+                ):
                     bare = child.qualname.rpartition(".")[2]
                     for base in symbol.node.bases:
                         for name in annotation_names(base):
@@ -696,12 +929,21 @@ def scan_module(module: Module) -> None:
                             if isinstance(found, Member) and found.kind == "class":
                                 overridden = member_of(found, bare)
                                 if overridden:
-                                    connect(symbol.ref, child.ref, overridden.ref, "overrides", child.line, path)
+                                    connect(
+                                        symbol.ref,
+                                        child.ref,
+                                        overridden.ref,
+                                        "overrides",
+                                        child.line,
+                                        path,
+                                    )
                 if child.kind == "attribute":
                     for name in annotation_names(child.annotation):
                         found = resolve(module, name)
                         if found is not None and getattr(found, "kind", "") != "function":
-                            connect(symbol.ref, child.ref, ref_of(found), "typed as", child.line, path)
+                            connect(
+                                symbol.ref, child.ref, ref_of(found), "typed as", child.line, path
+                            )
                 elif child.kind in ("method", "property"):
                     scan_callable(module, symbol.ref, child, symbol)
         elif symbol.kind == "function":
@@ -714,8 +956,14 @@ def scan_module(module: Module) -> None:
             value = getattr(symbol.node, "value", None)
             if symbol.qualname.endswith(".__all__"):
                 # Exports would pull every public symbol into the package view.
-                exported = [c.value for c in ast.walk(value) if isinstance(c, ast.Constant)] if value else []
-                symbol.description = f"Public API of {module.dotted}: {', '.join(map(str, exported))}."
+                exported = (
+                    [c.value for c in ast.walk(value) if isinstance(c, ast.Constant)]
+                    if value
+                    else []
+                )
+                symbol.description = (
+                    f"Public API of {module.dotted}: {', '.join(map(str, exported))}."
+                )
                 continue
             for name in annotation_names(value):
                 found = resolve(module, name)
@@ -743,7 +991,8 @@ def scan_imports(module: Module, parent_ref: str) -> None:
         shown = ", ".join(names[:3]) + (f" +{len(names) - 3}" if len(names) > 3 else "")
         edge = edges[(parent_ref, module.ref, target)]
         reexport = module.is_package and any(
-            m.ref == target and m.dotted.startswith(module.dotted + ".") for m in modules.values())
+            m.ref == target and m.dotted.startswith(module.dotted + ".") for m in modules.values()
+        )
         edge.verbs.append(f"{'re-exports' if reexport else 'imports'} {shown}")
         edge.lines.append(1)
         source_of[(parent_ref, module.ref, target)] = module.path.as_posix()
@@ -757,7 +1006,7 @@ def layout(refs: list[str], view: str) -> dict[str, tuple[int, int]]:
     """Longest-path ranks left to right, wrapped so no column gets too tall."""
     local = set(refs)
     outgoing: dict[str, set[str]] = defaultdict(set)
-    for (edge_view, source, target) in edges:
+    for edge_view, source, target in edges:
         if edge_view == view and source in local and target in local:
             outgoing[source].add(target)
     rank = {ref: 0 for ref in refs}
@@ -778,16 +1027,27 @@ def layout(refs: list[str], view: str) -> dict[str, tuple[int, int]]:
     for column in sorted(columns):
         members = columns[column]
         for start in range(0, len(members), MAX_ROWS):
-            for row, ref in enumerate(members[start: start + MAX_ROWS]):
+            for row, ref in enumerate(members[start : start + MAX_ROWS]):
                 positions[ref] = (x * GRID_X, row * GRID_Y)
             x += 1
     return positions
 
 
 def element(name, kind, description, file_path, parent, position, tags, layer, view_label=None):
+    """Build one tlDiagram element with its source link and owning placement.
+
+    Examples:
+        >>> item = element("demo", "module", "Example", "demo.py", "root", (0, 0), [], "kernel")
+        >>> item["placements"][0]["parent"]
+        'root'
+    """
     item = {
-        "name": name, "kind": kind, "technology": "Python", "description": description,
-        "file_path": file_path, "logo_url": PYTHON_ICON,
+        "name": name,
+        "kind": kind,
+        "technology": "Python",
+        "description": description,
+        "file_path": file_path,
+        "logo_url": PYTHON_ICON,
         "tags": sorted({"implemented", layer, *tags}),
         "placements": [{"parent": parent, "position_x": position[0], "position_y": position[1]}],
     }
@@ -798,6 +1058,12 @@ def element(name, kind, description, file_path, parent, position, tags, layer, v
 
 
 def parent_of(module: Module) -> Module | None:
+    """Find a module's containing package in the parsed source index.
+
+    Examples:
+        >>> parent_of(Module("demo", Path("demo.py"), ast.parse(""), False)) is None
+        True
+    """
     return modules.get(module.dotted.rpartition(".")[0])
 
 
@@ -807,6 +1073,7 @@ def merge_curated(curated: dict, owner_view: dict[str, str]) -> list[dict]:
     Overview connectors, and those from non-code elements, pass through unchanged and are
     returned. ``owner_view`` maps each generated ref to the view that owns it.
     """
+
     def chain(ref: str) -> set[str]:
         found = set()
         while ref in owner_view:
@@ -820,7 +1087,9 @@ def merge_curated(curated: dict, owner_view: dict[str, str]) -> list[dict]:
         if item["view"] == "root" or source not in owner_view:
             passthrough.append(item)
         elif source in chain(target) or target in chain(source):
-            print(f"curated: dropped {source} -> {target} ({item['label']}): one contains the other")
+            print(
+                f"curated: dropped {source} -> {target} ({item['label']}): one contains the other"
+            )
         else:
             key = (owner_view[source], source, target)
             edges[key]  # creates the connector when the source shows no static evidence for it
@@ -833,6 +1102,13 @@ curated_wording: dict[tuple[str, str, str], dict] = {}
 
 
 def main() -> None:
+    """Generate the complete import, optionally applying it to the local viewer.
+
+    Examples:
+        Run once from the repository root to write the import file:
+
+        >>> main()  # doctest: +SKIP
+    """
     load_modules()
     for module in modules.values():
         read_imports(module)
@@ -863,10 +1139,7 @@ def main() -> None:
     curated = yaml.safe_load(CURATED.read_text(encoding="utf-8"))
     passthrough = merge_curated(curated, owner_view)
 
-    positions = {
-        view: layout(refs, view) for view, refs in list(views.items())
-        if view != "root"
-    }
+    positions = {view: layout(refs, view) for view, refs in list(views.items()) if view != "root"}
 
     elements = {}
     for module in modules.values():
@@ -875,21 +1148,44 @@ def main() -> None:
         kind = "package" if parent is None else "subpackage" if module.is_package else "module"
         summary = first_line(module.tree)
         placement_view = parent.ref if parent else "root"
-        position = positions[placement_view][module.ref] if parent else curated["root_positions"][module.ref]
+        position = (
+            positions[placement_view][module.ref]
+            if parent
+            else curated["root_positions"][module.ref]
+        )
         elements[module.ref] = element(
-            module.dotted, kind, summary or f"Python {kind} {module.dotted}.", path.as_posix(),
-            placement_view, position, [], module.layer, "Modules" if module.is_package else "Members",
+            module.dotted,
+            kind,
+            summary or f"Python {kind} {module.dotted}.",
+            path.as_posix(),
+            placement_view,
+            position,
+            [],
+            module.layer,
+            "Modules" if module.is_package else "Members",
         )
         for symbol in module.symbols.values():
             elements[symbol.ref] = element(
-                symbol.name, symbol.kind, short(symbol.description, 600), symbol.anchor, module.ref,
-                positions[module.ref][symbol.ref], symbol.tags, module.layer,
+                symbol.name,
+                symbol.kind,
+                short(symbol.description, 600),
+                symbol.anchor,
+                module.ref,
+                positions[module.ref][symbol.ref],
+                symbol.tags,
+                module.layer,
                 "Members" if symbol.members else None,
             )
             for child in symbol.members.values():
                 elements[child.ref] = element(
-                    child.name, child.kind, short(child.description, 600), child.anchor, symbol.ref,
-                    positions[symbol.ref][child.ref], child.tags, module.layer,
+                    child.name,
+                    child.kind,
+                    short(child.description, 600),
+                    child.anchor,
+                    symbol.ref,
+                    positions[symbol.ref][child.ref],
+                    child.tags,
+                    module.layer,
                 )
     # tld matches new elements by name and kind, so those must be unique. It also trims the
     # middle of long names, so the distinguishing part goes first and the owner after it.
@@ -897,8 +1193,14 @@ def main() -> None:
     for item in elements.values():
         seen[(item["name"], item["kind"])] += 1
     owners = {s.ref: m.dotted for m in modules.values() for s in m.symbols.values()}
-    owners.update({c.ref: s.qualname for m in modules.values() for s in m.symbols.values()
-                   for c in s.members.values()})
+    owners.update(
+        {
+            c.ref: s.qualname
+            for m in modules.values()
+            for s in m.symbols.values()
+            for c in s.members.values()
+        }
+    )
     for ref, item in elements.items():
         if seen[(item["name"], item["kind"])] > 1 and ref in owners:
             item["name"] = f"{item['name']} · {owners[ref].rpartition('.')[2]}"
@@ -932,26 +1234,48 @@ def main() -> None:
             detail = f" Detected: {found}." if found else ""
             description = f"{wording.get('description', '')}{detail} {evidence}".strip()
         first = verbs[0].split(" ")[0] if verbs else ""
-        connectors.append({
-            "view": view, "source": source, "target": target,
-            "label": short(label, 80), "description": description,
-            "relationship": RELATIONSHIPS.get(first, (wording or {}).get("relationship", "uses")),
-            "direction": "forward", "style": "bezier",
-        })
+        connectors.append(
+            {
+                "view": view,
+                "source": source,
+                "target": target,
+                "label": short(label, 80),
+                "description": description,
+                "relationship": RELATIONSHIPS.get(
+                    first, (wording or {}).get("relationship", "uses")
+                ),
+                "direction": "forward",
+                "style": "bezier",
+            }
+        )
     connectors += passthrough
 
     OUT.write_text(
-        yaml.safe_dump({"elements": elements, "connectors": connectors},
-                       sort_keys=False, allow_unicode=True, width=120),
+        yaml.safe_dump(
+            {"elements": elements, "connectors": connectors},
+            sort_keys=False,
+            allow_unicode=True,
+            width=120,
+        ),
         encoding="utf-8",
     )
     counts: dict[str, int] = defaultdict(int)
     for item in elements.values():
         counts[item.get("kind")] += 1
     off_view = sum(1 for k in edges if k[2] not in views[k[0]])
-    print(dict(counts), "elements:", len(elements), "connectors:", len(connectors), "cross-view:", off_view)
-    print("connectors with hand-written wording but no static evidence:",
-          [k[1:] for k in curated_wording if not edges[k].verbs])
+    print(
+        dict(counts),
+        "elements:",
+        len(elements),
+        "connectors:",
+        len(connectors),
+        "cross-view:",
+        off_view,
+    )
+    print(
+        "connectors with hand-written wording but no static evidence:",
+        [k[1:] for k in curated_wording if not edges[k].verbs],
+    )
     if "--apply" in sys.argv:
         apply()
 
@@ -965,7 +1289,17 @@ def apply() -> None:
     """
     executable = str(Path(os.environ["LOCALAPPDATA"]) / "tld/bin/tld.exe")
     data_dir = Path(os.environ["USERPROFILE"]) / ".local/share/tldiagram"
-    common = ["--workspace", ".", "--target", "local", "--data-dir", str(data_dir), "--format", "json", "--compact"]
+    common = [
+        "--workspace",
+        ".",
+        "--target",
+        "local",
+        "--data-dir",
+        str(data_dir),
+        "--format",
+        "json",
+        "--compact",
+    ]
     subprocess.run([executable, "stop", "--kill"], capture_output=True, timeout=30)
     database = data_dir / "tld.db"
     if database.exists():
@@ -973,11 +1307,20 @@ def apply() -> None:
             [executable, "validate", "--source", "live", *common], capture_output=True, timeout=30
         )  # settles the write-ahead log before the copy
         shutil.copy2(database, data_dir / "tld.db.bak")
-    for path in [database, data_dir / "tld.db-shm", data_dir / "tld.db-wal",
-                 Path(".tld/elements.yaml"), Path(".tld/connectors.yaml"), Path(".tld/.tld.lock")]:
+    for path in [
+        database,
+        data_dir / "tld.db-shm",
+        data_dir / "tld.db-wal",
+        Path(".tld/elements.yaml"),
+        Path(".tld/connectors.yaml"),
+        Path(".tld/.tld.lock"),
+    ]:
         path.unlink(missing_ok=True)
     result = subprocess.run(
-        [executable, "import", str(OUT), *common], capture_output=True, encoding="utf-8", timeout=120
+        [executable, "import", str(OUT), *common],
+        capture_output=True,
+        encoding="utf-8",
+        timeout=120,
     )
     if result.returncode:
         raise SystemExit(f"tld import failed: {(result.stdout + result.stderr)[:600]}")

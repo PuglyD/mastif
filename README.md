@@ -11,6 +11,8 @@ The platform is this shared testing foundation. Organisations choose the deploym
 
 Status: early development. See `docs/plan.md` and `docs/adr/`.
 
+[Read the documentation](https://puglyd.github.io/mastif/) — built from `develop`.
+
 ```
 uv sync
 uv run pytest

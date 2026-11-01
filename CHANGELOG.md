@@ -70,8 +70,12 @@ project uses [Semantic Versioning](https://semver.org/) (see `CONTRIBUTING.md`).
 
 ### Documentation
 
-- Prepared a workflow that builds the docs strictly and deploys to GitHub Pages from
-  `develop`; publication remains on hold.
+- Added a Vesper-compatible, Gruvbox-inspired syntax palette with distinct colours
+  for keywords, functions, types, strings, numbers and decorators in dark and light modes.
+- Added a workflow that builds the docs strictly and deploys to GitHub Pages only from
+  `develop`, including manual deployments; pull requests build without deploying.
+- Brought the diagram generator into the lint and type checks. Kept MkDocs snippet
+  directives outside Python formatting while retaining checks on runnable examples.
 - Reorganised the docs into Getting Started (intro and a tutorial ending in deployment) and
   Learn (concepts, system design, architecture as built, project status, operation, recipes).
 - Rebuilt the homepage around a runnable quick start and the org-centric framing, with

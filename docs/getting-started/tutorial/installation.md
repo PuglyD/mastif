@@ -26,10 +26,12 @@ developed together.
 
 <!-- termynal: {title: "Real commands · clone and sync"} -->
 ```console
-$ git clone https://github.com/PuglyD/mastif.git
+$ git clone --branch develop https://github.com/PuglyD/mastif.git
 $ cd mastif
 $ uv sync --group docs
 ```
+
+These docs track `develop`, so the clone command selects that branch explicitly.
 
 `uv sync` reads the workspace, resolves its dependencies and creates a virtual
 environment in `.venv`. The `docs` group adds what you need to preview this site locally.

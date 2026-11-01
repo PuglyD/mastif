@@ -72,6 +72,9 @@ database holds only this map. It discards edits made in the UI, and view IDs can
 Edges are a lower bound: dynamic dispatch and values with no inferable type are not
 resolved.
 
+The generator participates in the repository's Ruff and ty checks. Its helper examples
+can also be checked with `uv run python -m doctest .tld/generate_architecture.py`.
+
 Nodes cannot be resized in tlDiagram 2.6.0: the UI has no resize control and the schema
 has no size field. Node size follows the content, and long names are trimmed in the middle,
 so names lead with the member. The Python icon comes from `logo_url: /icons/python.svg`.

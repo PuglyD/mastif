@@ -36,9 +36,9 @@ line-length = 100
 target-version = "py312"
 
 [tool.ruff.format]
-# This Python fence contains a MkDocs snippet directive, not Python source.
-# The included docs/examples/first_measurement.py is formatted normally.
-exclude = ["docs/wiki/first-measurement.md"]
+# MkDocs fences mix snippet directives and design-preview fragments with Python.
+# Format runnable sources in docs/examples/; preserve Markdown's authored fences.
+exclude = ["**/*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "SIM", "B", "D"]

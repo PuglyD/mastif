@@ -72,7 +72,7 @@ You need Python 3.12+, Git and [uv](https://docs.astral.sh/uv/). You don't need 
 ### 1. Install
 
 ```console
-git clone https://github.com/PuglyD/mastif.git
+git clone --branch develop https://github.com/PuglyD/mastif.git
 cd mastif
 uv sync
 ```

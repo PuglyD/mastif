@@ -1,9 +1,9 @@
 /* Shared reading and reference styles; Material owns the layout.
    Colours come from the Vesper theme for Obsidian, MIT licence, Copyright (c) 2025 Omar Rashad:
    https://github.com/omarrashad/obsidian-vesper
-   Vesper defines no syntax colours, so those are mapped from its palette. Its light accent
-   (#FFB066) is too faint for text on white, so light mode uses it for fills, and a darker
-   tone of it (#A65A14) for text. The teal #007A66 is darkened from #00D2B0 the same way. */
+   Syntax uses a custom Gruvbox-inspired palette with Vesper's peach and mint accents.
+   Light mode uses darker counterparts for readable code on its pale background.
+   Vesper's light accent (#FFB066) is used for fills, with #A65A14 for link text. */
 
 [data-md-color-scheme="slate"] {
   --md-default-bg-color: #101010;
@@ -25,19 +25,21 @@
   --md-typeset-color: #ffffff;
   --md-typeset-a-color: #ffc799;
   --md-code-bg-color: #1a1a1a;
-  --md-code-fg-color: #ffffff;
-  --md-code-hl-keyword-color: #ffc799;
+  --md-code-fg-color: #e8e3dc;
+  --md-code-hl-keyword-color: #e89b91;
   --md-code-hl-function-color: #ffc799;
-  --md-code-hl-constant-color: #ffc799;
-  --md-code-hl-number-color: #ffc799;
-  --md-code-hl-special-color: #ffc799;
+  --md-code-hl-constant-color: #c5afe8;
+  --md-code-hl-number-color: #c5afe8;
+  --md-code-hl-special-color: #9fc8e5;
   --md-code-hl-string-color: #99ffe4;
-  --md-code-hl-name-color: #ffffff;
-  --md-code-hl-variable-color: #ffffff;
-  --md-code-hl-generic-color: #a0a0a0;
-  --md-code-hl-operator-color: #a0a0a0;
-  --md-code-hl-punctuation-color: #a0a0a0;
-  --md-code-hl-comment-color: #a0a0a0;
+  --md-code-hl-name-color: #e8e3dc;
+  --md-code-hl-variable-color: #e8e3dc;
+  --md-code-hl-generic-color: #e8e3dc;
+  --md-code-hl-operator-color: #c9bfb3;
+  --md-code-hl-punctuation-color: #b5ada3;
+  --md-code-hl-comment-color: #96928c;
+  --mastif-code-type-color: #e6d18a;
+  --mastif-code-decorator-color: #9fc8e5;
   --md-footer-bg-color: #101010;
   --md-footer-bg-color--dark: #0a0a0a;
   --mastif-accent-fill: #ffc799;
@@ -65,19 +67,21 @@
   --md-typeset-color: #1a1a1a;
   --md-typeset-a-color: #a65a14;
   --md-code-bg-color: #fafafa;
-  --md-code-fg-color: #1a1a1a;
-  --md-code-hl-keyword-color: #a65a14;
-  --md-code-hl-function-color: #a65a14;
-  --md-code-hl-constant-color: #a65a14;
-  --md-code-hl-number-color: #a65a14;
-  --md-code-hl-special-color: #a65a14;
-  --md-code-hl-string-color: #007a66;
-  --md-code-hl-name-color: #1a1a1a;
-  --md-code-hl-variable-color: #1a1a1a;
-  --md-code-hl-generic-color: #777777;
-  --md-code-hl-operator-color: #777777;
-  --md-code-hl-punctuation-color: #777777;
-  --md-code-hl-comment-color: #777777;
+  --md-code-fg-color: #292522;
+  --md-code-hl-keyword-color: #a23e38;
+  --md-code-hl-function-color: #945116;
+  --md-code-hl-constant-color: #7952a3;
+  --md-code-hl-number-color: #7952a3;
+  --md-code-hl-special-color: #37698f;
+  --md-code-hl-string-color: #006f58;
+  --md-code-hl-name-color: #292522;
+  --md-code-hl-variable-color: #292522;
+  --md-code-hl-generic-color: #292522;
+  --md-code-hl-operator-color: #655b50;
+  --md-code-hl-punctuation-color: #70675d;
+  --md-code-hl-comment-color: #706a63;
+  --mastif-code-type-color: #78600e;
+  --mastif-code-decorator-color: #37698f;
   --md-footer-bg-color: #1a1a1a;
   --md-footer-bg-color--dark: #101010;
   --mastif-accent-fill: #ffb066;
@@ -87,6 +91,30 @@
   --mastif-symbol-function: #007a66;
   --mastif-symbol-attribute: #5f5f5f;
 }
+
+/* Material groups classes with functions, decorators with keywords, and keyword
+   constants with ordinary names. Split those Pygments tokens explicitly. These
+   selectors also apply to highlighted inline code and mkdocstrings signatures. */
+.highlight .nc,
+.highlight .ne,
+.highlight .kt,
+.highlight .nb { color: var(--mastif-code-type-color); }
+
+.highlight .nf,
+.highlight .fm { color: var(--md-code-hl-function-color); }
+
+.highlight .nd,
+.highlight .nn { color: var(--mastif-code-decorator-color); }
+
+.highlight .kc,
+.highlight .no { color: var(--md-code-hl-constant-color); }
+
+.highlight .bp { color: var(--md-code-hl-name-color); }
+
+/* Configuration keys are labels rather than language control-flow keywords. */
+.language-yaml.highlight .nt,
+.language-json.highlight .nt,
+.language-toml.highlight .na { color: var(--mastif-code-decorator-color); }
 
 ::selection { background-color: var(--mastif-selection); }
 
